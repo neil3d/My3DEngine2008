@@ -2,7 +2,9 @@
 using System.ComponentModel;
 using System.Text;
 using System.Collections;
+using System.Collections.Generic;
 using NexusEditor.Design;
+using NexusEngine;
 
 namespace NexusEditor.ResourceEditor
 {
@@ -15,11 +17,11 @@ namespace NexusEditor.ResourceEditor
         private int numVertices;
         private int numSection;
         private int numTriangles;
-        private MaterialPropertyCollection secMtl;
+        private List<NResourceLoc> secMtl;
 
         public MeshLODInfo()
         {
-            secMtl = new MaterialPropertyCollection();
+			secMtl = new List<NResourceLoc>();
         }
 
         [ReadOnly(true)]
@@ -44,7 +46,7 @@ namespace NexusEditor.ResourceEditor
         }
 
         [ReadOnly(true)]
-        public MaterialPropertyCollection Materials
+        public List<NResourceLoc> Materials
         {
             get { return secMtl; }
         }

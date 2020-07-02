@@ -14,6 +14,7 @@ namespace NexusEngine
 {
 	ref class NFileSystem;
 	ref class NRenderElement;	
+	ref class NRenderResourceManager;
 
 	//!	引擎配置
 	public ref struct NEngineConfig
@@ -25,12 +26,15 @@ namespace NexusEngine
 		System::Byte	ColorBits;
 		bool			FullScreen;
 		bool			EnableHDR;
+		bool			EnableSSAO;
 
 		//-- Native Engine设置
 		System::String^	RenderClass;
 		System::String^ FileSystemClass;
 		System::String^ FileSystemRoot;
 		System::String^ EngineDataPkg;
+		System::String^ ResourceCacheClass;
+		System::String^ ResourceIOClass;
 
 		void ToNative(engine_config& cfg);
 	};
@@ -55,25 +59,36 @@ namespace NexusEngine
 		//! 关闭引擎,执行最后的清理
 		virtual void Close();
 
+		//! 开始游戏
+		virtual void BeginPlay();
+
 		//-- 关卡管理接口 -------------------------------------------------------------
 		//!	创建一个新的空白关卡,关卡的名称要求是唯一的
-		NLevel^ CreateLevel(System::String^ lvName, System::String^ nativeClassName);
+		virtual NLevel^ CreateLevel(System::String^ lvName, System::String^ nativeClassName);
 
 		//! 销毁某个Level, 相当于Dispose, 即使外部仍持有NLevel对象引用, 其内容也已经不可用;
-		void DestroyLevel(NLevel^ lv);
+		virtual void DestroyLevel(NLevel^ lv);
 
 		//!	销毁指定名称的Level
-		void DestroyLevel(System::String^ lvName);
+		virtual void DestroyLevel(System::String^ lvName);
 
 		//!	从指定的文件系统目录读入关卡
-		NLevel^ LoadLevel(NResourceLoc^ loc);
+		virtual NLevel^ LoadLevel(NResourceLoc^ loc);
 
 		//!	将指定名称的Level存入文件系统的某个目录
-		void SaveLevel(System::String^ lvName, NResourceLoc^ loc);
+		virtual void SaveLevel(System::String^ lvName, NResourceLoc^ loc);
+
+		//!	将指定名称的Level导出到某个目录
+		virtual void ExportLevel(System::String^ lvName, NResourceLoc^ loc);
 
 		property NFileSystem^ FileSystem
 		{
 			NFileSystem^ get()	{	return m_fileSys;}
+		}
+
+		property NRenderResourceManager^ RenderResManager
+		{
+			NRenderResourceManager^ get() { return m_renderResourceManager; }
 		}
 		
 		property NEngineConfig^ Config
@@ -84,6 +99,7 @@ namespace NexusEngine
 		static NEngine^ s_instance;
 		NFileSystem^	m_fileSys;
 		NEngineConfig^	m_config;
+		NRenderResourceManager^ m_renderResourceManager;
 
 	protected:
 		System::Collections::Generic::Dictionary<System::String^, NLevel^>^	m_levelDict;

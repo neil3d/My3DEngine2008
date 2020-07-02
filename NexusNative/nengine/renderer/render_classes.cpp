@@ -1,14 +1,10 @@
 #include "StdAfx.h"
 #include "renderer_framework.h"
 #include "../framework/nengine.h"
-#include "../material/nmaterial.h"
+#include "../material/nmtl_base.h"
 
 namespace nexus
 {
-	nDEFINE_VIRTUAL_CLASS(nrender_light_proxy, nobject)
-	nDEFINE_CLASS(npoint_light_proxy, nrender_light_proxy)
-	nDEFINE_CLASS(ndirectional_light_proxy, nrender_light_proxy)
-
 	nDEFINE_VIRTUAL_CLASS(nrenderer_base, nsubsystem);
 	nDEFINE_VIRTUAL_CLASS(nrender_resource_manager, nsubsystem)
 
@@ -28,6 +24,7 @@ namespace nexus
 	nDEFINE_VIRTUAL_CLASS(nrender_anim_mesh, nrender_mesh)
 	nDEFINE_VIRTUAL_CLASS(nrender_cpu_skin_mesh, nrender_mesh)
 	nDEFINE_VIRTUAL_CLASS(nrender_dynamic_mesh_indexed, nrender_mesh)
+	nDEFINE_VIRTUAL_CLASS(nrender_dynamic_mesh, nrender_mesh)
 
 	nDEFINE_VIRTUAL_CLASS(nrender_texture, nrender_resource)
 	nDEFINE_VIRTUAL_CLASS(nrender_texture2D, nrender_texture)
@@ -43,15 +40,10 @@ namespace nexus
 	void nrender_resource::release()
 	{
 		nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
-		rres_mgr->free_resource(this);
+		if(rres_mgr)
+		{
+			rres_mgr->free_resource(this);
+		}
 	}
 
-	enum ETransparentType nrender_proxy::get_transparent_type(int lod, int mesh_sec) const
-	{
-		nmaterial_base* mtl = get_material(lod, mesh_sec);
-		if( mtl )
-			return mtl->get_trans_type();
-		else
-			return ETrans_Opaque;
-	}
 }

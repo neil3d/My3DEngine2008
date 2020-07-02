@@ -23,11 +23,11 @@ namespace nexus
 		m_stream_stride.clear();
 	}
 
-	void d3d9_vertex_factory::draw_set_full()
+	bool d3d9_vertex_factory::draw_set_full()
 	{
 		if(m_vert_streams.size() <= 0
 			|| m_type==NULL)
-			return;
+			return false;
 
 		m_type->draw_set_vert_decl();		
 
@@ -35,11 +35,16 @@ namespace nexus
 
 		for(UINT i=0; i<m_vert_streams.size(); i++)
 		{
-			d3d_device->SetStreamSource(i, m_vert_streams[i].get(), 0, m_stream_stride[i]);
+			if ( FAILED(d3d_device->SetStreamSource(i, m_vert_streams[i].get(), 0, m_stream_stride[i])))
+			{
+				return false;
+			}
 		}
+
+		return true;
 	}
 
-	d3d_vb_ptr d3d9_vertex_factory::create_d3d_vb_from_stream(const vertex_stream* stream, D3DPOOL pool, bool init_copy)
+	d3d_vb_ptr create_d3d_vb_from_stream(const vertex_stream* stream, D3DPOOL pool, bool init_copy)
 	{
 		IDirect3DDevice9* d3d_device = d3d_device_manager::instance()->get_device();
 

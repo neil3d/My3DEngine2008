@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "timer/ntimestamp.h"
 
 /*
 #ifdef _MANAGED
@@ -22,7 +23,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 */
 
+
+
 nCoreAPI void nexus_init_core()
 {
-	
 }

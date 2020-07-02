@@ -3,21 +3,19 @@
 
 namespace nexus
 {
-	const float WORLD_MAX		=	524288.0;	/* Maximum size of the world */
-	const float HALF_WORLD_MAX	=	262144.0;	/* Half the maximum size of the world */
-	const float HALF_WORLD_MAX1	=	262143.0;	/* Half the maximum size of the world - 1*/
-
-	// result from a collision check.
-	struct ncheck_result
+	/// line_check参数
+	enum ELineCheckType
 	{
-		vector3	location;
-		vector3	normal;
-		float	dist;
+		ELCT_Static		= (1<<1),		 //!< 只检测静态的物体
+		ELCT_Dynamic	= (1<<2),		 //!< 只检测动态的物体
 
-		ncheck_result(void)
-		{
-			dist = std::numeric_limits<float>::max();
-		}
+		ELCT_Terrain	= (1<<3),		 //!< 只检测地形
+		ELCT_Navigation	= (1<<4),		 //!< 只检测导航图
+
+		// combinations.
+		ELCT_World		= ELCT_Static | ELCT_Terrain,
+
+		ELCT_All = 0x7FFFFFFF
 	};
 }
 

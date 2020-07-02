@@ -44,12 +44,12 @@ namespace NexusEngine
 		numTri = num_tri;
 	}
 
-	NMaterialBase^ NResourceAnimMesh::GetMaterial(int lod, int sec)
+	NMtlBase^ NResourceAnimMesh::GetMaterial(int lod, int sec)
 	{
-		nmaterial_base::ptr mtl = NativePtr->get_material(lod, sec);
+		nmtl_base::ptr mtl = NativePtr->get_material(lod, sec);
 
 		if( mtl )
-			return NMaterialBase::FromNativePtr(mtl);
+			return NMtlBase::FromNativePtr(mtl);
 		else
 			return nullptr;
 	}
@@ -59,7 +59,7 @@ namespace NexusEngine
 		return NativePtr->get_num_section(lod);
 	}
 
-	void NResourceAnimMesh::ImportSetMaterial(int lod, int sec, NMaterialBase^ mtl)
+	void NResourceAnimMesh::ImportSetMaterial(int lod, int sec, NMtlBase^ mtl)
 	{
 		if( mtl == nullptr )
 		{

@@ -14,13 +14,10 @@ namespace nexus
 
 		virtual bool empty() const	{	return m_objs.empty();}
 		virtual void clear()		{	return m_objs.clear(); }
-		virtual void add_obj(const nrender_proxy* obj)
+
+		virtual void draw_all(const nview_info* view, drawing_policy* dp, drawing_filter* filter=NULL)
 		{
-			m_objs.push_back( obj );
-		}
-		virtual void draw_all(const d3d_view_info* view, drawing_policy* dp, drawing_filter* filter=NULL)
-		{
-			for(proxy_vector::iterator iter = m_objs.begin();
+		/*	for(st_proxy_vector::iterator iter = m_objs.begin();
 				iter != m_objs.end();
 				++iter)
 			{
@@ -29,13 +26,18 @@ namespace nexus
 				{
 					if( !filter->should_draw(obj) )
 						continue;
-				}				
-				dp->draw_mesh(view, obj);
-			}
+				}		
+
+				obj->draw_elements(view,dp);
+			}*/
 		}
 
+	/*	virtual const st_proxy_vector& get_proxys()
+		{
+			return m_objs;
+		}*/
+
 	private:
-		proxy_vector	m_objs;
 	};
 }//namespace nexus
 #endif //_NEXUS_RENDER_GROUP_PLAIN_H_

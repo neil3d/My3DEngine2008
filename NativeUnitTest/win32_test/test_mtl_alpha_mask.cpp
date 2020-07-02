@@ -43,6 +43,7 @@ nactor::ptr _load_sun_char_head(nlevel::ptr level_ptr, box_sphere_bounds& bounds
 	mtl_ptr2->set_int_param(_T("MTL_AlphaMask")	, 250);
 
 	mesh_ptr->import_set_material(0, 1, mtl_ptr2);
+	mesh_ptr->post_edit_change(true);
 
 	//-- add to level 
 	nactor::ptr actor_ptr = level_ptr->create_actor(_T("sun_girl_actor"));

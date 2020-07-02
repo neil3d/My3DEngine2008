@@ -46,6 +46,12 @@ void test_sample_mesh::open(perspective_camera_controller* cam)
 	//--
 	mesh_ptr->generate_simple_mesh();
 	m_comp_ptr = comp_ptr;
+
+	// 创建物理
+	mesh_ptr->set_pretriangle_collision(false);
+	m_comp_ptr->m_disable_all_rigidbody = false;
+
+	nengine::instance()->begin_play();
 }
 
 void test_sample_mesh::debug_draw(nrender_primitive_draw_interface* PDI)

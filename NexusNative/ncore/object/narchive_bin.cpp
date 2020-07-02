@@ -13,6 +13,23 @@ namespace nexus
 		return narchive::ptr(nNew narchive_bin_reader);
 	}
 
+	narchive::ptr narchive::open_bin_archive(nfile_system* fs, enum EFileMode mode, const nstring& pkg, const nstring& filename)
+	{
+		nfile::ptr fp = fs->open_file(pkg, filename, mode);
+		narchive::ptr ap;
+		if (mode == EFileRead)
+			ap = create_bin_reader();		
+		else if (mode == EFileWrite)
+			ap = create_bin_writer();
+		else
+		{
+			nASSERT(0 && "bad file io mode");
+		}
+
+		ap->open(fp);
+		return ap;
+	}
+
 	narchive_bin_writer::narchive_bin_writer(void)
 	{
 	}
@@ -129,6 +146,11 @@ namespace nexus
 		return buffer_size;
 	}
 
+	void narchive_bin_writer::object_description( const TCHAR* desc_name,nstring& description )
+	{
+		size_t s = (description.length()+1)*sizeof(nstring::value_type);
+		serial_blob(desc_name, (void*)description.c_str(), s);
+	}
 	narchive_bin_reader::narchive_bin_reader(void)
 	{
 	}
@@ -254,5 +276,13 @@ namespace nexus
 			return m_file_ptr->read_buffer(buffer, buffer_size);
 		}		
 	}
-	
+
+	void narchive_bin_reader::object_description( const TCHAR* desc_name,nstring& description )
+	{
+		size_t s = serial_blob(desc_name, NULL, 0);
+		scoped_array<char> buffer(nNew char[s]);		
+		serial_blob(desc_name, (void*)buffer.get(), s);
+		description = (TCHAR*)buffer.get();
+	}
+
 }//namespace nexus

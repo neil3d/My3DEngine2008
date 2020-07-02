@@ -10,7 +10,8 @@
 #include "ncore.h"
 #include "mesh_index_data.h"
 #include "mesh_vertex_data_common.h"
-#include "../material/nmaterial.h"
+#include "../material/nmtl_base.h"
+#include "../renderer/render_define.h"
 #include "math/geom_def.h"
 
 namespace nexus
@@ -47,10 +48,10 @@ namespace nexus
 	{
 		typedef shared_ptr<nstatic_mesh_lod> ptr;
 
-		nmesh_vertex_data::ptr		m_vert_data;
+		nmesh_vertex_data::ptr			m_vert_data;
 		vector<nmesh_section::ptr>	m_secton_array;
-		vector<nmaterial_base::ptr>	m_mtl_array;
-		box_sphere_bounds			m_bounding_box;
+		vector<nmtl_base::ptr>			m_mtl_array;
+		box_sphere_bounds				m_bounding_box;
 
 		size_t get_face_count() const
 		{

@@ -34,10 +34,24 @@ namespace nexus
 		// Given a child index and the parent's bounding cube, construct the child's bounding cube.
 		octree_node_bounds(const octree_node_bounds& inParentBounds,int inChildIndex)
 		{
+			const static vector3 offset[8] = {
+				vector3(-1,-1,-1),
+				vector3(1,-1,-1),
+				vector3(1,-1,1),
+				vector3(-1,-1,1),
+
+				vector3(-1,1,-1),
+				vector3(1,1,-1),
+				vector3(1,1,1),
+				vector3(-1,1,1),
+			} ;
+
 			extent = inParentBounds.extent * 0.5f;
-			center.x = inParentBounds.center.x + (((inChildIndex & OCTREE_CHILDXMAX) >> 1) - 1) * extent;
+			center = inParentBounds.center +offset[inChildIndex]*extent;
+
+		/*	center.x = inParentBounds.center.x + (((inChildIndex & OCTREE_CHILDXMAX) >> 1) - 1) * extent;
 			center.y = inParentBounds.center.y + (((inChildIndex & OCTREE_CHILDYMAX)     ) - 1) * extent;
-			center.z = inParentBounds.center.z + (((inChildIndex & OCTREE_CHILDZMAX) << 1) - 1) * extent;
+			center.z = inParentBounds.center.z + (((inChildIndex & OCTREE_CHILDZMAX) << 1) - 1) * extent;*/
 		}
 
 		// Returns a AABBox representing the cube.
@@ -163,8 +177,34 @@ namespace nexus
 		inline int find_child(const octree_node_bounds& parentbounds, const AABBox& testbox)
 		{
 			int result = 0;
+			
+		   static	int  index[2][2][2] = {
+				{ {0,3},  {4,7} },
+				{ {1,2},  {5,6} }
+			};
+		
+		   int x = 0;
+		   int y = 0;
+		   int z = 0;
+		 
+		   if(testbox.m_min.x > parentbounds.center.x)
+			   x = 1;
+		   else if(testbox.m_max.x > parentbounds.center.x)
+			   return -1;
 
-			if(testbox.m_min.x > parentbounds.center.x)
+		   if(testbox.m_min.y > parentbounds.center.y)
+			   y = 1;
+		   else if(testbox.m_max.y > parentbounds.center.y)
+			   return -1;
+
+		   if(testbox.m_min.z > parentbounds.center.z)
+			   z = 1;
+		   else if(testbox.m_max.z > parentbounds.center.z)
+			   return -1;
+
+		   result = index[x][y][z];
+
+		/*	if(testbox.m_min.x > parentbounds.center.x)
 				result |= OCTREE_CHILDXMAX;
 			else if(testbox.m_max.x > parentbounds.center.x)
 				return -1;
@@ -177,7 +217,7 @@ namespace nexus
 			if(testbox.m_min.z > parentbounds.center.z)
 				result |= OCTREE_CHILDZMAX;
 			else if(testbox.m_max.z > parentbounds.center.z)
-				return -1;
+				return -1;*/
 
 			return result;
 		}
@@ -382,29 +422,27 @@ namespace nexus
 	template<typename _node_type, typename octree_semantics>
 	void noctree_node<_node_type,octree_semantics>::store_element(node_type_ptr content, octree_node_bounds& bound, int child )
 	{
-		if( child != -1
-			&& m_children[child] == NULL
-			&& 0.5f * bound.extent > octree_semantics::MIN_NODE_SIZE 
-			)
+		if( child != -1&&bound.extent > octree_semantics::MIN_NODE_SIZE )
 		{
 			// Allocate memory for children nodes.
-			m_children[child] = new noctree_node;
+			if(m_children[child] == NULL)
+				m_children[child] = new noctree_node;
 
 			// Now we need to remove each actor from this node and re-check it,
 			// in case it needs to move down the Octree.
-			content_set pend_contents = m_contents;
-			m_contents.clear();
+		/*	content_set pend_contents = m_contents;
+			m_contents.clear();*/
 
 			// add content to child node
 			octree_node_bounds child_bound = octree_node_bounds(bound,child);
 			m_children[child]->add_content( content, child_bound );
 
 			// Re-add all of the node's elements, potentially creating children of this node for them.
-			content_set::const_iterator  it = pend_contents.begin();
+		/*	content_set::const_iterator  it = pend_contents.begin();
 			while ( it != pend_contents.end() )
 			{
 				add_content( content, bound );
-			}
+			}*/
 		}
 		else
 		{
@@ -418,6 +456,11 @@ namespace nexus
 	template<typename _node_type, typename octree_semantics>
 	void noctree_node<_node_type,octree_semantics>::remove_content( node_type_ptr content )
 	{
+		if(m_contents.empty())
+		{
+			return;
+		}
+
 		content_set::iterator it = m_contents.find( content );
 		if ( it != m_contents.end() )
 		{

@@ -30,6 +30,7 @@ namespace NexusEngine
 
 	void NTerrainEditor::BindTerrain(NTerrainActor^ trn)
 	{
+		m_trn = trn;
 		if (trn)
 		{
 			m_nativeEditor->bind_terrain(trn->GetSmartPtr());
@@ -97,7 +98,7 @@ namespace NexusEngine
 		case WM_MOUSEMOVE:
 			{
 				LPARAM lParam = msg.LParam.ToInt32();
-				npoint npt(LOWORD(lParam), HIWORD(lParam));
+				npoint npt((short)LOWORD(lParam), (short)HIWORD(lParam));
 
 				WPARAM wParam = msg.WParam.ToInt32();
 				m_nativeEditor->on_mouse_move(npt, (wParam&MK_CONTROL)!=0, cam->NativePtr);
@@ -129,62 +130,18 @@ namespace NexusEngine
 		m_nativeEditor->set_brush(nbrush);
 	}
 
-	void NTerrainEditor::CreateMaterialBasic(NResourceLoc^ textureLoc)
-	{
-		BEGIN_NATIVE_GUARD
-
-		nexus::resource_location nloc;
-		textureLoc->ToNative(nloc);
-		m_nativeEditor->create_material_basic(nloc);
-
-		END_NATIVE_GUARD
-	}
-
-	void NTerrainEditor::CreateTextureSplatting(int alphaW, int alphaH)
-	{
-		m_nativeEditor->create_texture_splatting((size_t)alphaW, (size_t)alphaH);
-	}
-
-	void NTerrainEditor::SplatSetLayer(UInt32 layerIndex, NResourceLoc^ textureLoc, Vector2 uvScale, float uvRotate)
-	{
-		BEGIN_NATIVE_GUARD
-
-		nexus::resource_location nloc;
-		textureLoc->ToNative(nloc);
-
-		nexus::vector2* pScale = reinterpret_cast<nexus::vector2*>(&uvScale);
-
-		m_nativeEditor->splat_set_layer(layerIndex, nloc, *pScale, uvRotate);
-
-		END_NATIVE_GUARD
-	}
-
-	void NTerrainEditor::SplatLayerNoise(UInt32 layerIndex, System::Windows::Int32Rect rc, int numOctaves, float amplitude, float frequency)
-	{
-		nrect nrc;
-		nrc.left = rc.X;
-		nrc.right = rc.X+rc.Width;
-		nrc.top = rc.Y;
-		nrc.bottom = rc.Y+rc.Height;
-
-		m_nativeEditor->splat_layer_noise(layerIndex, nrc, numOctaves, amplitude, frequency);
-	}
-
-	void NTerrainEditor::SplatGetLayer(UInt32 layerIndex, NResourceLoc% outTex, Vector2% outScale, float% outRotate)
-	{
-		nexus::resource_location nloc;
-		nexus::vector2 scale(10,10);
-		float rotate=0;
-
-		m_nativeEditor->get_layer_param(layerIndex, nloc, scale, rotate);
-		outTex.FromNative(nloc);
-		outScale.x = scale.x;
-		outScale.y = scale.y;
-		outRotate = rotate;
-	}
-
 	bool NTerrainEditor::Empty()
 	{
 		return m_nativeEditor->empty();
+	}
+
+	NTerrainMtlSetup^ NTerrainEditor::GetMaterial()
+	{
+		return m_trn->GetMaterial();
+	}
+
+	void NTerrainEditor::ShowChunkEdge(bool s)
+	{
+		m_nativeEditor->show_chunk_edge(s);
 	}
 }//namespace NexusEngine

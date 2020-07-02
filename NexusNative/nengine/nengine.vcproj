@@ -41,15 +41,16 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\ncore"
+				AdditionalIncludeDirectories="..\ncore;..\..\NexusGame\ngameframework;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\boost_1_40_0;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NENGINE_EXPORTS"
-				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4127"
+				EnablePREfast="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,11 +63,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Kernel32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
+				RandomizedBaseAddress="0"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
@@ -117,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\ncore"
+				AdditionalIncludeDirectories="..\ncore;..\..\NexusGame\ngameframework;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\boost_1_40_0;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NENGINE_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -136,13 +138,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Kernel32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\external\boost\lib"
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
+				RandomizedBaseAddress="0"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
@@ -189,6 +192,38 @@
 			</File>
 			<File
 				RelativePath=".\actor\nanim_mesh_component.h"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\navatar_actor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\navatar_actor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\navatar_attachment.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\navatar_attachment.h"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\navatar_skeletal_mesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\navatar_skeletal_mesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\nfog_volume_component.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\nfog_volume_component.h"
 				>
 			</File>
 			<File
@@ -239,28 +274,20 @@
 				RelativePath=".\actor\nstatic_mesh_component.h"
 				>
 			</File>
+			<File
+				RelativePath=".\actor\nwater_component.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\actor\nwater_component.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="scene"
 			>
 			<File
 				RelativePath=".\scene\ngeneric_octree.h"
-				>
-			</File>
-			<File
-				RelativePath=".\scene\noctree_scene.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\scene\noctree_scene.h"
-				>
-			</File>
-			<File
-				RelativePath=".\scene\nplain_scene.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\scene\nplain_scene.h"
 				>
 			</File>
 			<File
@@ -285,10 +312,6 @@
 			</File>
 			<File
 				RelativePath=".\framework\nactor.h"
-				>
-			</File>
-			<File
-				RelativePath=".\framework\nactor_controller.h"
 				>
 			</File>
 			<File
@@ -388,6 +411,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\renderer\nrender_dynamic_mesh.h"
+				>
+			</File>
+			<File
 				RelativePath=".\renderer\nrender_dynamic_mesh_indexed.h"
 				>
 			</File>
@@ -400,15 +427,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\renderer\nrender_light.h"
-				>
-			</File>
-			<File
 				RelativePath=".\renderer\nrender_mesh.h"
-				>
-			</File>
-			<File
-				RelativePath=".\renderer\nrender_proxy.h"
 				>
 			</File>
 			<File
@@ -445,6 +464,10 @@
 			</File>
 			<File
 				RelativePath=".\renderer\nui_canvas.h"
+				>
+			</File>
+			<File
+				RelativePath=".\renderer\nview_info.h"
 				>
 			</File>
 			<File
@@ -520,6 +543,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\resource\nresource_proc_texture.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\nresource_proc_texture.h"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\nresource_scene_mesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\nresource_scene_mesh.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource\nresource_skeletal_anim_set.cpp"
 				>
 			</File>
@@ -552,6 +591,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\resource\nresource_texture_atlas.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\nresource_texture_atlas.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource\resource_importer_manager.cpp"
 				>
 			</File>
@@ -568,91 +615,75 @@
 				>
 			</File>
 			<File
-				RelativePath=".\material\nmaterial.cpp"
+				RelativePath=".\material\mtl_param_serialize.h"
 				>
 			</File>
 			<File
-				RelativePath=".\material\nmaterial.h"
+				RelativePath=".\material\nmtl_base.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\material\nmaterial_script.cpp"
+				RelativePath=".\material\nmtl_base.h"
 				>
 			</File>
 			<File
-				RelativePath=".\material\nmaterial_script.h"
+				RelativePath=".\material\nmtl_common.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\material\nmaterial_template.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="animation"
-			>
-			<File
-				RelativePath=".\animation\anim_define.h"
+				RelativePath=".\material\nmtl_common.h"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nanim_blend_base.h"
+				RelativePath=".\material\nmtl_dynamic.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nanim_controller.h"
+				RelativePath=".\material\nmtl_dynamic.h"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nanim_node.h"
+				RelativePath=".\material\nmtl_static.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nanim_node_sequence.cpp"
+				RelativePath=".\material\nmtl_static.h"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nanim_node_sequence.h"
+				RelativePath=".\material\nmtl_tech.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nanim_tree.cpp"
+				RelativePath=".\material\nmtl_tech.h"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nanim_tree.h"
+				RelativePath=".\material\nmtl_tech_shader.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nmesh_anim_controller.cpp"
+				RelativePath=".\material\nmtl_tech_shader.h"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nmesh_anim_controller.h"
+				RelativePath=".\material\nmtl_tech_shader_hlsl.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nskel_anim_controller.cpp"
+				RelativePath=".\material\nmtl_tech_shader_hlsl.h"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nskel_anim_controller.h"
+				RelativePath=".\material\nmtl_tech_shader_node_based.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nskel_anim_play.cpp"
+				RelativePath=".\material\nmtl_tech_shader_node_based.h"
 				>
 			</File>
 			<File
-				RelativePath=".\animation\nskel_anim_play.h"
-				>
-			</File>
-			<File
-				RelativePath=".\animation\nskel_anim_tree_controller.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\animation\nskel_anim_tree_controller.h"
+				RelativePath=".\material\nrender_state.h"
 				>
 			</File>
 		</Filter>
@@ -744,35 +775,51 @@
 			Name="terrain"
 			>
 			<File
-				RelativePath=".\terrain\height_map_util.h"
-				>
-			</File>
-			<File
-				RelativePath=".\terrain\nbit_map.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\terrain\nbit_map.h"
-				>
-			</File>
-			<File
-				RelativePath=".\terrain\nheight_map.h"
-				>
-			</File>
-			<File
-				RelativePath=".\terrain\nquad_tree_terrain.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\terrain\nquad_tree_terrain.h"
-				>
-			</File>
-			<File
 				RelativePath=".\terrain\nterrain_actor.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\terrain\nterrain_actor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_chunk.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_chunk.h"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_deco_chunk_base.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_deco_chunk_base.h"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_deco_grass.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_deco_grass.h"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_deco_setup.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_deco_setup.h"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_grass_deco_chunk.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\terrain\nterrain_grass_deco_chunk.h"
 				>
 			</File>
 			<File
@@ -784,19 +831,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\terrain\nwater_mtl.cpp"
+				RelativePath=".\terrain\nterrain_mtl_setup.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\terrain\nwater_mtl.h"
+				RelativePath=".\terrain\nterrain_mtl_setup.h"
 				>
 			</File>
 			<File
-				RelativePath=".\terrain\terrain_water.cpp"
+				RelativePath=".\terrain\nterrain_static_mesh_deco_chunk.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\terrain\terrain_water.h"
+				RelativePath=".\terrain\nterrain_static_mesh_deco_chunk.h"
 				>
 			</File>
 		</Filter>
@@ -817,6 +864,14 @@
 			</File>
 			<File
 				RelativePath=".\util\editor_camera_controller.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util\hud_info.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\util\hud_info.h"
 				>
 			</File>
 			<File
@@ -855,6 +910,14 @@
 				RelativePath=".\image\nimage.h"
 				>
 			</File>
+			<File
+				RelativePath=".\image\texture_atlas_creator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\image\texture_atlas_creator.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="editor"
@@ -864,11 +927,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\editor\neditor_cmd_mgr.cpp"
+				RelativePath=".\editor\nactor_handles.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\editor\neditor_cmd_mgr.h"
+				RelativePath=".\editor\nactor_handles.h"
+				>
+			</File>
+			<File
+				RelativePath=".\editor\nav_map_editor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\editor\nav_map_editor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\editor\nbrush_noise.h"
 				>
 			</File>
 			<File
@@ -877,6 +952,14 @@
 			</File>
 			<File
 				RelativePath=".\editor\neditor_engine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\editor\nriver_editor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\editor\nriver_editor.h"
 				>
 			</File>
 			<File
@@ -937,34 +1020,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="sky"
-			>
-			<File
-				RelativePath=".\sky\ndynamic_sky_dome.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sky\ndynamic_sky_dome.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sky\nsky_box.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sky\nsky_box.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sky\sky_base.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sky\sky_base.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="speed_tree"
 			>
 			<File
@@ -1017,6 +1072,298 @@
 			</File>
 			<File
 				RelativePath=".\speed_tree\spt_cfg.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="physics"
+			>
+			<File
+				RelativePath=".\physics\nphys_body_instance.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_debug_render.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_debug_render.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_define.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_material.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_pch.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_scene.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_scene.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_scene_query_report.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_user_stream.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_user_stream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_util.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphys_util.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphysics_classes.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphysics_engine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphysics_engine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\physics\nphysics_framework.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="special_effect"
+			>
+			<File
+				RelativePath=".\special_effect\ndistribution.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_cross.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_cross.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_cylinder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_cylinder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_element.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_element.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_grid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_grid.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_particle_emitter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_particle_emitter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_quad.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_quad.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_vertex_data.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\neffect_vertex_data.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\nresource_special_effect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\nresource_special_effect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\nspecial_effect_instance.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\nspecial_effect_instance.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\nsub_uv.h"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\quad_face.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\special_effect\quad_face.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="animation"
+			>
+			<File
+				RelativePath=".\animation\anim_define.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nanim_blend_base.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nanim_controller.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nanim_node.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nanim_node_sequence.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nanim_node_sequence.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nanim_tree.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nanim_tree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nmesh_anim_controller.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nmesh_anim_controller.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nskel_anim_controller.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nskel_anim_controller.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nskel_anim_play.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nskel_anim_play.h"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nskel_anim_tree_controller.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\animation\nskel_anim_tree_controller.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="navigation_map"
+			>
+			<File
+				RelativePath=".\navigation_map\nav_map_actor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\navigation_map\nav_map_actor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\navigation_map\nav_map_component.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\navigation_map\nav_map_component.h"
+				>
+			</File>
+			<File
+				RelativePath=".\navigation_map\nav_map_vertex_data.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\navigation_map\nav_map_vertex_data.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="game"
+			>
+			<File
+				RelativePath=".\game\nstart_point_actor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\game\nstart_point_actor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\game\ntrigger_actor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\game\ntrigger_actor.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="sky"
+			>
+			<File
+				RelativePath=".\sky\sky_base.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sky\sky_base.h"
 				>
 			</File>
 		</Filter>

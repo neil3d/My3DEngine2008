@@ -7,6 +7,7 @@
 
 #ifndef _NEXUS_RESOURCE_H_
 #define _NEXUS_RESOURCE_H_
+#include <boost/thread/mutex.hpp>
 #include "ncore.h"
 
 namespace nexus
@@ -79,40 +80,43 @@ namespace nexus
 	public:
 		typedef boost::intrusive_ptr<nresource> ptr;
 
-		explicit nresource(const nstring& name_str) : m_ref_count(0), m_name(name_str)
+		explicit nresource(const nstring& name_str) : m_ref_count(0), m_name(name_str), m_ready(0)
 		{}
 		virtual ~nresource(void)
 		{}
 
-		const resource_location& get_location() const	{	return m_location; }
+		const resource_location& get_location() const;
 		const nname& get_name() const					{	return m_name;}
 		const nstring& get_name_str() const				{	return m_name.name_str;}
-		void add_ref()	{	m_ref_count++; }
+		void add_ref();
 		virtual void release();
 
-		virtual void load_from_file(const resource_location& loc)
-		{
-			m_location = loc;
-			do_serialize_io(loc, EFileRead, false);
-		}
-		virtual void save_to_file(const resource_location& loc, bool xml)
-		{
-			do_serialize_io(loc, EFileWrite, xml);
-		}
+		virtual void load_from_file(const resource_location& loc);
+		virtual void save_to_file(const resource_location& loc, bool xml);		
+		
+		//!	自身资源创建完成，并且所有“子资源”也创建完成才返回true
+		virtual bool ready() const	{	return m_ready!=0; }
 
-		virtual bool ready() const	{	return false; }
+		//! 在编辑器情景下，new一个资源是没有ready的，需要手动切换到ready，否则上层无法显示
+		virtual void post_edit_change(bool ready);
 
 		virtual size_t get_system_memory_size() const	{	return 0; }
 		virtual size_t get_render_memory_size() const	{	return 0; }
 
 		virtual void serialize(narchive& ar);
 
+		virtual void _on_device_lost(int param)		{	(void)param; }
+		virtual bool _on_device_reset(int param)	{	(void)param; return true; }
+
 	protected:
 		void do_serialize_io(const resource_location& loc, enum EFileMode fmode, bool xml);
 
-		int		m_ref_count;
-		nname	m_name;
-		resource_location	m_location;
+		volatile long		m_ref_count;
+		volatile long		m_ready;	// 是否内容已经加载完毕，主要是用作异步IO的场合
+
+		mutable boost::mutex		m_mutex;
+		nname						m_name;
+		resource_location			m_location;
 
 		nDECLARE_VIRTUAL_CLASS(nresource)
 	};

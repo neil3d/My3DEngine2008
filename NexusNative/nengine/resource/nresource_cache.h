@@ -12,6 +12,17 @@
 
 namespace nexus
 {
+	class nresource_cache_visitor
+	{
+	public:
+		nresource_cache_visitor()	{}
+		virtual ~nresource_cache_visitor()	{}
+
+		virtual void begin() {}
+		virtual void handle_resource(nresource* res, int param) = 0;
+		virtual void end() {}
+	};
+
 	/**
 	 *	resource cache²ßÂÔ»ùÀà
 	*/
@@ -31,6 +42,7 @@ namespace nexus
 		virtual nresource* active_resource(const nname& res_name) = 0;
 		virtual nresource* find_resource(const nname& res_name) = 0;
 		virtual size_t get_num_resource() = 0;
+		virtual void accept_visitor(nresource_cache_visitor* v, int param) = 0;
 
 		nDECLARE_VIRTUAL_CLASS(nresource_cache)
 	};

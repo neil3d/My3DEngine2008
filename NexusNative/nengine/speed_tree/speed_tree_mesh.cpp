@@ -17,16 +17,16 @@ namespace nexus
 		macros.push_back(shader_define("SPEEDTREE_MAX_NUM_LEAF_ANGLES", ostr.str()));
 
 #ifdef SPEEDTREE_BRANCH_DETAIL_LAYER
-		macros.push_back(shader_define("SPEEDTREE_BRANCH_DETAIL_LAYER",""));
+	//	macros.push_back(shader_define("SPEEDTREE_BRANCH_DETAIL_LAYER",""));
 #endif
 #ifdef SPEEDTREE_BRANCH_NORMAL_MAPPING
-		macros.push_back(shader_define("SPEEDTREE_BRANCH_NORMAL_MAPPING",""));
+	//	macros.push_back(shader_define("SPEEDTREE_BRANCH_NORMAL_MAPPING",""));
 #endif
 #ifdef SPEEDTREE_LEAF_NORMAL_MAPPING
-		macros.push_back(shader_define("SPEEDTREE_LEAF_NORMAL_MAPPING",""));
+	//	macros.push_back(shader_define("SPEEDTREE_LEAF_NORMAL_MAPPING",""));
 #endif
 #ifdef SPEEDTREE_FROND_NORMAL_MAPPING
-		macros.push_back(shader_define("SPEEDTREE_FROND_NORMAL_MAPPING",""));
+	//	macros.push_back(shader_define("SPEEDTREE_FROND_NORMAL_MAPPING",""));
 #endif		
 #ifdef SPEEDTREE_BRANCH_FADING
 		macros.push_back(shader_define("SPEEDTREE_BRANCH_FADING",""));

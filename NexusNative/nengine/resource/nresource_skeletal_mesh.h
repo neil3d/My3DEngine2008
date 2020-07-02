@@ -15,16 +15,20 @@ namespace nexus
 		explicit nresource_skeletal_mesh(const nstring& name_str);
 		virtual ~nresource_skeletal_mesh(void);
 
-		void import_lod(const nstring& full_path);
-		void import_set_material(int lod, int mtl_id, nmaterial_base::ptr mtl_ptr);
-
-		virtual bool ready() const	{	return true;}
+		void import_lod(int lod, const nstring& full_path);
+		void import_set_material(int lod, int sec, nmtl_base::ptr mtl_ptr);
+		
 		virtual void serialize(narchive& ar);
+		virtual bool ready() const;
 
 		size_t get_num_lod() const	{	return m_lod_array.size(); }
+		size_t get_num_section(size_t lod) const;
+		void get_lod_info(size_t i, int& num_vert, int& num_sec, int& num_tri) const;
+
 		nskeletal_mesh::ptr get_lod_mesh(size_t lod) const	{	return m_lod_array[lod];}
-		nmaterial_base* get_material(int lod, int mtl_id) const;
+		nmtl_base::ptr get_material(int lod, int mtl_id) const;
 	
+		void get_bounds(box_sphere_bounds& bounds) const;
 	private:
 		std::vector<nskeletal_mesh::ptr>	m_lod_array;
 		

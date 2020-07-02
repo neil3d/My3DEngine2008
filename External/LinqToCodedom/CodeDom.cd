@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="LinqToCodedom.Generator.CodeDom">
+    <Position X="1.75" Y="0.5" Width="3" />
+    <NestedTypes>
+      <Class Name="LinqToCodedom.Generator.CodeDom.NilClass" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Generator\CodeDom.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="LinqToCodedom.Generator.CodeDom.CodeNilExpression" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Generator\CodeDom.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="LinqToCodedom.Generator.CodeDom.CodeThisExpression" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Generator\CodeDom.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="LinqToCodedom.Generator.CodeDom.CodeBaseExpression" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Generator\CodeDom.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="LinqToCodedom.Generator.CodeDom.CodeVarExpression" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Generator\CodeDom.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="LinqToCodedom.Generator.CodeDom.CodeArgsInvoke" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Generator\CodeDom.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="LinqToCodedom.Generator.CodeDom.CodeDelegateArgsInvoke" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Generator\CodeDom.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAYACABAAAAAAAAAEwACAAAAAAAAAAEQFJgAQ=</HashCode>
+      <FileName>Generator\CodeDom.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

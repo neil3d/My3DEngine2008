@@ -7,7 +7,7 @@
 
 #ifndef _NEXUS_RENDER_GROUP_H_
 #define _NEXUS_RENDER_GROUP_H_
-#include "d3d_view_info.h"
+#include "../nengine/framework/view_info.h"
 
 namespace nexus
 {
@@ -22,10 +22,8 @@ namespace nexus
 
 		virtual bool empty() const = 0;
 		virtual void clear() = 0;
-		virtual void add_obj(const nrender_proxy* obj) = 0;
-		virtual void draw_all(const d3d_view_info* view, drawing_policy* dp, drawing_filter* filter=NULL) = 0;
-
-		typedef std::vector<const nrender_proxy*>	proxy_vector;
+		virtual void draw_all(const nview_info* view, drawing_policy* dp, drawing_filter* filter=NULL) = 0;
+		//virtual const st_proxy_vector& get_proxys() = 0;
 	};
 }//namespace nexus
 #endif //_NEXUS_RENDER_GROUP_H_

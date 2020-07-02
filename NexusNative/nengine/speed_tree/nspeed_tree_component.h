@@ -19,7 +19,7 @@ namespace nexus
 		virtual ~nspeed_tree_component(void);
 
 		virtual void update(float delta_time, const nviewport& view);
-		virtual void render(const nviewport& view);
+		virtual void render(class render_package_base* rpb);
 		virtual void _destroy();
 
 		void create(const resource_location& spt_file);
@@ -27,6 +27,11 @@ namespace nexus
 
 		virtual void serialize(narchive& ar);
 		virtual void _level_loaded(nactor* owner);
+
+		virtual nspt_instance* get_spt_instance()
+		{
+			return &m_spt;
+		}
 	private:
 		resource_location	m_spt_file_loc;
 		nspt_instance		m_spt;

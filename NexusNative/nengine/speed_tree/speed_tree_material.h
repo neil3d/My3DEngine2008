@@ -1,16 +1,16 @@
 #ifndef _NEXUS_SPEED_TREE_MATERIAL_H_
 #define _NEXUS_SPEED_TREE_MATERIAL_H_
 #include "spt_cfg.h"
-#include "../material/nmaterial.h"
+#include "../material/nmtl_base.h"
 #include "../resource/nresource_texture.h"
 
 namespace nexus
 {
 	class nspt_material
-		: public nmaterial_base
+		: public nmtl_base
 	{
 	public:
-		explicit nspt_material(const nstring& name_str):nmaterial_base(name_str),
+		explicit nspt_material(const nstring& name_str):nmtl_base(name_str),
 			m_afAmbient(0,0,0,1),m_afDiffuse(0,0,0,1),m_afSpecular(0,0,0,1),m_afEmission(0,0,0,1),
 			m_fShininess(5)
 		{}
@@ -55,7 +55,7 @@ namespace nexus
 		virtual ~nspt_branch_material(void)	{}
 
 		void create(boost::shared_ptr<CSpeedTreeRT> spt, const resource_location& spt_loc);
-		virtual void draw_effect_param(nshading_effect* effect_ptr) const;
+		virtual void setup_effect(nshading_effect* effect_ptr) const;
 
 	protected:
 		nresource_texture::ptr load_fallback_texture(int nLayer);
@@ -70,21 +70,19 @@ namespace nexus
 	{
 	public:
 		explicit nspt_frond_material(const nstring& name_str):nspt_material(name_str)
-		{}
+		{
+		}
 		virtual ~nspt_frond_material(void)	{}
 
 		void create(boost::shared_ptr<CSpeedTreeRT> spt, const resource_location& spt_loc);
-		virtual void draw_effect_param(nshading_effect* effect_ptr) const;
-
-		virtual enum ETransparentType get_trans_type() const	
-		{	
-			return ETrans_AlphaMasked; 
-		}
+	virtual void setup_effect(nshading_effect* effect_ptr) const;
 
 		nresource_texture::ptr get_texture(int layer) const
 		{
 			return m_texLeavesAndFronds[layer];
 		}
+
+		virtual bool get_two_side( ) const	{ return true; }
 
 	protected:
 		nresource_texture::ptr	m_texLeavesAndFronds[CSpeedTreeRT::TL_NUM_TEX_LAYERS];  // leaf/frond composite texture for all supported layers (CAD exported)
@@ -103,13 +101,9 @@ namespace nexus
 		virtual ~nspt_leaf_material(void)	{}
 
 		void create(nresource_texture::ptr composite_diffuse, nresource_texture::ptr composite_normal);
-		virtual void draw_effect_param(nshading_effect* effect_ptr) const;
-
-		virtual enum ETransparentType get_trans_type() const	
-		{	
-			return ETrans_AlphaMasked; 
-		}
-
+		virtual void setup_effect(nshading_effect* effect_ptr) const;
+		
+		virtual bool get_two_side( ) const	{ return true; }
 	protected:
 		nresource_texture::ptr	m_composite_diffuse, 
 								m_composite_normal;

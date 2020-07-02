@@ -8,65 +8,19 @@
 #ifndef _NEXUS_TERRAIN_ACTOR_H_
 #define _NEXUS_TERRAIN_ACTOR_H_
 #include <boost/pool/object_pool.hpp>
+#include "../../ncore/height_map/nheight_map.h"
+#include "../../ncore/height_map/nbit_map.h"
 #include "../framework/nactor.h"
 #include "../resource/nresource.h"
 #include "../renderer/nrender_resource.h"
-#include "nheight_map.h"
-#include "nterrain_mtl.h"
 #include "../framework/world_define.h"
+#include "../physics/nphys_body_instance.h"
+#include "nterrain_mtl_setup.h"
+#include "nterrain_deco_setup.h"
 
 namespace nexus
 {
-	template<typename T>
-	inline T lerp(const T& a, const T& b, const T& alpha)
-	{
-		return (T)(a + alpha*(b-a));
-	}
-
-	template<typename T>
-	inline T quad_lerp(const T& p00, const T& p10, const T& p01, const T& p11,
-		float u, float v)
-	{
-		if( u > v )
-		{
-			if( v<1.0f )
-				return lerp( lerp(p00, p11, v),	lerp(p10, p11, v),
-							(u-v)/(1.0f-v)	);
-			else
-				return p11;
-		}
-		else
-		{
-			if( v>0.0f )
-				return lerp( lerp(p00, p01, v), lerp(p00, p11, v),
-								u/v );
-			else
-				return p00;
-		}
-	}
-
-	template<typename T, typename U>
-	inline void _clip_rect(rect<T>& rc,  U width, U height)
-	{
-		_clip_rect(rc.left, rc.top, rc.right, rc.bottom, width, height);
-	}
-
-	template<typename T, typename U>
-	inline void _clip_rect(T& left, T& top, T& right, T& bottom, U width, U height)
-	{
-		if( right > width)
-			right = width;
-		if( bottom > height)
-			bottom = height;
-
-		if(left < 0)
-			left = 0;
-		if(top < 0)
-			top = 0;
-	}
-
-	class nquad_tree_terrain;
-	class nterrain_water;
+	class nterrain_chunk;
 
 	/**
 	 *	地形对象，管理height map以及渲染用的component
@@ -80,6 +34,9 @@ namespace nexus
 		nterrain_actor(const nstring& name_str);
 		virtual ~nterrain_actor(void);
 
+		//地形不可复制
+		virtual nactor::ptr clone();
+
 		// 不支持rotation
 		virtual void move(const vector3& pos, const vector3& rot, const vector3& scale)
 		{
@@ -91,20 +48,10 @@ namespace nexus
 			nactor::move(pos, vector3::zero, scale);
 		}
 
+		//-- 高度图操作接口
 		void create(size_t w, size_t h, unsigned short init_h, size_t chunk_size);		
 		void generate_noise(nrect rc, int numOctaves, float amplitude, float frequency);
-		void import_heightmap(const nstring& img_file_name);
-
-		void create_material_basic(const resource_location& texture_loc);
-		ntexture_splatting::ptr create_texture_splatting(size_t alpha_w, size_t alpha_h);
-		nmaterial_base* get_material();
-
-		void create_water(int water_h/*unscaled*/, size_t chunk_size);
-		void create_water_material_basic(const resource_location& texture_loc);
-		void create_water_material_natural(int render_target_w, int render_target_h,
-			const resource_location& detail_map, const resource_location& bump_map);
-
-		virtual bool line_check(ncheck_result& ret, const vector3& start, const vector3& end);
+		void import_heightmap(const nstring& img_file_name);		
 
 		npoint world2tile(float wx, float wz) const
 		{
@@ -146,30 +93,59 @@ namespace nexus
 
 		const vector3& get_scale() const	{	return m_space.scale;}
 
+		virtual bool line_check(ncheck_result& ret, const vector3& start, const vector3& end, ELineCheckType check_type);
 		/**	测试一个点是在地面以上还是以下
 			@return 1 == up, -1 == low */
 		int classify_side(const vector3& wpt);
 
-		int get_map_width() const	{	return m_height_map.get_width();}
-		int get_map_height() const	{	return m_height_map.get_height();}
-		size_t get_chunk_size() const {	return m_chunk_size;}
+		//-- 内部数据访问接口
+		int get_map_width() const		{	return m_height_map.get_width();}
+		int get_map_height() const		{	return m_height_map.get_height();}
+		size_t get_chunk_size() const	{	return m_chunk_size;}
 		nheight_map16* get_height_map()	{	return &m_height_map;}
-		nrender_heightmap* get_height_map_texture()	{	return m_heightmap_tex.get();}
-
-		void post_heightmap_change(const nrect& region);
+		nbit_map* get_viz_map()			{	return &m_viz_map;}
+		nterrain_mtl_setup* get_material()	{	return &m_mtl_setup; }
+		nterrain_deco_setup* get_deco()	{	return &m_deco_setup;	}
+		//获取指定世界空间坐标所属的chunk
+		shared_ptr<nterrain_chunk>	get_chunk(float x,float y);
+		//获取chunk的数量
+		size_t	get_chunk_count()	{return m_chunks.size();}
+		//获取指定索引的chunk
+		shared_ptr<nterrain_chunk>	get_chunk(size_t index)	{return m_chunks[index];}
 
 		virtual void _destroy();
 		virtual void serialize(narchive& ar);
 		virtual void _level_loaded(nlevel* level_ptr);
-	protected:
-		nheight_map16	m_height_map;
-		render_res_ptr<nrender_heightmap>
-						m_heightmap_tex;
 
-		size_t			m_chunk_size;
-				
-		shared_ptr<nquad_tree_terrain>	m_trn_component;
-		shared_ptr<nterrain_water>		m_water_component;
+		// physics interfaces
+		virtual void init_phys();
+		virtual void simulate_phys(float delta_time);
+		virtual void release_phys();
+
+		//-- 引擎内部使用的public接口函数
+	public:
+		void _post_material_create();
+		void _post_layer_alpha_change(const nstring& layer_name, const nrect& region);
+		void _post_terrain_layer_change();
+		void post_heightmap_change(const nrect& region);
+		void post_vizmap_change(const nrect& region);
+		//void post_deco_layer_change(nterrain_deco_layer* layer,const nrect& region);
+	protected:
+		void create_chunks();
+	protected:
+		nheight_map16		m_height_map;	// 地形高度图数据
+		nbit_map			m_viz_map;		// 哪个格子不可见（用来在地形上挖洞）
+		nterrain_mtl_setup	m_mtl_setup;	// 地形材质设置、编辑数据
+		nterrain_deco_setup	m_deco_setup;	// 地形装饰层编辑
+		size_t				m_chunk_size;	// 单个用来渲染的地形块的大小
+
+		//-- 渲染数据
+		typedef std::vector<boost::shared_ptr<nterrain_chunk> > st_chunk_array;
+		st_chunk_array		m_chunks;
+
+		//-- 物理系统数据
+		nphys_body_instance::ptr		m_phys_body_instance;
+		NxHeightField*					m_phys_height_field;
 
 		nDECLARE_NAMED_CLASS(nterrain_actor)
 	};

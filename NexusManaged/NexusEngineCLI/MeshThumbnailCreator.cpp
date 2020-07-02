@@ -11,7 +11,9 @@ namespace NexusEngine
 		m_fileExtList = gcnew System::Collections::ArrayList();
 		m_fileExtList->Add("nmdl");	// static mesh
 		m_fileExtList->Add("nam");	// anim mesh
-		m_fileExtList->Add("spt");	// SpeedTree		
+		m_fileExtList->Add("skm");	// skeletal mesh
+		m_fileExtList->Add("spt");	// SpeedTree	
+		m_fileExtList->Add("mtl");	// Material	
 	}
 
 	HBITMAP MeshThumbnailCreator::CreateThumbnail(NResourceLoc loc, int w, int h)
@@ -24,8 +26,18 @@ namespace NexusEngine
 		const TCHAR* lv_name = _T("MeshThumbnailCreator_TempLevel");
 		nlevel::ptr tmp_lv = engine->create_level(lv_name,
 			_T("nlevel") );
-		tmp_lv->init(_T("nplain_scene"));
+		tmp_lv->init();
 		nactor::ptr tmp_ac = tmp_lv->create_actor_t<nactor>(_T("TempActor"));
+
+#ifdef _MESH_THUMBNAIL_LIT_MODE
+		nactor::ptr lgtActor=tmp_lv->create_actor(_T("DefaultDirLgt"), _T("nactor"));
+		nactor_component::ptr _lgt_comp=lgtActor->create_component(_T("DirLgtComp"), _T("ndirectional_light_component"));
+		ndirectional_light_component::ptr lgtComp=boost::shared_dynamic_cast<ndirectional_light_component>(_lgt_comp);
+		lgtComp->project_shadow=false;
+		const object_space& os=lgtActor->get_space();
+		lgtActor->move(vector3(500, 500, 500),os.rotation,os.scale);
+		lgtActor->look_at(vector3(0,0,0));
+#endif
 
 		nstring file_ext = nloc.get_file_ext();
 		AABBox box;
@@ -46,11 +58,28 @@ namespace NexusEngine
 				tmp_comp->reset_resource(nloc);
 				box = tmp_comp->get_AABBox();
 			}
+			else if(file_ext == _T("skm"))
+			{
+				nskeletal_mesh_component::ptr tmp_comp = 
+					tmp_ac->create_component_t<nskeletal_mesh_component>(_T("MeshComp"));
+				tmp_comp->reset_resource(nloc, true);
+				box = tmp_comp->get_AABBox();
+			}
 			else if(file_ext == _T("spt"))
 			{
 				nspeed_tree_component::ptr tmp_comp = 
 					tmp_ac->create_component_t<nspeed_tree_component>(_T("MeshComp"));
 				tmp_comp->create(nloc);
+				box = tmp_comp->get_AABBox();
+			}
+			else if(file_ext==_T("mtl"))
+			{
+				resource_location mesh_loc(L"engine_data",L"/editor_res/material_ball.nmdl");
+				nstatic_mesh_component::ptr tmp_comp = 
+					tmp_ac->create_component_t<nstatic_mesh_component>(_T("MeshComp"));
+				tmp_comp->reset_resource(mesh_loc);
+				nmtl_base::ptr mtl=nmtl_base::create_from_file(nloc);
+				tmp_comp->replace_material(0,0,mtl);
 				box = tmp_comp->get_AABBox();
 			}
 		}
@@ -63,7 +92,11 @@ namespace NexusEngine
 
 		//-- render and screen shot
 		nviewport vp;
+#ifdef _MESH_THUMBNAIL_LIT_MODE
+		vp.render_mode = ERM_Lit;		
+#else
 		vp.render_mode = ERM_Unlit;		
+#endif
 		vp.width = w;
 		vp.height = h;
 		

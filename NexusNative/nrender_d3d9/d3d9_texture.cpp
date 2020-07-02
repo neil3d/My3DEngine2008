@@ -13,15 +13,16 @@ namespace nexus
 	{
 	}
 
-	d3d_texture_ptr load_d3d9_texture_file(nfile_system* fs, const nstring& pkg_name, const nstring& file_name)
+	d3d_texture_ptr load_d3d9_texture_file(nfile_system* fs, const nstring& pkg_name, const nstring& file_name, fsize& out_size)
 	{
 		//-- read file to memory
-		size_t file_size = fs->get_file_size(pkg_name, file_name);
+		int file_size = fs->get_file_size(pkg_name, file_name);
 		if( file_size==0
 			|| file_size==-1)
 		{
 			nLog_Error(_T("load texture failed, file=%s.%s\r\n"), pkg_name.c_str(), file_name.c_str());
 			THROW_D3D_EXCEPTION(_T("load texture failed."));
+			return NULL;
 		}
 
 		nfile::ptr file_ptr = fs->open_file(pkg_name, file_name, EFileRead);
@@ -33,6 +34,7 @@ namespace nexus
 		IDirect3DDevice9* d3d_device = d3d_device_manager::instance()->get_device();
 
 		IDirect3DTexture9* d3d_tex = NULL;
+		D3DXIMAGE_INFO src_info;
 		// 使用D3DX_DEFAULT设置filter时，nvPerfHud失败
 		HRESULT hr = D3DXCreateTextureFromFileInMemoryEx(
 			d3d_device,			// pDevice
@@ -47,7 +49,7 @@ namespace nexus
 			D3DX_FILTER_LINEAR|D3DX_FILTER_DITHER,	// Filter
 			D3DX_FILTER_LINEAR,	// MipFilter
 			0,					// ColorKey
-			NULL,				// pSrcInfo
+			&src_info,			// pSrcInfo
 			NULL,				// pPalette
 			&d3d_tex			// ppTexture
 			);
@@ -58,12 +60,14 @@ namespace nexus
 			THROW_D3D_HRESULT(hr, _T("create texture failed"));
 		}
 
+		out_size.x = static_cast<float>(src_info.Width);
+		out_size.y = static_cast<float>(src_info.Height);
 		return d3d_texture_ptr(d3d_tex);
 	}
 
 	void d3d9_texture2D::load_from_file(nfile_system* fs, const nstring& pkg_name, const nstring& file_name)
 	{
-		m_texture = load_d3d9_texture_file(fs, pkg_name, file_name);
+		m_texture = load_d3d9_texture_file(fs, pkg_name, file_name,m_original_size);
 	}
 
 	void d3d9_cube_map::load_from_file(nfile_system* fs, const nstring& pkg_name, const nstring& file_name)
@@ -219,22 +223,20 @@ namespace nexus
 			THROW_D3D_EXCEPTION(_T("create alphamap texture failed"));
 		}
 
-		m_texture.reset(d3d_tex);
+		m_texture.reset(d3d_tex);		
 	}
 
-	void d3d9_alphamap::copy_alpha(size_t channel, const nrect& rc, nalpha_map* src)
+	void d3d9_alphamap::copy_alpha(size_t channel, int src_x, int src_y, nalpha_map* src)
 	{
 		nASSERT( channel < 4);
 		nASSERT( src );		
 
-		HRESULT hr;
-
-		RECT d3d_rc;
-		_convert_rect(rc, d3d_rc);
-
 		nsize tex_size = get_size();
-		nASSERT( tex_size.x = src->get_width() );
-		nASSERT( tex_size.y = src->get_height() );
+
+		nASSERT( src_x+tex_size.x <= src->get_width() );
+		nASSERT( src_y+tex_size.y <= src->get_height() );
+
+		HRESULT hr;		
 
 		D3DLOCKED_RECT lrc;
 		hr = m_texture->LockRect(0, &lrc, NULL, 0);
@@ -261,12 +263,17 @@ namespace nexus
 			pixel* texel = (pixel*)(line);
 			for( UINT x=0; x<w; x++ )
 			{
-				texel[x].channel[channel] = src->get_value(x,y);
+				texel[x].channel[channel] = src->get_value(src_x+x, src_y+y);
 			}
 			line += lrc.Pitch;
 		}
 
 		hr = m_texture->UnlockRect(0);
+
+		/*hr = D3DXSaveTextureToFile(_T("d:\\test.bmp"),
+			D3DXIFF_BMP, 
+			m_texture.get(),			
+			NULL);*/
 	}
 
 	nsize d3d9_alphamap::get_size() const
@@ -276,5 +283,36 @@ namespace nexus
 		nASSERT( SUCCEEDED(hr) );
 
 		return nsize(desc.Width, desc.Height);
+	}
+
+	void d3d9_alphamap::set_alpha(size_t channel, unsigned char val)
+	{
+		nASSERT( channel < 4);
+		HRESULT hr;		
+		nsize tex_size = get_size();
+
+		D3DLOCKED_RECT lrc;
+		hr = m_texture->LockRect(0, &lrc, NULL, 0);
+
+		if( FAILED(hr) )
+		{
+			THROW_D3D_HRESULT(hr, _T("lock alpha map failed."));
+		}
+
+		BYTE* line = static_cast<BYTE*>(lrc.pBits);
+
+		for(int y=0; y<tex_size.y; y++)
+		{		
+			BYTE* pixel = line;
+			for( int x=0; x<tex_size.x; x++ )
+			{
+				pixel[channel] = val;
+				pixel += 4;
+			}
+			line += lrc.Pitch;
+		}
+
+
+		hr = m_texture->UnlockRect(0);
 	}
 }//namespace nexus

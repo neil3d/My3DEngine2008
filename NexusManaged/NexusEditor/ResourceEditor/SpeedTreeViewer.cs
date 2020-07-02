@@ -71,5 +71,25 @@ namespace NexusEditor.ResourceEditor
                 m_preview.SetViewLODBias(float.Parse(valTxt));
             }
         }
+
+        private void toolBtnLit_Click(object sender, EventArgs e)
+        {
+            m_preview.ViewRenderMode = ERenderMode.Lit;
+        }
+
+        private void toolBtnUnlit_Click(object sender, EventArgs e)
+        {
+            m_preview.ViewRenderMode = ERenderMode.Unlit;
+        }
+
+        private void toolBtnWireframe_Click(object sender, EventArgs e)
+        {
+            m_preview.ViewRenderMode = ERenderMode.Wireframe;
+        }
+
+        private void toolBtnZoomExtents_Click(object sender, EventArgs e)
+        {
+            m_preview.ZoomExtents();
+        }
     }
 }

@@ -5,7 +5,7 @@
 
 namespace nexus
 {
-	void load_shder_source(const nstring& file_name, std::string& shader_source)
+	void load_shader_source(const nstring& file_name, std::string& shader_source)
 	{
 		size_t file_size = g_file_sys->get_file_size(g_engine_package_name, file_name);
 		if(file_size > 0
@@ -36,4 +36,6 @@ namespace nexus
 		if( FAILED(hr) )
 			THROW_D3D_HRESULT(hr, _T("Vertex Buffer Unlock Failed."));
 	}
-}//namespace nexus
+
+	sphere g_sphere;
+}

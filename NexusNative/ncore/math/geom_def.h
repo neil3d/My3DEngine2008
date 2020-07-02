@@ -40,6 +40,16 @@ namespace nexus
 		vector3 origin,
 				box_extent;
 		float	sphere_radius;
+		
+		box_sphere_bounds()
+		{
+		}
+
+		box_sphere_bounds(const vector3 in_origin,const vector3 in_box_extent):
+		origin(in_origin),
+		box_extent(in_box_extent),
+		sphere_radius(sqrt(in_box_extent.x*in_box_extent.x + in_box_extent.y*in_box_extent.y +in_box_extent.z*in_box_extent.z))
+		{}
 
 		void get_corners(vector3 pt_array[8]) const;
 		void transform_by(const matrix44& mat);

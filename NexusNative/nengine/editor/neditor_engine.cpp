@@ -1,9 +1,11 @@
 #include "StdAfx.h"
 #include "neditor_engine.h"
+#include "../resource/nresource_manager.h"
 
 namespace nexus
 {
-	nDEFINE_CLASS(neditor_engine, nengine)
+	nDEFINE_VIRTUAL_CLASS(neditor_cmd, nobject)
+	nDEFINE_VIRTUAL_CLASS(neditor_engine, nengine)
 
 	neditor_engine::neditor_engine(void)
 	{
@@ -13,17 +15,18 @@ namespace nexus
 	{
 	}	
 
+	neditor_engine* neditor_engine::instance()
+	{
+		return ndynamic_cast<neditor_engine>(nengine::instance());
+	}
+
 	void neditor_engine::render_level(const nstring& lv_name, const nviewport& view, bool present)
 	{
 		if( !m_renderer )
 			return;
 
-		//-- make view info
-		m_cur_view = view;		
-
 		//-- render
-		if( m_renderer->frame_begin(view) )
-		{
+		
 			for(st_level_list::iterator iter= m_level_list.begin();
 				iter != m_level_list.end();
 				++iter)
@@ -31,20 +34,19 @@ namespace nexus
 				nlevel::ptr lv_ptr = (*iter);
 				if( lv_ptr->get_name() == lv_name )
 				{
-					lv_ptr->render(m_cur_view, m_cur_view.hit_hash);
+					lv_ptr->render(view);
 					break;
 				}
 			}
-
-			//--
-			m_renderer->frame_end();
-			if(present)
-				m_renderer->present(view.handle_wnd);
-		}
+	
+		if(present)
+			m_renderer->present(view.handle_wnd);
 	}
 
-	void neditor_engine::update_level(const nstring& lv_name, float delta_time)
+	void neditor_engine::update_level(const nstring& lv_name, float delta_time, const nviewport& view)
 	{
+		nresource_manager::instance()->dispatch_events();
+
 		for(st_level_list::iterator iter= m_level_list.begin();
 			iter != m_level_list.end();
 			++iter)
@@ -52,7 +54,7 @@ namespace nexus
 			nlevel::ptr lv_ptr = (*iter);
 			if( lv_ptr->get_name() == lv_name )
 			{
-				lv_ptr->update(delta_time, m_cur_view);
+				lv_ptr->update(delta_time,view);
 				break;
 			}
 		}

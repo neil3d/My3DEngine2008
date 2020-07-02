@@ -11,6 +11,8 @@
 
 namespace nexus
 {
+	typedef unsigned int argb_t; 
+
 	/** color */
 	struct color4f
 	{
@@ -21,6 +23,16 @@ namespace nexus
 
 		color4f(float r, float g, float b, float a):R(r),G(g),B(b),A(a)
 		{}
+		color4f(float* data):R(data[0]),G(data[1]),B(data[2]),A(data[3])
+		{}
+
+		color4f(argb_t color)
+		{
+			B = (color & 0xFF) / 255.f; 
+			G = (color>>8  & 0xFF) / 255.f; 
+			R = (color>>16 & 0xFF) / 255.f; 
+			A = (color>>24 & 0xFF) / 255.f; 
+		}
 
 		/*
 		To calculate luminance from RGB values, use this:
@@ -29,6 +41,14 @@ namespace nexus
 		float cal_lum()
 		{
 			return 0.27f*R + 0.67f*G + 0.06f*B;
+		}
+
+		argb_t to_argb()
+		{
+			return ( static_cast<argb_t>(A * 255) << 24 |
+					 static_cast<argb_t>(R * 255) << 16 |
+					 static_cast<argb_t>(G * 255) << 8 |
+					 static_cast<argb_t>(B * 255)			);
 		}
 	};
 

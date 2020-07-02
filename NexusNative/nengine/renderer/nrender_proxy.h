@@ -14,36 +14,7 @@
 
 namespace nexus
 {
-	class nmaterial_base;
-
-	// 一个对象可以有多个材质，每个材质的透明类型不同
-	struct transparent_flag
-	{
-		unsigned int flag;
-
-		transparent_flag(void):flag(0)	{}
-
-		void clear()
-		{
-			flag = 0;
-		}
-		void set(enum ETransparentType t)
-		{
-			flag = flag | (1<<t);
-		}
-		bool get(enum ETransparentType t)
-		{
-			return 0!=(flag &  (1<<t));
-		}
-	};
-
-	template<>
-	inline narchive& nserialize(narchive& ar, transparent_flag& f, const TCHAR* obj_name)
-	{
-		nserialize(ar, f.flag, obj_name);
-		return ar;
-	}
-
+	class nmtl_base;
 	/**
 	*	primitive component/level geom与渲染系统的接口
 	*
@@ -56,8 +27,7 @@ namespace nexus
 		virtual int get_render_lod() const							= 0;
 		virtual enum EDepthGroup get_depth_group() const		= 0;		
 		virtual nrender_mesh* get_render_mesh(int lod) const		= 0;
-		virtual nmaterial_base* get_material(int lod, int mtl_id) const	= 0;
-		virtual transparent_flag get_transparent_flag() const = 0;
+		virtual nmtl_base* get_material(int lod, int mtl_id) const	= 0;		
 		virtual const box_sphere_bounds& get_bounds() const	= 0;		
 		
 		virtual bool accept_dynamic_light() const = 0;
@@ -66,7 +36,16 @@ namespace nexus
 		virtual hit_id get_hit_proxy_id() const = 0;
 
 		// 默认返回material的transparent type
-		virtual enum ETransparentType get_transparent_type(int lod, int mesh_sec) const;
+		virtual enum ETransparentType get_transparent_type(int mesh_sec) const;
+		size_t get_num_mesh_section() const
+		{
+			nrender_mesh* mesh = get_render_mesh( get_render_lod() );
+			if( mesh )
+				return mesh->get_num_section();
+			else
+				return 0;
+		}
+
 		virtual void draw_setup_effect(nshading_effect* effect_ptr)	const
 		{
 			(void)effect_ptr;

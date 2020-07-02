@@ -27,6 +27,12 @@ namespace NexusEngine
 		bool ret = false;
 		switch(msg.Msg)
 		{
+		case WM_KILLFOCUS:
+			{
+				m_obj->on_mouse_left_up();
+				m_obj->on_mouse_right_up();
+			}
+			break;
 		case WM_LBUTTONDOWN:
 			{
 				LPARAM lParam = msg.LParam.ToInt32();
@@ -37,6 +43,18 @@ namespace NexusEngine
 			break;
 		case WM_LBUTTONUP:
 			m_obj->on_mouse_left_up();
+			ret = true;
+			break;
+		case WM_MBUTTONDOWN:
+			{
+				LPARAM lParam = msg.LParam.ToInt32();
+				npoint npt(LOWORD(lParam), HIWORD(lParam));
+				m_obj->on_mouse_middle_down(npt);
+			}
+			ret = true;
+			break;
+		case WM_MBUTTONUP:
+			m_obj->on_mouse_middle_up();
 			ret = true;
 			break;
 		case WM_RBUTTONDOWN:
@@ -54,7 +72,7 @@ namespace NexusEngine
 		case WM_MOUSEMOVE:
 			{
 				LPARAM lParam = msg.LParam.ToInt32();
-				npoint npt(LOWORD(lParam), HIWORD(lParam));
+				npoint npt((short)LOWORD(lParam), (short)HIWORD(lParam));
 
 				WPARAM wParam = msg.WParam.ToInt32();
 				m_obj->on_mouse_move(npt, (wParam&MK_CONTROL)!=0);
@@ -67,6 +85,12 @@ namespace NexusEngine
 				short delta = GET_WHEEL_DELTA_WPARAM(wParam);
 				m_obj->on_mouse_wheel(delta);
 				ret = true;
+			}
+			break;
+		case WM_KEYDOWN:
+			{
+				WPARAM wParam = msg.WParam.ToInt32();
+				ret = m_obj->on_key_down(wParam);
 			}
 			break;
 		}

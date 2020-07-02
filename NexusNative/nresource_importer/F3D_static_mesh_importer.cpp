@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "F3D_static_mesh_importer.h"
 #include "../F3DFileHeader/StaticMeshFile.h"
 #include "../F3DFileHeader/SubMesh.h"

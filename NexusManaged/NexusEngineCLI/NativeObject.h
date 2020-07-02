@@ -75,6 +75,11 @@ namespace NexusEngine
 			nexus::nobject* get();
 		}
 
+		property boost::shared_ptr<nexus::nobject>* SharedPtr
+		{
+			boost::shared_ptr<nexus::nobject>* get();
+		}
+
 	protected:
 		boost::shared_ptr<nexus::nobject>*	m_smart_ptr;
 	};

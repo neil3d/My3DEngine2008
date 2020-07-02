@@ -3,6 +3,8 @@
 
 namespace NexusEngine
 {
+	ref class ImageThumbnailCreator;
+
 	ref class ThumbnailCreator abstract
 	{
 	public:
@@ -33,13 +35,18 @@ namespace NexusEngine
 		void Close();
 		
 		HBITMAP CreateThumbnail(NResourceLoc loc, int w, int h);		
+		HBITMAP LoadTextureAsBitmap(NResourceLoc loc);
 	private:
 		void AddThumbnailCreator(ThumbnailCreator^ thumb);
 	private:
 		System::Collections::Generic::List<ThumbnailCreator^>^	m_creatorList;
 		System::Collections::Generic::Dictionary<String^, ThumbnailCreator^>^ m_fileExtDict;
+
+		ImageThumbnailCreator^	m_imgCreator;
 		
 		HBITMAP	m_fallback;
+		HBITMAP	m_error;
 		HBITMAP m_fileTypeXML;		
+		HBITMAP m_fileTypeAnimSet;
 	};
 }//namespace NexusEngine

@@ -1,4 +1,4 @@
-namespace NControl
+namespace NexusEditor.NControl
 {
     partial class CollapsibleGroupBox
     {

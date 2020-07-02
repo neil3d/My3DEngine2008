@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "F3D_vertex_anim_importer.h"
 #include "../F3DFileHeader/AnimMeshFile.h"
 #include "../F3DFileHeader/SubMesh.h"
@@ -197,7 +197,8 @@ namespace nexus
 		shared_ptr<F3D::VertFrame> aFrame;
 
 		fseek(fp,header.offsetFrame,SEEK_SET);
-		for(DWORD i=0; i< header.numFrame; i++)
+		// F3D导出插件计算的Frame多了一帧，所以导入的帧数需要-1
+		for(DWORD i=0; i< header.numFrame - 1; i++)
 		{
 			shared_ptr<F3D::VertFrame> fframe( nNew F3D::VertFrame );
 			if( !aFrame )

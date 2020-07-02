@@ -31,13 +31,14 @@ namespace nexus
 		return fMin + fUnit * fDiff;
 	}
 
+	class nspeed_tree_component;
 
 	struct nAPI nspt_instance
 	{
 		nspeed_base_tree::ptr	base_spt;
 		matrix44				mat_world;		
 		box_sphere_bounds		bounds;
-		hit_id	m_hit_id;
+		nspeed_tree_component*	owner;
 
 		vector3	pos;	// 3D position of tree in space
 		float	scale;	// relative size of instance (1.0 is unscaled)

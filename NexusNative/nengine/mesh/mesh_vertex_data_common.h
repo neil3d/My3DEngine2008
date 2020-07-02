@@ -32,9 +32,10 @@ namespace nexus
 		virtual vertex_stream* get_stream(size_t i)
 		{
 			nASSERT(i < 2);
-			vertex_stream* ptr_array[2] = 
+			vertex_stream* ptr_array[3] = 
 				{	&m_pos_stream,
-					&m_second_stream,					
+					&m_second_stream,
+					0,
 			};
 
 			return ptr_array[i];

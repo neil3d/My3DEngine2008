@@ -43,12 +43,12 @@ namespace NexusEngine
 		numTri = num_tri;
 	}
 
-	NMaterialBase^ NResourceStaticMesh::GetMaterial(int lod, int sec)
+	NMtlBase^ NResourceStaticMesh::GetMaterial(int lod, int sec)
 	{
-		nmaterial_base::ptr mtl = NativePtr->get_material(lod, sec);
+		nmtl_base::ptr mtl = NativePtr->get_material(lod, sec);
 
 		if( mtl )
-			return NMaterialBase::FromNativePtr(mtl);
+			return NMtlBase::FromNativePtr(mtl);
 		else
 			return nullptr;
 	}
@@ -58,15 +58,16 @@ namespace NexusEngine
 		return NativePtr->get_num_section(lod);
 	}
 
-	void NResourceStaticMesh::ImportSetMaterial(int lod, int sec, NMaterialBase^ mtl)
+	void NResourceStaticMesh::ImportSetMaterial(int lod, int sec, NMtlBase^ mtl)
 	{
 		if( mtl == nullptr )
 		{
-			throw gcnew System::ArgumentException("Can't Set Static Mesh Materal to NULL.");
+			NativePtr->import_set_material(lod, sec, nmtl_base::ptr());
 		}
 		else
 		{
 			NativePtr->import_set_material(lod, sec, mtl->GetSmartPtr());
 		}
 	}
+
 }//namespace NexusEngine

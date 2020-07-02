@@ -50,6 +50,7 @@ namespace NexusEngine
 			void set(float v){m_obj->set_wheel_factor(v);}			
 		}
 
+
 	protected:
 		void SetNativeObj(camera_controller* obj);
 	};

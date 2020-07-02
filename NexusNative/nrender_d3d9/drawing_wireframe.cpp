@@ -12,28 +12,21 @@ namespace nexus
 		m_type = shading_effect_lib::instance()->get_draw_policy_type(
 			s_dp_name_str
 			);
+		m_policy_tech = EDP_Wireframe;
 	}
 
 	drawing_wireframe::~drawing_wireframe(void)
 	{
 	}
 
-	void drawing_wireframe::draw_mesh(const d3d_view_info* view, const nrender_proxy* obj)
-	{
-		nrender_mesh* res_ptr = obj->get_render_mesh(obj->get_render_lod());
-		if(res_ptr == NULL)
-			return;
-
-		d3d9_vertex_factory* vf = static_cast<d3d9_vertex_factory*>(res_ptr->get_vertex_factory());
-		d3d9_shading_effect* shader = shading_effect_lib::instance()->acquire_shader(m_type.get(), vf->get_type(),
-			NULL, res_ptr->get_shader_mod());
-
-		for(size_t i=0; i<res_ptr->get_num_section(); i++)
-			draw_shared_no_material(shader, view, obj, i);
-	}
-
 	void drawing_wireframe::create_type(dp_type_list& type_list)
 	{
 		default_create_type(type_list, s_dp_name_str);		
+	}
+
+	void drawing_wireframe::setup_effect(d3d9_shading_effect* effect_ptr, const nprimitive_component* mesh_comp)
+	{
+		(void)mesh_comp;
+		effect_ptr->set_render_state(ERS_CullMode,ECM_None);
 	}
 }//namespace nexus

@@ -51,8 +51,12 @@ namespace NexusEditor.EditorMain
                         m_noiseGen.Amplitude, m_noiseGen.Frequency);
                     break;
                 case ETrnBurshTarget.Alphamap:
-                    trnEd.SplatLayerNoise(m_noiseGen.TargetIndex, m_noiseGen.AreaRect, m_noiseGen.NumOctaves,
-                        m_noiseGen.Amplitude, m_noiseGen.Frequency);
+                    {
+                        NTerrainMtlSetup mtl = trnEd.GetMaterial();
+                        mtl.GenerateNoise((int)m_noiseGen.TargetIndex,
+                            m_noiseGen.AreaRect, m_noiseGen.NumOctaves,
+                            m_noiseGen.Amplitude, m_noiseGen.Frequency);
+                    }
                     break;
                 case ETrnBurshTarget.Decomap:
                     break;

@@ -24,8 +24,7 @@ namespace nexus
 
 		static nstring get_name(void)	{	return nstring(_T("directional_light"));}
 		static void modify_drawing_policy_type(light_drawing_policy_type* dp_type);
-
-		virtual void set_effect_parameter(d3d9_shading_effect* effect_ptr, const nrender_light_proxy* lgt);
+		static EDrawingPolicy  get_policy_type() { return EDP_Directional_Light; }
 	};
 }//namespace nexus
 #endif //_NEXUS_D3D9_DIRECTIONAL_LIGHT_POLICY_H_

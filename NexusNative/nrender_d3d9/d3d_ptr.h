@@ -88,12 +88,16 @@ namespace nexus
 		{	return m_com_obj; }
 	};
 
-	typedef d3d_ptr<IDirect3DDevice9>		d3d_device_ptr;
-	typedef d3d_ptr<IDirect3DVertexBuffer9>	d3d_vb_ptr;
-	typedef d3d_ptr<IDirect3DIndexBuffer9>	d3d_index_ptr;
-	typedef d3d_ptr<ID3DXEffect>			d3d_effect_ptr;
-	typedef d3d_ptr<IDirect3DTexture9>		d3d_texture_ptr;
-	typedef d3d_ptr<IDirect3DSurface9>		d3d_surface_ptr;
+	typedef d3d_ptr<IDirect3DDevice9>			d3d_device_ptr;
+	typedef d3d_ptr<IDirect3DVertexBuffer9>		d3d_vb_ptr;
+	typedef d3d_ptr<IDirect3DIndexBuffer9>		d3d_index_ptr;
+	typedef d3d_ptr<ID3DXEffect>				d3d_effect_ptr;
+	typedef d3d_ptr<IDirect3DTexture9>			d3d_texture_ptr;
+	typedef d3d_ptr<IDirect3DCubeTexture9>		d3d_cube_texture_ptr;
+    typedef d3d_ptr<IDirect3DVolumeTexture9>	d3d_volume_texture_ptr;
+	typedef d3d_ptr<IDirect3DSurface9>			d3d_surface_ptr;
+	typedef d3d_ptr<ID3DXSprite>				d3d_sprite_ptr;
+	typedef d3d_ptr<ID3DXFont>					d3d_font_ptr;
 }//namespace nexus
 
 #endif //_NEXUS_D3D_PTR_H_

@@ -37,10 +37,10 @@ namespace nexus
 	}
 
 	void shader_compile_environment::init(drawing_policy_type* dp_type, vertex_factory_type* vf_type, 
-		const nmaterial_base* mtl, const nshader_modifier* mod)
+		const nmtl_tech_shader* mtl_shader, const nshader_modifier* mesh_mod,const nshader_modifier* mtl_mod)
 	{
 		m_dp_type = dp_type;
-		m_include.set_data(dp_type, vf_type, mtl);
+		m_include.set_data(dp_type, vf_type, mtl_shader);
 
 		//-- make D3DX macro
 		m_macro_array.clear();
@@ -51,11 +51,23 @@ namespace nexus
 		// drawing policy macros
 		_convert_shader_macros(m_dp_type->macros, m_macro_array);
 
-		if( mod )
+		if( mesh_mod )
 		{
-			for(size_t i=0; i<mod->get_num_macro(); i++)
+			for( shader_macro_array::const_iterator itor = mesh_mod->get_macro_array().begin();
+				itor != mesh_mod->get_macro_array().end();
+				++itor)
 			{
-				m_macro_array.push_back(_convert_macor(mod->get_macro(i)));
+				m_macro_array.push_back(_convert_macor(*itor));
+			}
+		}
+
+		if( mtl_mod )
+		{
+			for( shader_macro_array::const_iterator itor = mtl_mod->get_macro_array().begin();
+				itor != mtl_mod->get_macro_array().end();
+				++itor)
+			{
+				m_macro_array.push_back(_convert_macor(*itor));
 			}
 		}
 		
@@ -72,10 +84,14 @@ namespace nexus
 			<< _T('_')
 			<< vf_type->get_name()
 			<< _T('_');
-		if( mod )
-			ss << mod->get_name();
-		ss << mtl->get_template_name();			
-		
+			
+		if( mesh_mod )
+			ss << mesh_mod->get_name()<< _T('_');
+
+		if( mtl_mod )
+			ss << mtl_mod->get_name();
+
+		ss << mtl_shader->get_name_str();
 
 		m_name = boost::replace_all_copy(ss.str(), g_engine_package_name, _T("_"));
 		m_name = boost::replace_all_copy(m_name, _T("/"), _T("_"));	// file name ready
@@ -94,7 +110,7 @@ namespace nexus
 
 			if( g_file_sys->file_exists(g_engine_package_name, full_path_str) )
 			{
-				load_shder_source(full_path_str, m_include_code);
+				load_shader_source(full_path_str, m_include_code);
 				return true;
 			}
 		}

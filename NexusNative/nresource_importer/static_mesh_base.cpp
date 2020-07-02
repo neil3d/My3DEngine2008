@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include <sstream>
 #include "static_mesh_base.h"
 #include "nv_meshmender/NVMeshMender.h"
@@ -11,6 +11,32 @@
 
 namespace nexus
 {
+	IDirect3DDevice9* g_device = NULL;
+
+	IDirect3DDevice9* get_device()
+	{
+		if (!g_device)
+		{
+			IDirect3D9* d3d9_obj = Direct3DCreate9(D3D_SDK_VERSION);
+			// Create the D3D object, which is needed to create the D3DDevice.
+
+			D3DPRESENT_PARAMETERS d3dpp;
+			ZeroMemory( &d3dpp, sizeof( d3dpp ) );
+			d3dpp.Windowed = TRUE;
+			d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+			d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+
+			IDirect3DDevice9* d3d9_device = NULL;
+
+			HRESULT hr = d3d9_obj->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, GetDesktopWindow(),
+				D3DCREATE_HARDWARE_VERTEXPROCESSING,
+				&d3dpp, &d3d9_device );
+			g_device = d3d9_device;
+		}
+
+		return g_device;
+	}
+
 	static_mesh_base::static_mesh_base(void)
 	{
 	}
@@ -65,6 +91,13 @@ namespace nexus
 		return false;
 	}
 
+	struct d3d_vertex
+	{
+		vector3	pos;
+		vector3	normal;
+		vector3 tangent;
+		vector2	uv;
+	};
 
 	void static_mesh_base::generate_tangent(nstatic_mesh_lod::ptr lod)
 	{
@@ -111,7 +144,7 @@ namespace nexus
 			bool success = theMender.Mend(md_vb,
 				md_indices, mappingNewToOldVert,
 				0.5f, 0.5f, 0.5f, 1.0f,
-				MeshMender::DONT_CALCULATE_NORMALS,	// note: 使用“CALCULATE_NORMALS”会造成per-pixel lighting的bug
+				MeshMender::CALCULATE_NORMALS,	// note: 使用“CALCULATE_NORMALS”会造成per-pixel lighting的bug
 				MeshMender::DONT_RESPECT_SPLITS,
 				MeshMender::DONT_FIX_CYLINDRICAL);
 
@@ -119,9 +152,9 @@ namespace nexus
 			//		update the mesh with the mended data
 			/*if( success )
 			{
-				nASSERT(md_indices.size() == sec->m_index_buffer.get_index_count());
-				for(size_t j=0; j<md_indices.size(); j++)
-					sec->m_index_buffer.data[j] = md_indices[j];
+			nASSERT(md_indices.size() == sec->m_index_buffer.get_index_count());
+			for(size_t j=0; j<md_indices.size(); j++)
+			sec->m_index_buffer.data[j] = md_indices[j];
 			}*/
 		}
 
@@ -136,16 +169,119 @@ namespace nexus
 			memcpy(&v.tangent,	&md_vert.tangent, sizeof(vector3));
 
 			// test data
-			if( error_normal(v.normal) 
+		/*	if( error_normal(v.normal) 
 				|| error_normal(v.tangent))
 			{
 				v.normal= vector3(0,1,0);			
 				v.tangent = vector3(1,0,0);
-			}
+			}*/
 
 			v.tex.x = md_vert.s;
 			v.tex.y = md_vert.t;
 		}
+
+		//return;
+
+		std::vector<WORD> d3d_indices;
+		std::vector<d3d_vertex> d3d_vertcies;
+		std::vector<DWORD> d3d_attributes;
+	
+		for(size_t i=0; i<lod->m_secton_array.size(); i++)
+		{
+			nmesh_section::ptr sec = lod->m_secton_array[i];
+
+			for(size_t j=0; j<sec->m_index_buffer.get_index_count(); j += 3)
+			{
+				d3d_attributes.push_back(sec->m_material_id);
+			}
+
+			d3d_indices.insert(d3d_indices.end(),sec->m_index_buffer.data.begin(),sec->m_index_buffer.data.end());
+		}
+
+		nASSERT(d3d_attributes.size()*3 ==d3d_indices.size());
+
+		d3d_vertcies.resize(m_vertex_buffer.size());
+		for (size_t i = 0; i < m_vertex_buffer.size(); i ++)
+		{
+			d3d_vertcies[i].pos = m_vertex_buffer[i].pos;
+			d3d_vertcies[i].normal = m_vertex_buffer[i].normal;
+			d3d_vertcies[i].tangent = m_vertex_buffer[i].tangent;
+			d3d_vertcies[i].uv = m_vertex_buffer[i].tex;
+		}	
+
+		// Vertex declaration
+		D3DVERTEXELEMENT9 VERTEX_DECL[] =
+		{
+			{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT,  D3DDECLUSAGE_POSITION, 0},
+			{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT,  D3DDECLUSAGE_NORMAL,   0},
+			{ 0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT,  D3DDECLUSAGE_TANGENT,   0},
+			{ 0, 36, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT,  D3DDECLUSAGE_TEXCOORD, 0},
+			D3DDECL_END()
+		};
+
+		LPD3DXMESH pD3DMesh = NULL;
+		HRESULT hr = D3DXCreateMesh(d3d_indices.size()/3,m_vertex_buffer.size(),D3DXMESH_SYSTEMMEM,VERTEX_DECL,get_device(),&pD3DMesh);
+
+		d3d_vertex* D3DVertices = NULL;
+		WORD*		 D3DIndices = NULL;
+		DWORD*		 D3DAttributes = NULL;
+
+		pD3DMesh->LockVertexBuffer(0,(LPVOID*)&D3DVertices);
+		pD3DMesh->LockIndexBuffer(0,(LPVOID*)&D3DIndices);
+		pD3DMesh->LockAttributeBuffer(0, &D3DAttributes);
+
+		memcpy(D3DVertices,&d3d_vertcies[0],d3d_vertcies.size()* sizeof(d3d_vertex));
+		memcpy(D3DIndices,&d3d_indices[0],d3d_indices.size()* sizeof(WORD));
+		memcpy(D3DAttributes,&d3d_attributes[0],d3d_attributes.size() * sizeof(DWORD));
+
+		pD3DMesh->UnlockIndexBuffer();
+		pD3DMesh->UnlockVertexBuffer();
+		pD3DMesh->UnlockAttributeBuffer();
+
+	   DWORD* aAdjacency = new DWORD[pD3DMesh->GetNumFaces() * 3];
+	   hr = pD3DMesh->GenerateAdjacency( 1e-6f, aAdjacency );
+	//   hr = D3DXComputeNormals(pD3DMesh,aAdjacency);
+	//   hr = D3DXComputeTangentFrame(pD3DMesh,NULL);
+	   hr = pD3DMesh->OptimizeInplace( D3DXMESHOPT_COMPACT|D3DXMESHOPT_VERTEXCACHE, aAdjacency, NULL, NULL, NULL );
+
+	   D3DVertices = NULL;
+	   D3DIndices = NULL;
+	   D3DAttributes = NULL;
+	   pD3DMesh->LockVertexBuffer(D3DLOCK_READONLY,(LPVOID*)&D3DVertices);
+	   pD3DMesh->LockIndexBuffer(D3DLOCK_READONLY,(LPVOID*)&D3DIndices);
+	   pD3DMesh->LockAttributeBuffer(D3DLOCK_READONLY,&D3DAttributes);
+
+	   m_vertex_buffer.clear();
+	   m_vertex_buffer.resize(pD3DMesh->GetNumVertices());
+	   for (size_t i = 0; i < pD3DMesh->GetNumVertices(); i ++)
+	   {
+			m_vertex_buffer[i].pos = D3DVertices[i].pos;
+			m_vertex_buffer[i].normal = D3DVertices[i].normal;
+			m_vertex_buffer[i].tangent = D3DVertices[i].tangent;
+			m_vertex_buffer[i].tex = D3DVertices[i].uv;
+	   }
+
+	   for(size_t j=0; j<lod->m_secton_array.size(); j++)
+	   { 
+		   nmesh_section::ptr sec = lod->m_secton_array[j];
+		   sec->m_index_buffer.data.clear();
+		   for (size_t i = 0; i < pD3DMesh->GetNumFaces(); i ++)
+		   {
+			   if (D3DAttributes[i] == sec->m_material_id )
+			   {
+					sec->m_index_buffer.append_index(D3DIndices[i*3 + 0]);
+					sec->m_index_buffer.append_index(D3DIndices[i*3 + 1]);
+					sec->m_index_buffer.append_index(D3DIndices[i*3 + 2]);
+			   }
+		   }
+	   }
+		
+	   nASSERT(lod->get_face_count() == pD3DMesh->GetNumFaces())
+	   pD3DMesh->UnlockIndexBuffer();
+	   pD3DMesh->UnlockVertexBuffer();
+	   pD3DMesh->UnlockAttributeBuffer();
+
+	   delete aAdjacency;
 	}
 
 	nmesh_vertex_data::ptr static_mesh_base::create_vertex_data()

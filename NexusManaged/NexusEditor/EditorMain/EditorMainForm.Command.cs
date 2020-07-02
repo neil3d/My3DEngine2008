@@ -21,6 +21,7 @@ namespace NexusEditor
             m_btnList.Add(this.toolBtnPick);
             m_btnList.Add(this.toolBtnCamera);
             m_btnList.Add(this.toolBtnTerrainEd);
+            m_btnList.Add(this.toolBtnNavEditor);
             m_btnList.Add(this.toolBtnTranslate);
             m_btnList.Add(this.toolBtnRotate);
             m_btnList.Add(this.toolBtnScale);
@@ -35,6 +36,7 @@ namespace NexusEditor
                 btn.Tag = (EditorCommand)i;
                 i++;
                 btn.Click += new EventHandler(btnCommand_Click);
+                btn.CheckedChanged += new EventHandler(btnCommand_Checked);
             }
         }
 
@@ -45,21 +47,7 @@ namespace NexusEditor
         void btnCommand_Click(object sender, EventArgs e)
         {
             ToolStripButton clickBtn = sender as ToolStripButton;
-            EditorCommand cmd = (EditorCommand)clickBtn.Tag;
-
-            bool ok = true;
-            if (cmd == EditorCommand.TerrainMode)
-            {
-                ok = NLevelEditorEngine.Instance.BindSelectedActorToTerrainEd();
-                if (!ok)
-                    NexusEditor.Program.ShowError("Please Select a Terrain First!");
-            }
-            
-            if( ok )
-            {
-                CheckCommandButton(clickBtn);
-                NLevelEditorEngine.Instance.Command = (EditorCommand)clickBtn.Tag;            
-            }                      
+            CheckCommandButton(clickBtn);         
         }
 
         /// <summary>
@@ -71,6 +59,38 @@ namespace NexusEditor
             {
                 ibtn.Checked = (ibtn == btn);
             }
+        }
+
+        void btnCommand_Checked(object sender, EventArgs e)
+        {
+            ToolStripButton clickBtn = sender as ToolStripButton;
+            if (!clickBtn.Checked)
+                return;
+
+            EditorCommand cmd = (EditorCommand)clickBtn.Tag;
+
+            bool ok = true;
+            if (cmd == EditorCommand.TerrainMode)
+            {
+                ok = NLevelEditorEngine.Instance.BindSelectedActorToTerrainEd();
+                if (!ok)
+                    NexusEditor.Program.ShowError("Please Select a Terrain First!");
+            }
+
+            // 开启或者关闭导航图编辑模式
+            if( cmd == EditorCommand.NavigateMapMode)
+            {
+                NLevelEditorEngine.Instance.NavigateMapEd.BeginNavigateMapEditor(NLevelEditorEngine.Instance.MainLevel);
+            }
+            else
+            {
+                NLevelEditorEngine.Instance.NavigateMapEd.EndNavigateMapEditor();
+            }
+
+            if (ok)
+            {                
+                NLevelEditorEngine.Instance.Command = cmd;
+            }           
         }
     }
 }

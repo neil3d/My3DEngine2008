@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
-namespace NControl
+namespace NexusEditor.NControl
 {
     /// <summary>
     /// GroupBox control that provides functionality to 

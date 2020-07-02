@@ -23,7 +23,7 @@ namespace NexusEngine
 		NativePtr->create_sphere(radius, numRings, numSections);
 	}
 
-	void NShapeComponent::SetMaterial(NMaterial^ mtl)
+	void NShapeComponent::SetMaterial(NMtlBase^ mtl)
 	{
 		NativePtr->set_material(mtl->GetSmartPtr());
 	}

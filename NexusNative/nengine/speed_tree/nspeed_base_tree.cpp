@@ -13,6 +13,8 @@
 
 namespace nexus
 {
+	nDEFINE_NAMED_CLASS(nspeed_base_tree, nresource)
+
 	nspeed_base_tree::nspeed_base_tree(const nstring& name_str):nresource(name_str),
 		m_branches_mtl(_T("spt_branch_mtl")),
 		m_frond_mtl(_T("spt_frond_mtl")),
@@ -110,10 +112,10 @@ namespace nexus
 		{
 			std::string txt;
 			txt.resize(file_size+1, 0);
-			nfile::ptr file_ptr = fs->open_file(_T("engine_data"), _T("common/GeneralWind.ini"), EFileRead);
-			file_ptr->read_buffer((void*)txt.data(), file_size);
+			nfile::ptr generalwind_file_ptr = fs->open_file(_T("engine_data"), _T("common/GeneralWind.ini"), EFileRead);
+			generalwind_file_ptr->read_buffer((void*)txt.data(), file_size);
 			
-			bool ok = m_cGeneralWind.Load(txt.c_str(), file_size);			
+			bool wind_ok = m_cGeneralWind.Load(txt.c_str(), file_size);			
 		}
 		
 		//--
@@ -317,9 +319,17 @@ namespace nexus
 				nspt_leafcard_vertex_data vert_data;
 				if( vert_data.create(sLeaves) > 0 )
 				{
-					render_res_ptr<nrender_static_mesh> lod_mesh(
-						rres_mgr->alloc_static_mesh() );
-					lod_mesh->create(EDraw_TriangleList, &vert_data);
+					render_res_ptr<nrender_static_mesh_indexed> lod_mesh(
+						rres_mgr->alloc_static_mesh_indexed() );
+			
+					index_buffer16 index_data;
+					size_t num_index = vert_data.get_num_vert();
+					for (size_t i = 0; i < num_index; i ++)
+					{
+						index_data.append_index(num_index - i - 1);
+					}
+
+					lod_mesh->create(EDraw_TriangleList, &vert_data,&index_data,0);
 					m_leafcard_lods.push_back( lod_mesh.release() );
 					m_has_leafcard = true;
 				}
@@ -369,5 +379,25 @@ namespace nexus
 			m_leafmesh.reset( new_render_mesh.release() );
 			m_has_leafmesh = true;
 		}
+	}
+
+	void nspeed_base_tree::_on_device_lost(int param)
+	{
+		m_branches_mesh.reset();
+		m_frond_mesh.reset();
+		m_leafcard_lods.clear();
+		m_leafmesh.reset();
+	}
+
+	bool nspeed_base_tree::_on_device_reset(int param)
+	{
+		if( m_spt )
+		{
+			create_branches(m_spt);
+			create_frond(m_spt);
+			create_leafcard(m_spt);
+			create_leafmesh(m_spt);
+		}
+		return true;
 	}
 }//namespace nexus

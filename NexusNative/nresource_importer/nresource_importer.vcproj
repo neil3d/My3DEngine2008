@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\ncore"
+				AdditionalIncludeDirectories="..\ncore;..\..\External\NexusExternal\boost_1_40_0;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\DXSDK_Aug2009\Include;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NRESOURCE_IMPORTER_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,9 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).nex"
+				AdditionalDependencies="d3d9.lib"
+				OutputFile="..\..\debug\$(ProjectName).nex"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\NexusExternal\DXSDK_Aug2009\Lib\x86;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -118,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\ncore"
+				AdditionalIncludeDirectories="..\ncore;..\..\External\NexusExternal\boost_1_40_0;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\DXSDK_Aug2009\Include;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NRESOURCE_IMPORTER_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -137,9 +138,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="d3d9.lib"
 				OutputFile="$(OutDir)\$(ProjectName).nex"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\external\boost\lib;..\..\..\external\DirectX\Lib\x86"
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\NexusExternal\DXSDK_Aug2009\Lib\x86;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -180,22 +182,6 @@
 			<File
 				RelativePath=".\nv_meshmender\NVMeshMender.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\nv_meshmender\NVMeshMender.h"

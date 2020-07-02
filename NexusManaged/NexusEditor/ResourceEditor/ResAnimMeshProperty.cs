@@ -70,9 +70,9 @@ namespace NexusEditor.ResourceEditor
 
                     for (int j = 0; j < numSec; j++)
                     {
-                        NMaterial mtl = res.GetMaterial(i, j) as NMaterial;
-                        MaterialProperty mtlProp = new MaterialProperty(mtl);
-                        lod.Materials.Add(mtlProp);
+                        NMtlStatic mtl = res.GetMaterial(i, j) as NMtlStatic;
+                        //MaterialProperty mtlProp = new MaterialProperty(mtl);
+                        //lod.Materials.Add(mtlProp);
                     }
 
                     lods.Add(lod);

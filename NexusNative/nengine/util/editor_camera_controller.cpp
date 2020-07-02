@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "editor_camera_controller.h"
-
+#include <Windows.h>
 namespace nexus
 {
 	perspective_camera_controller::perspective_camera_controller(void)		
@@ -16,39 +16,109 @@ namespace nexus
 	void perspective_camera_controller::on_mouse_wheel(int delta)
 	{
 		// 处理鼠标滚轮
-		m_compute.move_dist(delta*m_wheel_factor);
+		if(!m_right_down)
+			m_compute.move_dist(delta*m_wheel_factor);
 	}
 
 	void perspective_camera_controller::on_mouse_move(const npoint& pt, bool ctrl_down)
 	{
-		if( m_left_down )
+		if(m_middle_down)
 		{
+			npoint d = pt-m_middle_drag_pt;
+			vector3 delta(0,0,0);
+
+			if( ctrl_down ) //  ctrl
+				delta += m_compute.m_forward*d.y * m_move_factor;
+			else
+				delta += m_compute.m_up*d.y * m_move_factor;
+
+			delta += m_compute.m_side*d.x * m_move_factor;
+
+			m_compute.move_look_at(delta);
+
+			m_middle_drag_pt=pt;
+		}
+		if(m_left_down )	// 左键拖动
+		{		
+			vector3 delta(0,0,0);
 			npoint d = pt-m_left_drag_pt;
 
-			if( m_right_down)	// 两键一起拖动
-			{		
-				vector3 delta(0,0,0);
-
-				if( ctrl_down ) //  ctrl
-					delta += m_compute.m_forward*d.y * m_move_factor;
-				else
-					delta += m_compute.m_up*d.y * m_move_factor;
-
-				delta -= m_compute.m_side*d.x * m_move_factor;
-				
-				m_compute.move_look_at(delta);
-			}
+			if( ctrl_down ) //  ctrl
+				delta += m_compute.m_forward*d.y * m_move_factor;
 			else
-			{
-				m_compute.move_yaw(d.x * m_rotate_factor);
-				m_compute.move_pitch(-d.y * m_rotate_factor);
-			}
-		}
+				delta += m_compute.m_up*d.y * m_move_factor;
 
-		m_left_drag_pt = pt;
+			delta += m_compute.m_side*d.x * m_move_factor;
+			
+			m_compute.move_look_at(delta);
+
+			m_left_drag_pt = pt;
+			m_right_drag_pt = pt;
+
+			// 左键优先
+			m_right_down = false;
+		}
+		else if(m_right_down)
+		{
+			npoint d = pt-m_right_drag_pt;
+			m_compute.move_yaw(-d.x * m_rotate_factor);
+			m_compute.move_pitch(-d.y * m_rotate_factor);
+
+			m_left_drag_pt = pt;
+			m_right_drag_pt = pt;
+		}
 	}
 
-	ortho_camera_controller::ortho_camera_controller(void):m_dist(500),m_look_at(0,0,0)
+	bool perspective_camera_controller::on_key_down( unsigned int key )
+	{
+		vector3 delta(0,0,0);
+		switch (key)
+		{
+		case VK_UP:
+			{
+				delta += m_compute.m_forward*100 * m_move_factor;
+				m_compute.move_look_at(delta);
+			}
+			break;
+		case VK_DOWN:
+			{
+				delta -= m_compute.m_forward*100 * m_move_factor;
+				m_compute.move_look_at(delta);
+				break;
+			}
+		case VK_LEFT:
+			{				
+				delta += m_compute.m_side*100 * m_move_factor;
+				m_compute.move_look_at(delta);
+			}
+			break;
+		case VK_RIGHT:
+			{
+				delta -= m_compute.m_side*100 * m_move_factor;
+				m_compute.move_look_at(delta);
+			}
+			break;
+		case VK_PRIOR:
+			{
+				delta += m_compute.m_up*100 * m_move_factor;
+				m_compute.move_look_at(delta);
+			}
+			break;
+		case VK_NEXT:
+			{
+				delta -= m_compute.m_up*100 * m_move_factor;
+				m_compute.move_look_at(delta);
+			}
+			break;
+
+		default:
+			return camera_controller::on_key_down(key);
+		}
+
+		return true;
+	}
+
+	ortho_camera_controller::ortho_camera_controller(void):m_dist(2000),m_look_at(0,0,0)
 	{
 		m_axis = _T('Y');
 
@@ -60,30 +130,39 @@ namespace nexus
 		float view_w = m_view_size;
 		float view_h = m_view_size/cam->get_viewport_aspect();
 
-		vector3 eye = m_look_at-get_forward()*m_dist;						
-		vector3 up = get_up();
+		vector3 eye = m_look_at-get_forward()*m_dist;
+
 		cam->set_lookat(eye, m_look_at, get_up());
-		cam->set_ortho(view_w, view_h, 50, 500000);
+		cam->set_ortho(view_w, view_h, cam->get_znear(), cam->get_zfar());
 	}
 
 	void ortho_camera_controller::on_mouse_wheel(int delta)
 	{
-		m_view_size += delta*m_wheel_factor*10;
+		if(!m_right_down)
+			m_view_size += delta*m_wheel_factor*10;
+		if(!m_right_down)
+		{
+			m_dist+=delta*m_wheel_factor;
+			if(m_dist<1.0f) m_dist=1.0f;
+		}
 	}
 
 	void ortho_camera_controller::on_mouse_move(const npoint& pt, bool ctrl_down)
 	{
 		(void)ctrl_down;
-		if( m_left_down )
+
+		if(m_middle_down)
 		{
-			npoint d = pt-m_left_drag_pt;
+			npoint d = pt-m_middle_drag_pt;
+
 			vector3 offset_x = get_side()*(d.x*m_move_factor);
 			vector3 offset_y = get_up()*(d.y*m_move_factor);
 
-			m_look_at += offset_x;
+			m_look_at -= offset_x;
 			m_look_at += offset_y;
+
+			m_middle_drag_pt=pt;
 		}
-		m_left_drag_pt = pt;
 	}
 
 	void ortho_camera_controller::set_orientation(TCHAR axis)
@@ -102,7 +181,7 @@ namespace nexus
 			return vector3(0, -1, 0);
 			break;
 		case _T('Z'):
-			return vector3(0, 0, -1);
+			return vector3(0, 0, 1);
 			break;
 		}
 
@@ -120,7 +199,7 @@ namespace nexus
 			return vector3(1, 0, 0);
 			break;
 		case _T('Z'):
-			return vector3(-1, 0, 0);
+			return vector3(1, 0, 0);
 			break;
 		}
 

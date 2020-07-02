@@ -148,6 +148,12 @@ namespace NexusEditor.ResourceEditor
             }
         }
 
+        public ETextureType TextureType
+        {
+            get { return m_data.textureType; }
+            set { m_data.textureType = value; }
+        }
+
         public override bool IsValid()
         {
             return this.TextureLoc.IsValid();

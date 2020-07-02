@@ -7,6 +7,32 @@
 #pragma once
 #include "NativeObject.h"
 
+#define DECLARE_PROPERTY(CLASS,PropName,MemberName)\
+	property CLASS PropName\
+	{\
+	CLASS get()\
+		{\
+		return CLASS::FromNative(NativePtr->MemberName);\
+		}\
+		void set(CLASS val)\
+		{\
+		NativePtr->MemberName = val.ToNative();\
+		}\
+	}
+
+#define DECLARE_SINGLE_PROPERTY(CLASS,PropName,MemberName)\
+	property CLASS PropName\
+	{\
+	CLASS get()\
+		{\
+		return NativePtr->MemberName;\
+		}\
+		void set(CLASS val)\
+		{\
+		NativePtr->MemberName = val;\
+		}\
+	}
+
 namespace NexusEngine
 {
 	ref class NActor;
@@ -34,6 +60,12 @@ namespace NexusEngine
 		property System::String^ NativeClassName
 		{
 			System::String^ get();
+		}
+
+		[System::ComponentModel::CategoryAttribute("ActorComponent")]
+		property bool Editable
+		{
+			bool get();
 		}
 
 	protected:

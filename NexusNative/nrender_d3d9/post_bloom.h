@@ -11,7 +11,7 @@ namespace nexus
 		virtual ~post_bloom(void);
 
 		void create_resources();
-		void draw_process(const rt_item& source_rt);
+		void draw_process(const rt_item& source_rt) const; 
 
 		const rt_item& get_result() const	{	return m_bloom_vertical_rt;}
 	private:
@@ -22,6 +22,8 @@ namespace nexus
 
 		d3d_ptr<ID3DXEffect>	m_effect;
 	};
+
+	extern float ComputeGaussianValue( float x, float mean, float std_deviation );
 }//nexus
 
 #endif //_NEXUS_POST_BLOOM_H_

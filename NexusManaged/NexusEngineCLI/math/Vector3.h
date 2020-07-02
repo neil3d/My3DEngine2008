@@ -7,6 +7,8 @@ using System::Runtime::InteropServices::OutAttribute;
 
 namespace NexusEngine
 {
+	using namespace NexusEngineExtension;
+
 	value class Matrix;
 	value class Vector2;
 	
@@ -17,6 +19,7 @@ namespace NexusEngine
 	[System::Serializable]
 	[System::Runtime::InteropServices::StructLayout( System::Runtime::InteropServices::LayoutKind::Sequential, Pack = 8 )]
 	[System::ComponentModel::TypeConverter( NexusEngine::Design::Vector3Converter::typeid )]
+	[XmlClassSerializable("Vector3",false)]
 	public value class Vector3 : System::IEquatable<Vector3>
 	{
 	public:
@@ -24,18 +27,21 @@ namespace NexusEngine
 		/// Gets or sets the X component of the vector.
 		/// </summary>
 		/// <value>The X component of the vector.</value>
+		[XmlFieldSerializable("x")]
 		float x;
 
 		/// <summary>
 		/// Gets or sets the Y component of the vector.
 		/// </summary>
 		/// <value>The Y component of the vector.</value>
+		[XmlFieldSerializable("y")]
 		float y;
 
 		/// <summary>
 		/// Gets or sets the Z component of the vector.
 		/// </summary>
 		/// <value>The Z component of the vector.</value>
+		[XmlFieldSerializable("z")]
 		float z;
 		
 		property float default[int]
@@ -106,6 +112,17 @@ namespace NexusEngine
 		/// <returns>The squared length of the vector.</returns>
 		float LengthSquared();	
 		
+		/// Calculates the 2D length of the vector.
+		/// </summary>
+		/// <returns>The length of the vector.</returns>
+		float Length2D();		
+
+		/// <summary>
+		/// Calculates the squared 2D length of the vector.
+		/// </summary>
+		/// <returns>The squared length of the vector.</returns>
+		float LengthSquared2D();	
+
 		/// <summary>
 		/// Converts the vector into a unit vector.
 		/// </summary>
@@ -769,6 +786,9 @@ namespace NexusEngine
 		/// </summary>
 		/// <returns>The string representation of the value of this instance.</returns>
 		virtual System::String^ ToString() override;
+		virtual System::String^ ToString(bool shortenDecmialPlaces);
+
+		static Vector3 Parse(System::String^ text);
 
 		/// <summary>
 		/// Returns the hash code for this instance.
@@ -809,5 +829,8 @@ namespace NexusEngine
 		{
 			return nexus::vector3(x,y,z);
 		}
+
+		//! 计算水平朝向
+		static float CalcYaw(Vector3 dir);
 	};
 }

@@ -7,7 +7,6 @@
 
 #ifndef _NEXUS_DRAWING_POLICY_H_
 #define _NEXUS_DRAWING_POLICY_H_
-#include "d3d_view_info.h"
 #include "drawing_policy_type.h"
 
 namespace nexus
@@ -17,33 +16,44 @@ namespace nexus
 	class drawing_filter
 	{
 	public:
-		virtual bool should_draw(const nrender_proxy* obj) = 0;
+		static bool should_draw(const nprimitive_component* component)
+		{
+			return true;
+		}
 	};
 
 	/**
 	 *	渲染策略的基类
 	*/
-	class drawing_policy 		
+	class drawing_policy
 	{
 	public:
 		drawing_policy(void);
-		virtual ~drawing_policy(void)	{	}
+		virtual ~drawing_policy(void)	{}
+		
+		drawing_policy_type* get_type()
+		{
+			return m_type.get();
+		}
 
-		virtual void draw_mesh(const d3d_view_info* view, const nrender_proxy* obj) = 0;
-		// hardware instance drawing
-		//virtual void draw_mesh_packet();
+		void set_effect_tech(const std::string& tech)
+		{
+			m_tech = tech;
+		}
+
+		virtual void setup_effect(d3d9_shading_effect* effect_ptr, const nprimitive_component* prim_comp);
+		virtual void draw(const nview_info* view,const vector<const struct mesh_element*>& mesh_elements);
+		virtual void draw(const nview_info* view,const mesh_element& element);
+		enum EDrawingPolicy get_policy_tech()			{   return m_policy_tech; }
 
 	protected:
-		virtual void setup_effect(d3d9_shading_effect* effect_ptr, const nrender_proxy* obj, size_t section_index);
-
-		// 不使用材质的draw，即可以将mesh的所有section在一个effect pass中画出
-		void draw_shared_no_material(d3d9_shading_effect* shader, const d3d_view_info* view, const nrender_proxy* obj, size_t section_index);		
-
-		void draw_shared_material(const d3d_view_info* view, const nrender_proxy* obj, size_t section_index);		
+		virtual void set_technique(d3d9_shading_effect* effect_ptr);
 
 		static void default_create_type(dp_type_list& type_list, const nstring& dp_name);
 
-		drawing_policy_type::ptr	m_type;
+		std::string m_tech;
+		drawing_policy_type::ptr		m_type;
+		enum EDrawingPolicy			m_policy_tech;
 	};
 }//namespace nexus
 

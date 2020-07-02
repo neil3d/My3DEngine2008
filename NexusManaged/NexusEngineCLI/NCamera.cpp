@@ -56,4 +56,9 @@ namespace NexusEngine
 		NativePtr->get_mouse_ray(cursorX, cursorY, nray);
 		return Ray::FromNative(nray);
 	}
+
+	NexusEngine::Vector4 NCamera::WorldToScreenWithDepth( Vector3 p )
+	{	
+		return Vector4::FromNative(NativePtr->world2screen_with_depth(p.ToNative()));
+	}
 }//namespace NexusEngine

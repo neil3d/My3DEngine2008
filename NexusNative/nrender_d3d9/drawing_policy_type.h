@@ -28,7 +28,7 @@ namespace nexus
 		{	return false; }
 
 		virtual void load_shader_file();
-		nstring get_name_str() const	{	return dp_name.name_str;}
+		const nstring& get_name_str() const	{	return dp_name.name_str;}
 	};
 
 	typedef std::map<nname, drawing_policy_type::ptr>	dp_type_map;

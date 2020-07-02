@@ -10,7 +10,7 @@ namespace NexusEditor
     partial class EditorMainForm
     {
         private EditorMain.ActorListDlg m_actorList;
-
+        
         /// <summary>
         /// 初始化, 绑定一些事件
         /// </summary>
@@ -69,9 +69,12 @@ namespace NexusEditor
                 {
                     NActorComponent comp = selActor.GetComponent(i);
 
-                    TreeNode compNode = new TreeNode(comp.Name);
-                    compNode.Tag = comp;
-                    actorNode.Nodes.Add(compNode);
+                    if (comp.Editable)
+                    {
+                        TreeNode compNode = new TreeNode(comp.Name);
+                        compNode.Tag = comp;
+                        actorNode.Nodes.Add(compNode);
+                    }
                 }
 
                 this.treeViewActor.SelectedNode = actorNode;
@@ -112,6 +115,6 @@ namespace NexusEditor
             {
                 vp.Refresh();
             }            
-        }       
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using NexusEngine;
+using NexusEngineExtension;
 
 namespace NexusEditor
 {
@@ -13,10 +14,11 @@ namespace NexusEditor
         Side
     }
 
+	public delegate void CameraOperateFactorChange(int delta);
     /// <summary>
     /// 管理编辑器窗口的一个渲染窗口
     /// </summary>
-    class NEViewport : Panel
+    public class NEViewport : Panel
     {
         protected NViewport m_view;
         protected NEditorCameraController m_cameraCtrl;
@@ -24,17 +26,32 @@ namespace NexusEditor
         protected ContextMenuStrip m_menu;
         protected NGameTimer m_mainTimer;
         protected string m_focusLevel;
+		protected bool m_isRightMouseDown;
+		protected float m_cameraSight;
+		protected float m_minCameraSight;
+		protected float m_maxCameraSight;
+		protected float m_Sight;
+        /// <summary>
+        /// cache鼠标右键按下的位置，client坐标
+        /// </summary>
+        public Point RightMouseButtenDownPosition { get; set; }
+
+		public CameraOperateFactorChange CameraOperateFactorChangeEvent;
 
         public NEViewport()
         {            
             m_view = new NViewport();
             int w = NEditorEngine.Instance().Config.ClientWidth;
             int h = NEditorEngine.Instance().Config.ClientHeight;
-            m_view.Camera.SetPerspective(MathConst.PI / 4, w, h, 20, 500000);
+			m_minCameraSight = 500;
+			m_maxCameraSight = 300000;
+			m_Sight = 0.25f;
+			m_cameraSight=m_minCameraSight*(1-m_Sight*m_Sight)+m_maxCameraSight*(m_Sight*m_Sight);
+			m_view.Camera.SetPerspective(MathConst.PI / 4, w, h, 1.0f, m_cameraSight);
             m_cameraCtrl = new NPerspectiveCameraController();
-
             InitializeComponent();
             this.Dock = DockStyle.Fill;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
 
             m_view.HandleWnd = this.Handle;
             m_view.RenderMode = ERenderMode.Unlit;
@@ -44,7 +61,7 @@ namespace NexusEditor
             m_view.WidgetsRender = widgets;
             widgets.AddViewport(this);
 
-            //-- contex menu
+            //-- context menu
             m_menu = new ContextMenuStrip();            
             ToolStripMenuItem viewMenu = new ToolStripMenuItem("Render mode");            
             foreach (ERenderMode rm in Enum.GetValues(typeof(ERenderMode)))
@@ -60,6 +77,27 @@ namespace NexusEditor
             m_mainTimer = new NGameTimer();
             m_mainTimer.Reset();
         }
+
+		public float Sight
+		{
+			get	{return m_Sight;}
+			set
+			{
+				m_Sight=value;
+				m_cameraSight = m_minCameraSight * (1 - m_Sight * m_Sight) + m_maxCameraSight * (m_Sight * m_Sight);
+				int w = NEditorEngine.Instance().Config.ClientWidth;
+				int h = NEditorEngine.Instance().Config.ClientHeight;
+				if (m_cameraCtrl is NPerspectiveCameraController)
+				{
+					m_view.Camera.SetPerspective(MathConst.PI / 4, w, h, 20, m_cameraSight);
+				}
+				else
+				{
+					m_view.Camera.SetOrtho(w, h, 20, m_cameraSight);
+				}
+				
+			}			
+		}
 
         protected override void Dispose(bool disposing)
         {
@@ -89,27 +127,21 @@ namespace NexusEditor
                 m_view.RenderMode = value;
                 this.Refresh();
             }
-        }       
+        }
 
-        private void OnClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        protected override void OnMouseClick(MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
+            base.OnMouseClick(e);
+
+            this.Focus();
+            if(e.Button == MouseButtons.Right)
             {
-                System.Drawing.Rectangle rc = new Rectangle(0, 0, 18*6, 18);                
+                System.Drawing.Rectangle rc = new Rectangle(0, 0, 18 * 6, 18);
                 if (rc.Contains(e.Location))
                 {
                     m_menu.Show(this, e.Location);
                 }
             }
-            else if (e.Button == MouseButtons.Left)
-            {
-                this.Focus();
-            }
-        }
-
-        private void OnPaint(object sender, System.Windows.Forms.PaintEventArgs e)
-        {
-            RenderLevel();
         }
 
         protected virtual void RenderLevel()
@@ -123,7 +155,7 @@ namespace NexusEditor
             NEditorEngine eng = NexusEditor.Program.engine;
 
             //-- draw level
-            eng.UpdateLevel(m_focusLevel, m_mainTimer.DeltaTime);
+            eng.UpdateLevel(m_focusLevel, m_mainTimer.DeltaTime, m_view);
 
             if (m_focusLevel == eng.MainLevelName)
                 eng.RenderMainLevel(m_focusLevel, m_view);
@@ -131,12 +163,72 @@ namespace NexusEditor
                 eng.RenderLevel(m_focusLevel, m_view, true);
         }
 
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            //base.OnPaint(e);
+
+            RenderLevel();
+        }
+
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             // do nothing
         }
 
-        public void DrawWidgets(NRenderPrimitiveDrawInterface PDI)
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            // 设置鼠标Capture保证鼠标释放消息肯定能发生达到该窗口
+            NativeMethods.CaptureMouse(this.Handle, true);
+            NativeRectangle clipRect = (NativeRectangle)this.RectangleToScreen(this.ClientRectangle);
+            NativeMethods.ClipCursor(ref clipRect);
+            if(e.Button == MouseButtons.Right)
+            {
+				m_isRightMouseDown = true;
+                while (NativeMethods.ShowCursor(false) >= 0) ;
+                RightMouseButtenDownPosition = e.Location;
+            }
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            NativeMethods.ClipCursor(IntPtr.Zero);
+            NativeMethods.CaptureMouse(this.Handle, false);
+            while (NativeMethods.ShowCursor(true) < 0) ;
+            if (e.Button == MouseButtons.Right)
+            {
+                Point screenPoint = this.PointToScreen(RightMouseButtenDownPosition);
+                NativeMethods.SetCursorPos(screenPoint.X, screenPoint.Y);
+				m_isRightMouseDown=false;
+            }
+        }
+
+		protected override void OnMouseWheel(MouseEventArgs e)
+		{
+			if (m_isRightMouseDown)
+			{
+				//改变摄像机运行速度
+
+				if (CameraOperateFactorChangeEvent!=null)
+				{
+					CameraOperateFactorChangeEvent(e.Delta);
+				}
+			}
+			base.OnMouseWheel(e);
+		}
+
+        protected override void OnLostFocus(EventArgs e)
+        {
+            base.OnLostFocus(e);
+
+            NativeMethods.CaptureMouse(this.Handle, false);
+            while (NativeMethods.ShowCursor(true) < 0) ;
+        }
+
+        virtual public void DrawWidgets(NRenderPrimitiveDrawInterface PDI)
         {
             PDI.DrawDebugString(3, 3, m_mode.ToString(), new Color4ub(0, 5, 5, 255));
             PDI.DrawDebugString(2, 2, m_mode.ToString(), new Color4ub(255, 250, 250, 255));
@@ -248,9 +340,7 @@ namespace NexusEditor
             // NEViewPort
             // 
             this.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
             this.Leave += new System.EventHandler(this.NEViewPort_Leave);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnClick);
             this.Enter += new System.EventHandler(this.NEViewPort_Enter);
             this.SizeChanged += new System.EventHandler(this.NEViewPort_SizeChanged);
             this.ResumeLayout(false);
@@ -265,8 +355,8 @@ namespace NexusEditor
             NEngineConfig eng = NEditorEngine.Instance().Config;
             m_view.X = (uint)(eng.ClientWidth - m_view.Width) / 2;
             m_view.Y = (uint)(eng.ClientHeight - m_view.Height) / 2;
-
-            m_view.Camera.SetPerspective(MathConst.PI / 4, ClientSize.Width, ClientSize.Height, 20, 500000);
+			m_cameraSight = m_minCameraSight * (1 - m_Sight * m_Sight) + m_maxCameraSight * (m_Sight * m_Sight);
+            m_view.Camera.SetPerspective(MathConst.PI / 4, ClientSize.Width, ClientSize.Height, 20, m_cameraSight);
         }
 
         private void NEViewPort_Enter(object sender, EventArgs e)
@@ -282,6 +372,30 @@ namespace NexusEditor
         public NEditorCameraController CameraCtrl
         {
             get { return m_cameraCtrl; }
+        }
+
+		public NViewport Viewport
+		{
+			get { return m_view; }
+		}
+
+        protected override bool IsInputKey(Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Up:
+                case Keys.Down:
+                case Keys.Right:
+                case Keys.Left:
+                case Keys.Up | Keys.Shift:
+                case Keys.Down | Keys.Shift:
+                case Keys.Right | Keys.Shift:
+                case Keys.Left | Keys.Shift:
+                case Keys.PrintScreen:
+                case Keys.F9:
+                    return true;
+            }
+            return base.IsInputKey(keyData);
         }
     }
 }

@@ -4,28 +4,34 @@
 
 namespace NexusEngine
 {
+	using namespace NexusEngineExtension;
+
 	/// <summary>
 	/// A three-component (RGB) color value; each component is a float in the range [0,1].
 	/// </summary>
 	[System::Serializable]
 	[System::Runtime::InteropServices::StructLayout(System::Runtime::InteropServices::LayoutKind::Sequential)]
 	[System::ComponentModel::TypeConverter( NexusEngine::Design::Color3Converter::typeid )]
+	[XmlClassSerializable("Color3",false)]
 	public value class Color3 : System::IEquatable<Color3>
 	{
 	public:
 		/// <summary>
 		/// Gets or sets the color's red component.
 		/// </summary>
+		[XmlFieldSerializable("R")]
 		float R;
 		
 		/// <summary>
 		/// Gets or sets the color's green component.
 		/// </summary>
+		[XmlFieldSerializable("G")]
 		float G;
 		
 		/// <summary>
 		/// Gets or sets the color's blue component.
 		/// </summary>
+		[XmlFieldSerializable("B")]
 		float B;
 		
 		/// <summary>

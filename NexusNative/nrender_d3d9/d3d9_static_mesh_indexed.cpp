@@ -82,4 +82,9 @@ namespace nexus
 
 		return m_section_array.size()-1;
 	}
+
+	void d3d9_static_mesh_indexed::update_vertex_buffer(const nmesh_vertex_data* vert_data)
+	{
+		m_vert->update(vert_data);
+	}
 }//namespace nexus

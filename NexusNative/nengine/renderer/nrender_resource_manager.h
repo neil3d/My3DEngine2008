@@ -18,8 +18,11 @@
 #include "nrender_texture.h"
 #include "nrender_target.h"
 #include "nrender_dynamic_mesh_indexed.h"
+#include "nrender_dynamic_mesh.h"
 #include "nrender_simple_mesh.h"
 #include "nhit_proxy_hash.h"
+#include "nrender_font.h"
+#include "nui_canvas.h"
 
 namespace nexus
 {
@@ -27,6 +30,15 @@ namespace nexus
 	 *	创建、管理render hardware上的资源对象
 	 *	@remark 【线程安全】
 	*/
+	enum EEngineTexture
+	{
+		ETexture_Jitter,
+		ETexture_Rot,
+		ETexture_FFT,
+		ETexture_FFT_Normal,
+		ETexture_Max
+	};
+
 	class nAPI nrender_resource_manager :
 		public nsubsystem
 	{
@@ -36,12 +48,16 @@ namespace nexus
 		nrender_resource_manager(void)	{	}
 		virtual ~nrender_resource_manager(void)	{	}
 
+		virtual void destory() = 0;
 		virtual nrender_static_mesh* alloc_static_mesh() = 0;
 		virtual nrender_static_mesh_indexed* alloc_static_mesh_indexed() = 0;
 		virtual nrender_anim_mesh* alloc_anim_mesh_indexed() = 0;
 		virtual nrender_cpu_skin_mesh* alloc_cup_skin_mesh() = 0;		
 		virtual nrender_dynamic_mesh_indexed* alloc_dynamic_mesh_indexed() = 0;
+		virtual nrender_dynamic_mesh* alloc_dynamic_mesh() = 0;
 		virtual nrender_simple_mesh* alloc_simple_mesh() = 0;
+		virtual nui_canvas* alloc_ui_canvas() = 0;
+		virtual nrender_font* alloc_render_font() = 0;
 
 		virtual nrender_texture2D*	alloc_texture_2d() = 0;
 		virtual nrender_cube_map*	alloc_cube_map() = 0;
@@ -49,11 +65,8 @@ namespace nexus
 		virtual nrender_alphamap*	alloc_alphamap() = 0;
 		virtual nrender_target* alloc_render_target() = 0;
 		virtual nhit_proxy_hash* alloc_hit_proxy_hash() = 0;
-
+		
 		virtual void free_resource(nrender_resource* res) = 0;
-
-		virtual void set_default_material(nmaterial_base* mtl, nmaterial_base* mtl_two_sided) = 0;
-	private:	
 
 		nDECLARE_VIRTUAL_CLASS(nrender_resource_manager);
 	};

@@ -11,7 +11,7 @@ namespace NexusEngine
 	/**
 	 *	提供一个引擎异常的基类
 	*/
-	public ref class NexusException : public System::Exception
+	public ref class NexusException : public System::ApplicationException
 	{
 	public:
 		NexusException(System::String^ info);

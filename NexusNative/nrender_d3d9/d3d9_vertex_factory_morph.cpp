@@ -9,6 +9,7 @@ namespace nexus
 	d3d9_vertex_factory_morph::d3d9_vertex_factory_morph(void)
 	{
 		m_pos_stream_stride = sizeof(vector3);
+		prepared = false;
 	}
 
 	d3d9_vertex_factory_morph::~d3d9_vertex_factory_morph(void)
@@ -85,8 +86,13 @@ namespace nexus
 	{
 		try
 		{
-			m_vb_pos_a = create_vertex_for_frame(anim.src_frame_vert);
-			m_vb_pos_b = create_vertex_for_frame(anim.dst_frame_vert);
+			if (prepared == false)
+			{
+				m_vb_pos_a = create_vertex_for_frame(anim.src_frame_vert);
+				m_vb_pos_b = create_vertex_for_frame(anim.dst_frame_vert);
+				prepared = true;
+			}
+		
 		}// end of try
 		catch(nexception& e)
 		{
@@ -101,7 +107,7 @@ namespace nexus
 	{
 		m_vb_pos_a.reset();
 		m_vb_pos_b.reset();
-		
+		prepared = false;
 		for(size_t i=0; i<m_vert_streams.size(); i++)
 			dynamic_vb_pool::instance()->free( m_vert_streams[i] );
 

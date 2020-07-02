@@ -1,6 +1,7 @@
 #ifndef _NEXUS_RENDER_DYNAMIC_MESH_INDEXED_H_
 #define _NEXUS_RENDER_DYNAMIC_MESH_INDEXED_H_
 #include "nrender_mesh.h"
+#include "../mesh/mesh_index_data.h"
 
 namespace nexus
 {

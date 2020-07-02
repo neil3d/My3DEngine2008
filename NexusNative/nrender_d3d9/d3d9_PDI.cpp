@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <boost/bind.hpp>
 #include "d3d9_PDI.h"
 #include "d3d_device_manager.h"
 #include "d3d_exception.h"
@@ -7,6 +8,7 @@
 #include "nrenderer_d3d9.h"
 #include "drawing_unlit.h"
 #include "draw_hit_proxy.h"
+#include "mesh_render.h"
 
 namespace nexus
 {
@@ -14,15 +16,20 @@ namespace nexus
 	{
 		m_in_line_batch = false;
 		m_view_info = NULL;
+
+		d3d_device_manager::instance()->register_device_handler(
+			boost::bind(&d3d9_PDI::on_device_lost, this, _1),
+			boost::bind(&d3d9_PDI::on_device_reset, this, _1) );
 	}
 
 	d3d9_PDI::~d3d9_PDI(void)
 	{
 	}
 
-	void d3d9_PDI::init(d3d_view_info* view_ptr)
+	void d3d9_PDI::init(nview_info* view_ptr)
 	{
 		m_view_info = view_ptr;
+		mat_set_identity(m_matrix);
 
 		//-- create vertex decaration
 		std::vector<D3DVERTEXELEMENT9>	color_vert_def;
@@ -46,7 +53,7 @@ namespace nexus
 
 		//-- load effect
 		std::string effect_code;
-		load_shder_source(_T("shader_d3d9/misc/line_batch.fx"), effect_code);
+		load_shader_source(_T("shader_d3d9/misc/line_batch.fx"), effect_code);
 
 		ID3DXEffect* d3d_effect = NULL;
 		hr = D3DXCreateEffect(d3d_device,
@@ -81,6 +88,23 @@ namespace nexus
 			THROW_D3D_HRESULT(hr, _T("D3DXCreateFontIndirect() Failed"));
 		
 		m_font.reset(d3d_font);
+
+		//-----------------------------------------------------------------------------------
+		//生成球体的顶点
+		const int segment_count=36;
+		float angle=nPI*2.0f/(segment_count-1.0f);
+		vector3 v;
+		for(int i=0;i<segment_count;++i)
+		{
+			float x=cosf(angle*i);
+			float y=sinf(angle*i);
+			float z=0;
+			v.x=x;	v.y=z;	v.z=y;		m_sphere_vertex[0].push_back(v);
+
+			v.x=x;	v.y=y;	v.z=z;		m_sphere_vertex[1].push_back(v);
+
+			v.x=z;	v.y=y;	v.z=x;		m_sphere_vertex[2].push_back(v);			
+		}
 	}
 
 	void d3d9_PDI::begin_line_batch()
@@ -114,7 +138,9 @@ namespace nexus
 
 		hr = d3d_device->SetVertexDeclaration(m_color_vert_decl.get());
 
-		hr = m_line_effect->SetMatrix("g_matWorldViewPrj", (const D3DXMATRIX*)(&m_view_info->mat_view_project));
+		matrix44 m;
+		m=m_matrix*m_view_info->mat_view_project;
+		hr = m_line_effect->SetMatrix("g_matWorldViewPrj", (const D3DXMATRIX*)(&m));
 
 		UINT num_pass = 0;
 		hr = m_line_effect->Begin(&num_pass, 0);
@@ -155,8 +181,8 @@ namespace nexus
 	{
 		size_t len = text.length();	
 
-		x += m_view_info->d3d_view.X;
-		y += m_view_info->d3d_view.Y;
+		x += m_view_info->m_view_port.X;
+		y += m_view_info->m_view_port.Y;
 
 		RECT rc;
 		rc.left = x;
@@ -173,7 +199,8 @@ namespace nexus
 		if( pos_array.empty() )
 			return;
 
-		if( m_in_line_batch )
+		bool line_batch=m_in_line_batch;
+		if( line_batch )
 		{
 			end_line_batch();
 		}
@@ -190,7 +217,7 @@ namespace nexus
 
 		draw_line_shared(D3DPT_LINESTRIP);
 
-		if( m_in_line_batch )
+		if( line_batch )
 		{
 			begin_line_batch();
 		}
@@ -209,22 +236,102 @@ namespace nexus
 		}
 	}
 
-	void d3d9_PDI::draw_primitive(const nrender_proxy* obj, bool hit_proxy, bool disable_ztest)
+	void d3d9_PDI::draw_mesh_component(const nmesh_component* comp, bool hit_proxy, bool disable_ztest)
 	{
-		const d3d_view_info* v = nrenderer_d3d9::instance()->get_view_info();
+		const std::vector<mesh_element>& mesh_elements = (const_cast<nmesh_component*>(comp))->get_mesh_element(0);
+
+		const nview_info* v = nrenderer_d3d9::instance()->get_view_info();
+
+		draw_hit_proxy hit_dp;
+		drawing_unlit unlit_dp;
+		
+		if(disable_ztest)
+		{
+			hit_dp.set_effect_tech("techDisableZ");
+			unlit_dp.set_effect_tech("techDisableZ");
+		}
+
+		drawing_policy* dp = NULL;
 		if( hit_proxy )
-		{
-			draw_hit_proxy dp;
-			if(disable_ztest)
-				dp.set_effect_tech("techDisableZ");
-			dp.draw_mesh(v, obj);
-		}
+			dp = &hit_dp;
 		else
+			dp = &unlit_dp;
+
+		for ( size_t i = 0; i < mesh_elements.size(); i ++)
 		{
-			drawing_unlit dp;
-			if(disable_ztest)
-				dp.set_effect_tech("techDisableZ");
-			dp.draw_mesh(v, obj);
+			dp->draw(v,mesh_elements[i]);
 		}
+	}
+
+	void d3d9_PDI::on_device_lost(int param)
+	{
+		HRESULT hr;
+		if( m_line_effect )
+		{
+			hr = m_line_effect->OnLostDevice();
+			nASSERT( SUCCEEDED(hr) );
+		}
+		if( m_font )
+		{
+			hr = m_font->OnLostDevice();
+			nASSERT( SUCCEEDED(hr) );
+		}
+	}
+
+	bool d3d9_PDI::on_device_reset(int param)
+	{
+		HRESULT hr;
+		if( m_line_effect )
+		{
+			hr = m_line_effect->OnResetDevice();
+			if( FAILED(hr) )
+				return false;
+		}
+
+		if( m_font )
+		{
+			hr = m_font->OnResetDevice();
+			if( FAILED(hr) )
+				return false;
+		}
+
+		return true;
+	}
+
+	void d3d9_PDI::draw_wired_sphere( const vector3& pos,float radius, const color4f& color )
+	{
+		mat_set_scaling(m_matrix,radius,radius,radius);
+		mat_translate(m_matrix,pos);
+		color4f colorX = color4f(1, 0, 0, 1);
+		color4f colorY = color4f(0, 1, 0, 1);
+		color4f colorZ = color4f(0, 0, 1, 1);
+		draw_line_strip(m_sphere_vertex[0],colorY);
+		draw_line_strip(m_sphere_vertex[1],colorZ);
+		draw_line_strip(m_sphere_vertex[2],colorX);
+		mat_set_identity(m_matrix);
+	}
+
+	void d3d9_PDI::draw_wired_cone( float bottom_radius, float length, const matrix44& transform, const color4f& color )
+	{
+		const int segment_count=36;
+		float angle=nPI*2.0f/(segment_count-1.0f);
+		vector3 v,p(0,0,0);
+		std::vector<vector3>		m_cone_vertex;
+		m_matrix=transform;
+		for(int i=0;i<segment_count;++i)
+		{
+			v.x=bottom_radius*cosf(angle*i);
+			v.y=bottom_radius*sinf(angle*i);
+			v.z=length;
+			m_cone_vertex.push_back(v);
+			draw_line(v,p,color);
+		}
+		draw_line_strip(m_cone_vertex,color);
+		mat_set_identity(m_matrix);
+	}
+
+	void d3d9_PDI::set_transform( const matrix44& matrix )
+	{
+		m_matrix=matrix;
 	}
 }//namespace nexus

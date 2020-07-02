@@ -21,11 +21,8 @@ namespace nexus
 		nresource_io_basic(void);
 		virtual ~nresource_io_basic(void);
 
-		virtual void load_resource(nresource* res_ptr,
-			nfile_system* fs, const nstring& pkg_name, const nstring& file_name, enum EResourceIOMode mode, enum EResourceIOPriority pri);
-
-		virtual void cancel_resource_load(nresource* res_ptr);
-
+		virtual void load_resource(nresource::ptr res_ptr,
+			const nstring& pkg_name, const nstring& file_name, enum EResourceIOMode mode, enum EResourceIOPriority pri);
 	private:
 		nDECLARE_CLASS(nresource_io_basic)
 	};

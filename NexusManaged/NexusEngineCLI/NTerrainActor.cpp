@@ -5,6 +5,8 @@ namespace NexusEngine
 {
 	NTerrainActor::NTerrainActor(nexus::nterrain_actor::ptr nativeTrn):NActor(nativeTrn)
 	{
+		m_mtlSetup = gcnew NTerrainMtlSetup(nativeTrn->get_material());
+		m_DecoSetup=gcnew NTerrainDecoSetup(nativeTrn->get_deco());
 	}
 
 	nterrain_actor* NTerrainActor::NativePtr::get()
@@ -29,4 +31,16 @@ namespace NexusEngine
 		nexus::vector3* nscale = reinterpret_cast<nexus::vector3*>(&scale);
 		NativePtr->move(*npos, *nscale);
 	}
+
+	void NTerrainActor::GetWorldHeight( float worldX, float worldZ )
+	{
+		NativePtr->get_height(worldX,worldZ);
+
+	}
+
+	void NTerrainActor::GetTileHeight( int tileX, int tileZ )
+	{
+		NativePtr->get_height(tileX,tileZ);
+	}
+
 }//namespace NexusEngine

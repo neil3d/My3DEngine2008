@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(test_file_class)
 		boost::scoped_ptr<nfile_system> fsys( static_cast<nfile_system*>(class_child->alloc_object()) );
 		fsys->init( nfile_sys_default_root() );
 
-		nstring pkg_name(_T("game_data"));
+		nstring pkg_name(_T("demo_data"));
 		nstring file_name(_T("test/hello.txt"));
 		fsys->open_package(pkg_name);
 
@@ -86,9 +86,9 @@ BOOST_AUTO_TEST_CASE(test_package_query)
 
 	my_file_query fq;
 	wcout << _T("query package root...") << endl;
-	file_sys.query_package(_T("game_data"), _T("/"), fq);
+	file_sys.query_package(_T("demo_data"), _T("/"), fq);
 
 	wcout << _T("query package folder...") << endl;
-	file_sys.query_package(_T("game_data"), _T("terrain"), fq);
+	file_sys.query_package(_T("demo_data"), _T("terrain"), fq);
 
 }

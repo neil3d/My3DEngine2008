@@ -4,13 +4,9 @@
 
 namespace nexus
 {
-	nname::nname(const nstring& szname) : name_str(szname)
+	nname::nname(const nstring& szname) 
 	{
-		boost::crc_32_type  crc_result;
-		crc_result.process_bytes(name_str.data(), 
-			name_str.size()*sizeof(nstring::value_type));
-
-		name_crc = crc_result.checksum();
+		reset(szname);
 	}
 
 	void nname::reset(const nstring& szname)

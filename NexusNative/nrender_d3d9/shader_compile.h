@@ -23,15 +23,15 @@ namespace nexus
 	{
 	public:
 		shader_include()
-			: m_vf_type(NULL), m_mtl(NULL)
+			: m_vf_type(NULL), m_mtl_shader(NULL)
 		{}
 		virtual ~shader_include()	{}
 
-		void set_data(drawing_policy_type*	dp, vertex_factory_type* vf_type, const nmaterial_base* mtl)
+		void set_data(drawing_policy_type*	dp, vertex_factory_type* vf_type, const nmtl_tech_shader* mtl_shader)
 		{
 			m_dp = dp;
 			m_vf_type = vf_type;
-			m_mtl = mtl;
+			m_mtl_shader = mtl_shader;
 		}
 		STDMETHOD(Open)(THIS_ D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
 		{
@@ -53,10 +53,10 @@ namespace nexus
 			}
 			else if(_stricmp(pFileName, "material.hlsl") == 0)
 			{
-				if(m_mtl == NULL)
+				if(m_mtl_shader == NULL)
 					return D3DERR_NOTFOUND;
 				
-				const std::string& code = m_mtl->get_shader_code();
+				const std::string& code = m_mtl_shader->get_shader_code();
 
 				*ppData = (void*)code.c_str();
 				*pBytes = (UINT)code.size();
@@ -84,15 +84,15 @@ namespace nexus
 		}
 
 		bool search_include_file(const nstring& file_name);
-		void load_shder_source_file()
+		void load_shader_source_file()
 		{
 			m_dp->load_shader_file();
 			m_vf_type->load_shader_file();
 		}
 	private:
-		vertex_factory_type*	m_vf_type;
-		const nmaterial_base*		m_mtl;
-		drawing_policy_type*	m_dp;
+		vertex_factory_type*		m_vf_type;
+		const nmtl_tech_shader*		m_mtl_shader;
+		drawing_policy_type*		m_dp;
 		
 		std::string	m_include_code;
 	};
@@ -106,8 +106,11 @@ namespace nexus
 		shader_compile_environment(void);
 		~shader_compile_environment(void);
 
-		void init(drawing_policy_type* dp_type, vertex_factory_type* vf_type, 
-			const nmaterial_base* mtl, const nshader_modifier* mod);
+		void init(drawing_policy_type* dp_type, 
+			vertex_factory_type* vf_type, 
+			const nmtl_tech_shader* mtl_shader,
+			const nshader_modifier* mesh_mod,
+			const nshader_modifier* mtl_mod);
 		
 		const char* get_shader_source()		{	return m_dp_type->shader_source.c_str();}
 		size_t get_shader_source_len()	{	return m_dp_type->shader_source.size();}
@@ -123,9 +126,9 @@ namespace nexus
 
 		const nstring& get_name() const	{	return m_name;}
 
-		void load_shder_source()
+		void load_shader_source()
 		{
-			m_include.load_shder_source_file();
+			m_include.load_shader_source_file();
 		}
 	private:
 		drawing_policy_type*	m_dp_type;

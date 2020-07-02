@@ -21,6 +21,12 @@ namespace NexusEngine
 		Int		= EMPT_Int,
 	};
 
+	public enum class ETextureType
+	{
+		Texture2D = 0,
+		CubeMap = 1,
+	};
+
 	//!	²ÄÖÊ²ÎÊý
 	public value struct NMaterialParam
 	{
@@ -30,7 +36,8 @@ namespace NexusEngine
 		int				 intVal;
 		Vector4			 floatVal;
 		NResourceLoc	 textureLoc;
+		ETextureType textureType;
 
-		void FromNative(const nexus::material_parameter_value& np);
+		void FromNative(const nexus::material_parameter& np);
 	};
 }//namespace NexusEngine

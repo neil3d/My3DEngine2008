@@ -34,11 +34,29 @@ namespace NexusEngine
 		//!	查询某个文件包的名称
 		System::String^ GetPackageName(int i);
 
+		//查询指定文件是否存在
+		bool IsFileExist(System::String^ pkgName, System::String^ path);
 		//!	查询某个文件包中的某个路径下的所有文件和文件夹
 		void QueryPackage(System::String^ pkgName, System::String^ path, NFileQuery^ fq);
+		//在指定包下面创建目录
+		void CreateDirectory(System::String^ pkgName, System::String^ path);
+		//删除指定目录
+		void DeleteDirectory(System::String^ pkgName, System::String^ path);
+		//重命名指定目录
+		bool RenameDirectory(System::String^ pkgName, System::String^ oldName,System::String^ newName);
 
 		System::UInt32 GetFileSize(System::String^ pkgName, System::String^ path);
 		System::DateTime GetFileTime(System::String^ pkgName, System::String^ path);
+
+		System::String^ GetFullPath(System::String^ pkgName, System::String^ fileName);
+
+		static property System::String^ DefaultFileSystemRoot
+		{
+			System::String^ get()
+			{
+				return gcnew System::String(nfile_sys_default_root().c_str());
+			}
+		}
 
 		//-- Native wrapper
 	public:

@@ -15,7 +15,7 @@ namespace nexus
 	/*
 	 *	一个标准文件的封装
 	*/
-	class nstd_file : public nfile
+	class nCoreAPI nstd_file : public nfile
 	{
 	public:
 		nstd_file(void);
@@ -65,14 +65,18 @@ namespace nexus
 
 		virtual void open_package(const nstring& pkg_name);
 		virtual void close_package(const nstring& pkg_name);
+		virtual void create_directory(const nstring& pkg_name,const nstring& dir);
+		virtual void remove_directory(const nstring& pkg_name,const nstring& dir);
+		virtual bool rename_directory(const nstring& pkg_name,const nstring& old_name,const nstring& new_name);
 		virtual nfile::ptr open_file(const nstring& pkg_name, const nstring& file_name, enum EFileMode mode);
 		virtual bool remove_file(const nstring& pkg_name, const nstring& file_name);
 		virtual int get_file_size(const nstring& pkg_name, const nstring& file_name);
 		virtual time_t get_file_time(const nstring& pkg_name, const nstring& file_name);
 		virtual bool file_exists(const nstring& pkg_name, const nstring& file_name);
 
-	private:
-		nstring get_full_path(const nstring& pkg_name, const nstring& file_name) const;
+		virtual nstring get_full_path(const nstring& pkg_name, const nstring& file_name) const;
+
+	private:		
 		void query_path_R(const nstring& path_str, nfile_query* out_info, int parent_id, int& count);
 
 		nstring	m_base_path;

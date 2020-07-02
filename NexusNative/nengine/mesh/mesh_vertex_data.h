@@ -8,32 +8,11 @@
 #ifndef _NEXUS_MESH_VERTEX_DATA_H_
 #define _NEXUS_MESH_VERTEX_DATA_H_
 #include "ncore.h"
+#include "../renderer/render_define.h"
 #include "vertex_stream.h"
 
 namespace nexus
 {
-	struct shader_define
-	{
-		std::string	name;
-		std::string	value;
-
-		shader_define(void)	{}
-		shader_define(const std::string& _name, const std::string& _value):name(_name),value(_value)
-		{}
-	};
-	typedef std::vector<shader_define> shader_macro_array;
-
-	template<>
-	inline narchive& nserialize(narchive& ar, shader_define& d, const TCHAR* obj_name)
-	{
-		nstring class_name(_T("shader_define"));
-		ar.object_begin(obj_name, class_name);
-			nserialize(ar, d.name, _T("name"));
-			nserialize(ar, d.value, _T("value"));		
-		ar.object_end();
-		return ar;
-	}
-
 	/**
 	 *	管理一个Mesh所需的vertex相关数据
 	*/

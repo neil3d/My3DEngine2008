@@ -10,12 +10,21 @@
 #include "vertex_factory_type.h"
 #include "drawing_light.h"
 #include "scene_render_targets.h"
-#include "drawing_lit_trans_obj.h"
-#include "drawing_unlit_trans.h"
 #include "d3d9_hit_proxy_hash.h"
 #include "draw_hit_proxy.h"
 #include "dynamic_vb_pool.h"
 #include "global_shader_lib.h"
+#include "d3d_exception.h"
+#include "drawing_extend.h"
+#include "drawing_policy.h"
+#include "ambent_light_policy.h"
+#include "ssao.h"
+#include "..\nengine\actor\nlight_component.h"
+#include "FFTWave.h"
+
+#include "..\nengine\speed_tree\nspeed_tree_component.h"
+#include "..\nengine\actor\nmesh_component.h"
+#include "..\nengine\util\hud_info.h"
 
 #ifdef _DEBUG
 #	pragma comment(lib,"../nengine/SPT_SDK/lib/vc9/debug/SpeedTreeRT_d.lib")
@@ -25,6 +34,104 @@
 
 namespace nexus
 {
+	void draw_stencil_volume(
+							const vector<vector3>& positons,
+							const UINT* indexes,
+							UINT prim_count,
+							const matrix44&world,
+							const matrix44&view,
+							const matrix44&proj
+							)
+	{
+		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+		device->Clear(0, NULL, D3DCLEAR_STENCIL, 0, 0, 0);
+		device->SetVertexShader(NULL);	
+		device->SetPixelShader(NULL);
+		device->SetFVF(D3DFVF_XYZ);
+		device->SetTransform(D3DTS_WORLD,(D3DXMATRIX*)&world);
+		device->SetTransform(D3DTS_VIEW,(D3DXMATRIX*)&view);
+		device->SetTransform(D3DTS_PROJECTION,(D3DXMATRIX*)&proj);
+		device->SetVertexShader(NULL);	
+		device->SetPixelShader(NULL);
+		device->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
+		device->SetRenderState(D3DRS_FILLMODE,D3DFILL_SOLID);
+
+		device->SetRenderState(D3DRS_STENCILENABLE,true);
+		device->SetRenderState(D3DRS_STENCILFUNC,D3DCMP_ALWAYS);
+		device->SetRenderState(D3DRS_STENCILFAIL,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_STENCILZFAIL,D3DSTENCILOP_DECR);
+		device->SetRenderState(D3DRS_STENCILPASS,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_TWOSIDEDSTENCILMODE,true);
+		device->SetRenderState(D3DRS_CCW_STENCILFUNC,D3DCMP_ALWAYS);
+		device->SetRenderState(D3DRS_CCW_STENCILFAIL,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_CCW_STENCILZFAIL,D3DSTENCILOP_INCR);
+		device->SetRenderState(D3DRS_CCW_STENCILPASS,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_STENCILMASK,0xff);
+		device->SetRenderState(D3DRS_STENCILWRITEMASK,0xff);
+		device->SetRenderState(D3DRS_STENCILREF,0);
+
+		device->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
+		device->SetRenderState(D3DRS_ZWRITEENABLE,false);
+		device->SetRenderState(D3DRS_ZENABLE,true);
+
+		device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST,0,positons.size(),prim_count,indexes,D3DFMT_INDEX32,&positons[0],sizeof(vector3));
+
+		device->SetRenderState(D3DRS_STENCILENABLE,true);
+		device->SetRenderState(D3DRS_STENCILFUNC,D3DCMP_NOTEQUAL);
+		device->SetRenderState(D3DRS_STENCILFAIL,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_STENCILZFAIL,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_STENCILPASS,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_TWOSIDEDSTENCILMODE,false);
+		device->SetRenderState(D3DRS_CCW_STENCILFUNC,D3DCMP_ALWAYS);
+		device->SetRenderState(D3DRS_CCW_STENCILFAIL,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_CCW_STENCILZFAIL,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_CCW_STENCILPASS,D3DSTENCILOP_KEEP);
+		device->SetRenderState(D3DRS_STENCILMASK,0xff);
+		device->SetRenderState(D3DRS_STENCILWRITEMASK,0xff);
+		device->SetRenderState(D3DRS_STENCILREF,0);
+		device->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORALL);
+	}
+
+	class  occlusion_query
+	{
+	public:
+		occlusion_query()
+		{
+			d3d_device_manager::instance()->get_device()->CreateQuery(D3DQUERYTYPE_OCCLUSION,&m_query);
+		}
+
+		~occlusion_query()
+		{
+			m_query->Release();
+		}
+
+		void begin( )
+		{
+			m_query->Issue( D3DISSUE_BEGIN );
+		}
+
+		void end()
+		{
+			m_query->Issue( D3DISSUE_END );
+		}
+
+		bool get_result()
+		{
+			DWORD pixelsVisible = 100;
+			while (m_query->GetData((void *)&pixelsVisible, sizeof(DWORD), D3DGETDATA_FLUSH) == S_FALSE);
+
+			if( pixelsVisible >9 )
+				return false;
+			else
+			{
+				return true;
+			}	
+		}
+
+	private:
+		IDirect3DQuery9* m_query;
+	};
+
 	nDEFINE_CLASS(nrenderer_d3d9, nrenderer_base)
 
 	nfile_system::ptr g_file_sys;
@@ -34,12 +141,11 @@ namespace nexus
 
 	nrenderer_d3d9::nrenderer_d3d9(void)
 	{
-		g_instance = this;
-
+		g_instance = this;		
+		m_device_lost = 0;
+		m_ssao = NULL;
+		bocclusion_query = false;
 		m_render_mode = ERM_Lit;
-		m_render_group[EDG_Background]	= &m_bg_group;
-		m_render_group[EDG_World]		= &m_world_group;
-		m_render_group[EDG_Foreground]	= &m_fore_group;
 	}
 
 	nrenderer_d3d9::~nrenderer_d3d9(void)
@@ -60,125 +166,76 @@ namespace nexus
 
 	void nrenderer_d3d9::init(render_config& cfg)
 	{
-		d3d_device_manager::instance()->create_device((HWND)cfg.window_handle,
-			cfg.width, cfg.height,
-			cfg.color_bits,
-			cfg.bWindowed);
-
-		if( cfg.bEnableHDR )
-			scene_render_targets::create_instance(scene_render_targets::HDR, cfg);
-		else
-			scene_render_targets::create_instance(scene_render_targets::LDR, cfg);
+		d3d_device_manager::instance()->create_device(cfg);
+		scene_render_targets::create_instance(cfg);
 
 		shading_effect_lib::instance()->init();
-
 		dynamic_vb_pool::instance()->init();
 
+		if (cfg.bEnableSSAO)
+		{
+			m_ssao = new ssao(high);
+		}	
+
 		m_PDI.init(&m_view_info);
-
-		m_shadow_buffer.reset( new shadow_buffer );
-		m_shadow_buffer->create(2048);
-
+		
 		// todo : 使用vfs
-		nstring global_shader_path = _T("../engine_data/shader_d3d9/global");
-		global_shader_lib::instance()->load(global_shader_path);
+		nstring global_shader_path = _T("shader_d3d9/global");
+		global_shader_lib::instance()->load(g_engine_package_name, global_shader_path);
+
+		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+		HRESULT hr = D3DXCreateVolumeTextureFromFile(device,_T("../nexus_game/engine_data/resource_default/Jitter.dds"),(LPDIRECT3DVOLUMETEXTURE9*)&m_engine_textures[ETexture_Jitter]);
+		hr = D3DXCreateTextureFromFile(device,_T("../nexus_game/engine_data/resource_default/rotrandomCM.dds"),(LPDIRECT3DTEXTURE9*)&m_engine_textures[ETexture_Rot]);
+		hr = device->CreateTexture(NX,NY,0,D3DUSAGE_DYNAMIC,D3DFMT_A32B32G32R32F,D3DPOOL_DEFAULT,(LPDIRECT3DTEXTURE9*)&m_engine_textures[ETexture_FFT],NULL);
+		hr = device->CreateTexture(NX,NY,0,D3DUSAGE_RENDERTARGET,D3DFMT_A8R8G8B8,D3DPOOL_DEFAULT,(LPDIRECT3DTEXTURE9*)&m_engine_textures[ETexture_FFT_Normal],NULL);
 
 		m_timer.restart();
 	}
 
-	void nrenderer_d3d9::frame_view_info(const ncamera* cam)
+	void nrenderer_d3d9::frame_view_info(const nviewport& view)
 	{
+		m_view_info.frustum = view.frustum;
+		const ncamera* cam = &view.camera;
 		m_view_info.look_at = cam->get_lookat();
+		m_view_info.aspect = cam->get_viewport_aspect();
 		m_view_info.eye_pos = cam->get_eye_pos();
 		m_view_info.mat_view = cam->get_view();
-		m_view_info.mat_project = cam->get_project();
-		m_view_info.mat_view_project = cam->get_view()*cam->get_project();
 		m_view_info.time = get_run_time();
+		m_view_info.znear = cam->get_znear();
+		m_view_info.zfar = cam->get_zfar();
+		m_view_info.fov = cam->get_fov();
+		m_view_info.mat_project = cam->get_project();
+
+		m_view_info.mat_view_project = m_view_info.mat_view*m_view_info.mat_project;
+		m_view_info.enable_dynamic_shadow = view.enable_dynamic_shadow;
 	}
 
-	bool nrenderer_d3d9::frame_begin(const nviewport& view)
+	void nrenderer_d3d9::frame_light(const nlight_component* lgt)
 	{
-		//-- device
-		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-		if( !device )
-			return false;
-		
-		D3DVIEWPORT9& vp = m_view_info.d3d_view;
-		vp.X      = view.x;
-		vp.Y      = view.y;
-		vp.Width  = view.width;
-		vp.Height = view.height;
-		vp.MinZ   = view.min_z;
-		vp.MaxZ   = view.max_z;
+		nrender_light_proxy * light_proxy = NULL;
 
-		HRESULT hr;
-		hr = device->SetViewport(&vp);
-
-
-		if( FAILED( device->BeginScene() ) )
+		switch(lgt->m_type)
 		{
-			return false;
+		case ELight_Point:
+			{
+				light_proxy = new npoint_light_proxy((npoint_light_component*)lgt);
+			}
+			break;
+		case ELight_Directional:
+			{
+				light_proxy = new ndirectional_light_proxy((ndirectional_light_component*)lgt);
+			}
+			break;
+		case Elight_Spot:
+			{
+				light_proxy = new nspot_light_proxy((nspot_light_component*)lgt);
+			}
+			break;
+		default:
+			assert(0);  //LightType ndef
 		}
 
-		hr = device->Clear(0, NULL, D3DCLEAR_TARGET, 0x000000, 1, 0);
-		m_render_mode = view.render_mode;
-		m_view_widgets = view.widgets_render;
-		return true;
-	}
-
-	void nrenderer_d3d9::frame_begin_level(const ncamera* cam)
-	{
-		frame_view_info(cam);
-
-		//--
-		m_lights.clear();
-		m_post_handle_array.clear();
-		m_spt_renderer.clear();
-
-		//-- render group;
-		for(int i=0; i<EDG_Max; i++)
-			if(m_render_group[i] != NULL)
-				m_render_group[i]->clear();
-	}
-
-	void nrenderer_d3d9::frame_object(const nrender_proxy* obj)
-	{
-		enum EDepthGroup dg = obj->get_depth_group();
-
-		nASSERT(dg>=0 && dg<EDG_Max);
-		m_render_group[dg]->add_obj(obj);
-
-		//--
-		nrender_mesh* mesh = obj->get_render_mesh(
-			obj->get_render_lod() );
-		if( mesh->pre_render() )
-		{
-			m_post_handle_array.push_back(mesh);
-		}
-	}
-
-	void nrenderer_d3d9::frame_light(const nrender_light_proxy* lgt)
-	{
-		m_lights.push_back(lgt);
-	}
-
-	void nrenderer_d3d9::frame_end_level(nhit_proxy_hash* hit_map)
-	{
-		//-- render main scene
-		m_world_group.sort_draw_order(&m_view_info);
-		frame_render();
-
-		if( hit_map )
-			update_hit_proxy_hash(hit_map);
-
-		//-- frame data clear
-		for(render_mesh_vector::iterator iter = m_post_handle_array.begin();
-			iter != m_post_handle_array.end();
-			++iter)
-		{
-			nrender_mesh* mesh = *iter;
-			mesh->post_render();
-		}
+		m_lights.push_back(light_proxy);
 	}
 
 	void nrenderer_d3d9::update_hit_proxy_hash(nhit_proxy_hash* hit_map)
@@ -186,12 +243,12 @@ namespace nexus
 		d3d9_hit_proxy_hash* d3d9_hm = dynamic_cast<d3d9_hit_proxy_hash*>(hit_map);
 		d3d9_hm->begin_update();
 		
-		draw_hit_proxy dp;
-		m_world_group.draw_opaque(&m_view_info, &dp);
-		m_world_group.draw_mixed_trans(&m_view_info, &dp);
-		m_spt_renderer.draw_all_trees(&m_view_info, &dp);
-
-		m_view_widgets->update_hit_proxy(&m_PDI);
+		draw_hit_proxy dp;		
+		m_render_package.draw_for_hit_hash(&m_view_info, &dp);
+		
+		if(m_view_widgets)
+			m_view_widgets->update_hit_proxy(&m_PDI);
+			
 		d3d9_hm->end_update();
 	}
 	
@@ -200,32 +257,56 @@ namespace nexus
 		scene_render_targets::instance()->copy_render_target(target);
 	}
 
-	void nrenderer_d3d9::frame_end()
-	{
-		//-- draw view widgets		
-		scene_render_targets::instance()->draw_final_scene( m_render_mode==ERM_Lit );
-		if(m_view_widgets)		
-		{
-			scene_render_targets::instance()->begin_back_buffer();
-			m_view_widgets->draw(&m_PDI);
-			scene_render_targets::instance()->end_back_buffer();
-		}		
-
-		//-- end d3d scene
-		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-		HRESULT hr = device->EndScene();
-	}
-
 	void nrenderer_d3d9::present(void* hWindow)
 	{
 		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-
 		HRESULT hr;
+
+		//-- 处理device lost，尝试恢复
+		if( m_device_lost )
+		{
+			hr = device->TestCooperativeLevel();
+			
+			if( hr == D3DERR_DEVICENOTRESET )
+			{
+				// 设备就绪，可以reset了
+				D3DPRESENT_PARAMETERS pp = d3d_device_manager::instance()->get_present_param();
+				hr = device->Reset(&pp);
+
+				if ( SUCCEEDED(hr) )
+				{
+					// 成功恢复设备，通知所有handler创建资源
+					if( !d3d_device_manager::instance()->on_device_reset(0 ))
+					{
+						// 资源创建失败
+						THROW_D3D_EXCEPTION(_T("D3D device reset handler return false."));
+					}	
+
+					hr = D3DXCreateVolumeTextureFromFile(device,_T("../nexus_game/engine_data/resource_default/Jitter.dds"),(LPDIRECT3DVOLUMETEXTURE9*)&m_engine_textures[ETexture_Jitter]);
+					hr = D3DXCreateTextureFromFile(device,_T("../nexus_game/engine_data/resource_default/rotrandomCM.dds"),(LPDIRECT3DTEXTURE9*)&m_engine_textures[ETexture_Rot]);
+					hr = device->CreateTexture(NX,NY,0,D3DUSAGE_DYNAMIC,D3DFMT_A32B32G32R32F,D3DPOOL_DEFAULT,(LPDIRECT3DTEXTURE9*)&m_engine_textures[ETexture_FFT],NULL);
+					hr = device->CreateTexture(NX,NY,0,D3DUSAGE_RENDERTARGET,D3DFMT_A8R8G8B8,D3DPOOL_DEFAULT,(LPDIRECT3DTEXTURE9*)&m_engine_textures[ETexture_FFT_Normal],NULL);
+
+					::InterlockedExchange((LONG*)&m_device_lost, 0L);					
+				}// end of if
+				else
+				{
+					THROW_D3D_HRESULT(hr, _T("D3D Device Reset Failed!"));
+				}
+			}// end of if
+			else if( hr ==  D3DERR_DEVICELOST )
+			{
+				::Sleep(200); // 为了更好的与其他应用程序协作
+			}
+			return;
+		}
+
+		//-- 处理正常渲染		
 #if 0
 		hr = device->Present(NULL, NULL, (HWND)hWindow,	NULL);
 #else
 		//-- 为了在editor模式下，将部分back buffer不拉伸的显示到窗口，需要指定present的rect	
-		const D3DVIEWPORT9& vp = m_view_info.d3d_view;
+		const D3DVIEWPORT9& vp = *(D3DVIEWPORT9*)&m_view_info.m_view_port;
 
 		RECT src_rc, dst_rc;
 		src_rc.left = vp.X;
@@ -241,7 +322,31 @@ namespace nexus
 			(HWND)hWindow,
 			NULL);
 #endif
+		if(hr == D3DERR_DEVICELOST)
+		{			
+			// 由正常状态切换到Lost状态，通知所有handler释放资源
+			::InterlockedExchange((LONG*)&m_device_lost, 1L);					
+			d3d_device_manager::instance()->on_device_lost(0);
 
+			for ( occlusion_map::iterator it = m_occlusion_map.begin();
+				it != m_occlusion_map.end();
+				++it)
+			{
+				delete it->second;
+			}
+
+			m_occlusion_map.clear();
+
+			m_render_package.clear();
+			m_lights.clear();
+
+			for (int i = 0; i < ETexture_Max; i ++)
+			{
+				m_engine_textures[i]->Release();
+				m_engine_textures[i] = NULL;
+			}
+		}
+		
 		//hr = D3DXSaveSurfaceToFile(_T("d:\\test.bmp"),
 		//	D3DXIFF_BMP, 
 		//	scene_render_targets::instance()->get_back_surface().get(),
@@ -251,6 +356,23 @@ namespace nexus
 
 	void nrenderer_d3d9::close()
 	{
+		m_PDI.destroy();
+		m_render_package.clear();
+
+		delete m_ssao;
+		m_ssao = NULL;
+		for (size_t i = 0; i < m_postprocess_array.size(); i ++)
+		{
+			delete m_postprocess_array[i];
+		}
+		m_postprocess_array.clear();
+
+		for(int i = 0; i < ETexture_Max; i ++)
+		{
+			m_engine_textures[i]->Release();
+			m_engine_textures[i] = NULL;
+		}
+
 		shading_effect_lib::instance()->close();
 
 		global_shader_lib::instance()->close();
@@ -262,54 +384,321 @@ namespace nexus
 
 		d3d_device_manager::instance()->destroy_device();
 		g_file_sys.reset();
+		nLog_Info(_T("nexus d3d9 renderer closed.\r\n"));
 	}
 
 	void nrenderer_d3d9::draw_background()
 	{
-		scene_render_targets::instance()->begin_scene_color(true);
-
-		if( m_render_mode == ERM_Wireframe )
-		{
-			drawing_wireframe dp;
-			m_bg_group.draw_all(&m_view_info, &dp);
-		}
-		else
-		{
-			drawing_unlit dp;
-			m_bg_group.draw_all(&m_view_info, &dp);
-		}
-		scene_render_targets::instance()->end_scene_color();
 	}
 
 	void nrenderer_d3d9::draw_foreground()
 	{
-		scene_render_targets::instance()->begin_scene_color(false);
-
-		if( m_render_mode == ERM_Wireframe )
-		{
-			drawing_wireframe dp;
-			m_fore_group.draw_all(&m_view_info, &dp);
-		}
-		else
-		{
-			drawing_unlit dp;
-			dp.set_effect_tech("techForgroundBlend");
-			m_fore_group.draw_all(&m_view_info, &dp);
-		}
-		scene_render_targets::instance()->end_scene_color();
 	}
 
-	void nrenderer_d3d9::frame_render()
+	void nrenderer_d3d9::make_occlusion_query( const nview_info&view_info,node_ptr node,box_sphere_bounds bound )
 	{
+		vector3 box_max = bound.origin+bound.box_extent;
+		vector3 box_min = bound.origin - bound.box_extent;
+
+		if ( view_info.eye_pos.x > box_min.x 
+			&&view_info.eye_pos.x < box_max.x 
+			&&view_info.eye_pos.y > box_min.y 
+			&&view_info.eye_pos.y < box_max.y 
+			&&view_info.eye_pos.z > box_min.z 
+			&&view_info.eye_pos.z < box_max.z)
+		{
+			return;
+		}
+
+		static vector3 positons[8];
+		positons[0] = vector3(box_min.x,box_max.y,box_min.z); 
+		positons[1] = box_min;  
+		positons[2] = vector3(box_max.x,box_min.y,box_min.z); 
+		positons[3] = vector3(box_max.x,box_max.y,box_min.z);
+
+		positons[4] = vector3(box_min.x,box_max.y,box_max.z);	
+		positons[5] = vector3(box_min.x,box_min.y,box_max.z);
+		positons[6] = vector3(box_max.x,box_min.y,box_max.z);
+		positons[7] =  box_max;	
+
+		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+		occlusion_node_map::iterator it = m_occlusion_node_map.find(node);
+		occlusion_query* query = NULL;
+		if( it != m_occlusion_node_map.end())
+			query = it->second;
+		else
+		{
+			query = new occlusion_query();
+			m_occlusion_node_map.insert(pair<node_ptr,occlusion_query*>(node,query));
+		}
+
+		query->begin();
+		device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST,0,8,12,cube_index,D3DFMT_INDEX32,positons,sizeof(vector3));
+		query->end();
+	}
+
+	void nrenderer_d3d9::make_occlusion_query( const nview_info&view_info,nprimitive_component* prim )
+	{
+		const box_sphere_bounds& bound = prim->get_bounds();
+		vector3 box_max = bound.origin+bound.box_extent + vector3(5,5,5);
+		vector3 box_min = bound.origin - bound.box_extent - vector3(5,5,5);
+
+		if ( view_info.eye_pos.x > box_min.x 
+			&&view_info.eye_pos.x < box_max.x 
+			&&view_info.eye_pos.y > box_min.y 
+			&&view_info.eye_pos.y < box_max.y 
+			&&view_info.eye_pos.z > box_min.z 
+			&&view_info.eye_pos.z < box_max.z)
+		{
+			return;
+		}
+
+		static vector3 positons[8];
+		positons[0] = vector3(box_min.x,box_max.y,box_min.z); 
+		positons[1] = box_min;  
+		positons[2] = vector3(box_max.x,box_min.y,box_min.z); 
+		positons[3] = vector3(box_max.x,box_max.y,box_min.z);
+
+		positons[4] = vector3(box_min.x,box_max.y,box_max.z);	
+		positons[5] = vector3(box_min.x,box_min.y,box_max.z);
+		positons[6] = vector3(box_max.x,box_min.y,box_max.z);
+		positons[7] =  box_max;	
+
+		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+		occlusion_map::iterator it = m_occlusion_map.find(prim);
+		occlusion_query* query = NULL;
+		if( it != m_occlusion_map.end())
+			query = it->second;
+		else
+		{
+			query = new occlusion_query();
+			m_occlusion_map.insert(pair<nprimitive_component*,occlusion_query*>(prim,query));
+		}
+			
+		query->begin();
+		device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST,0,8,12,cube_index,D3DFMT_INDEX32,positons,sizeof(vector3));
+		query->end();
+	}
+
+	void nrenderer_d3d9::render_scene(const nviewport& view,nscene_manager::ptr scene_ptr,const render_setting& setting)
+	{
+		// 加载level失败时可能导致scene_ptr为空
+		if (is_device_lost() || !scene_ptr)
+		{
+			return;
+		}
+
+		//-- device
+		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+		if( !device )
+			return;
+
+		D3DVIEWPORT9& vp = *(D3DVIEWPORT9*)&m_view_info.m_view_port;
+		vp.X      = view.x;
+		vp.Y      = view.y;
+		vp.Width  = view.width;
+		vp.Height = view.height;
+		vp.MinZ   = view.min_z;
+		vp.MaxZ   = view.max_z;
+
+		HRESULT hr;
+		hr = device->SetViewport(&vp);
+		if( FAILED( device->BeginScene() ) )
+		{
+			return;
+		}
+
+		//hr = device->Clear(0, NULL, D3DCLEAR_TARGET, 0x000000, 1, 0);
+		m_render_mode = view.render_mode;
+		m_view_widgets = view.widgets_render;
+
+		m_lights.clear();
+		m_render_package.clear();
+		
+		frame_view_info(view);
+		m_scene_ptr = scene_ptr;
+		m_render_setting = setting;
+		
+		//init_visible();	
+		vector<node_ptr> cur_frame_nodes;
+		vector<box_sphere_bounds> cur_frame_node_bounds;
+		
+		in_frustum_prims.clear();
+		in_frustum_prims.reserve(1024);
+
+		scene_render_targets::instance()->begin_scene_color();
+
+		if (bocclusion_query)
+		{
+			for ( nscene_manager::prim_octree_type::const_iterator pri_it( *m_scene_ptr->m_prim_octrant );
+				pri_it.has_pending_node(); pri_it.advance() )
+			{
+				const nscene_manager::prim_octree_type::octreenode_ptr	curr_node	= pri_it.get_curr_node();
+				const octree_node_bounds&				curr_bound	= pri_it.get_curr_boud();
+				box_sphere_bounds node_bound(curr_bound.center,vector3(curr_bound.extent,curr_bound.extent,curr_bound.extent));
+
+				if( m_view_info.frustum.intersect_bounds( node_bound ))
+				{
+					cur_frame_nodes.push_back(curr_node);
+					cur_frame_node_bounds.push_back(node_bound);
+					bool node_occlude = false;
+					occlusion_node_map::iterator it = m_occlusion_node_map.find(curr_node);
+					if (it != m_occlusion_node_map.end())
+					{
+						node_occlude = it->second->get_result();
+					}
+
+					if(!node_occlude)
+					{
+						const std::set<nprimitive_component*>& curr_elements = curr_node->get_curr_contents();
+						for ( std::set<nprimitive_component*>::const_iterator comp_it = curr_elements.begin();
+							comp_it != curr_elements.end(); ++comp_it)
+						{
+							// 再进行一次视锥裁剪
+							nprimitive_component* prim = *comp_it; 
+							if( prim->get_visible())
+							{
+								const box_sphere_bounds& bound = prim->get_bounds();
+								if(m_view_info.frustum.intersect_bounds(bound))
+								{
+									bool bocclude = false;
+									in_frustum_prims.push_back(prim);
+									occlusion_map::iterator it = m_occlusion_map.find(prim);
+									if (it != m_occlusion_map.end())
+									{
+										bocclude = it->second->get_result();
+									}
+
+									if(!bocclude)
+									{
+										g_hud_info.visible_primitive_count ++;
+										prim->render(&m_render_package);
+									}
+									else
+									{
+										g_hud_info.primitive_occlude_count ++;
+									}
+								}
+							}
+						}
+
+						// push children
+						for ( int i=0; i< 8; ++i )
+						{
+							if( curr_node->has_child(i) )
+							{
+								pri_it.push_children( i );
+							}
+						}
+					}
+				}
+			}
+		}	
+		else
+		{
+			for ( nscene_manager::prim_octree_type::const_iterator pri_it( *m_scene_ptr->m_prim_octrant );
+				pri_it.has_pending_node(); pri_it.advance() )
+			{
+				const nscene_manager::prim_octree_type::octreenode_ptr	curr_node	= pri_it.get_curr_node();
+				const octree_node_bounds&				curr_bound	= pri_it.get_curr_boud();
+				box_sphere_bounds node_bound(curr_bound.center,vector3(curr_bound.extent,curr_bound.extent,curr_bound.extent));
+
+				if(  m_view_info.frustum.intersect_bounds( node_bound ))
+				{
+					const std::set<nprimitive_component*>& curr_elements = curr_node->get_curr_contents();
+					for ( std::set<nprimitive_component*>::const_iterator comp_it = curr_elements.begin();
+						comp_it != curr_elements.end(); ++comp_it)
+					{
+						// 再进行一次视锥裁剪
+						nprimitive_component* prim = *comp_it; 
+						if( prim->get_visible())
+						{
+							const box_sphere_bounds& bound = prim->get_bounds();
+							if(m_view_info.frustum.intersect_bounds(bound))
+							{
+								g_hud_info.visible_primitive_count ++;
+								prim->render(&m_render_package);
+							}
+						}
+					}
+
+					// push children
+					for ( int i=0; i< 8; ++i )
+					{
+						if( curr_node->has_child(i) )
+						{
+							pri_it.push_children( i );
+						}
+					}
+				}
+			}
+		}
+
+		int num = g_hud_info.visible_primitive_count;
+
+		vector<nlight_component*> visble_light;
+		m_scene_ptr->get_visible_light(m_view_info.frustum,visble_light);
+		for (size_t i = 0; i < visble_light.size(); i++)
+		{
+			frame_light(visble_light[i]);
+		}
+	
+//----------------------------------------------------------rendering---------------------------------------------------------------------------
+		m_render_package.begin(true);
 		draw_background();
 		draw_world();
 		draw_foreground();
+
+		if(view.hit_hash)
+			update_hit_proxy_hash(view.hit_hash);
+
+		m_render_package.end();
+		//-- draw view widgets		
+		scene_render_targets::instance()->draw_final_scene(false);
+		if(m_view_widgets)		
+		{
+			scene_render_targets::instance()->begin_back_buffer();
+			m_view_widgets->draw(&m_PDI);
+			scene_render_targets::instance()->end_back_buffer();
+		}		
+
+		if (bocclusion_query)
+		{
+			device->SetVertexShader(NULL);	
+			device->SetPixelShader(NULL);
+			device->SetFVF(D3DFVF_XYZ);
+			device->SetTransform(D3DTS_WORLD,(D3DXMATRIX*)&matrix44::identity);
+			device->SetTransform(D3DTS_VIEW,(D3DXMATRIX*)&m_view_info.mat_view);
+			device->SetTransform(D3DTS_PROJECTION,(D3DXMATRIX*)&m_view_info.mat_project);
+			device->SetRenderState(D3DRS_CULLMODE,D3DCULL_CW);
+			device->SetRenderState(D3DRS_FILLMODE,D3DFILL_SOLID);
+
+			device->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
+			device->SetRenderState(D3DRS_ZWRITEENABLE,false);
+			device->SetRenderState(D3DRS_ZENABLE,true);
+			device->SetRenderState(D3DRS_ZFUNC,D3DCMP_LESSEQUAL);
+
+			for (size_t i =0; i < cur_frame_nodes.size(); i ++)
+			{
+				make_occlusion_query(m_view_info,cur_frame_nodes[i],cur_frame_node_bounds[i]);
+			}
+
+			for(size_t i = 0; i < in_frustum_prims.size(); i ++)
+			{
+				make_occlusion_query(m_view_info, in_frustum_prims[i]);
+			}
+
+			device->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORALL);
+		}
+		
+		//-- end d3d scene
+		device->EndScene();
 	}
 
 	class drawing_unlit_filter : public drawing_filter
 	{
 	public:
-		virtual bool should_draw(const nrender_proxy* obj)
+		static bool should_draw(const nprimitive_component* obj)
 		{
 			return !obj->accept_dynamic_light();
 		}
@@ -317,58 +706,72 @@ namespace nexus
 
 	void nrenderer_d3d9::draw_world()
 	{
-		//-- render depth pass
-		{
-			scene_render_targets::instance()->begin_pre_pass();
-			drawing_pre_pass dp;
-			m_world_group.draw_all(&m_view_info, &dp);
-			m_spt_renderer.draw_all_trees(&m_view_info, &dp);
-			scene_render_targets::instance()->end_pre_pass();
-		}
-		
-		scene_render_targets::instance()->begin_scene_color(false);
 		switch(m_render_mode)
 		{
 		case ERM_Wireframe:
 			{
+				scene_render_targets::instance()->begin_scene_color(true);
 				drawing_wireframe dp;
-				m_world_group.draw_all(&m_view_info, &dp);
-				m_spt_renderer.draw_all_trees(&m_view_info, &dp);
+
+				m_render_package.draw_all(&m_view_info,&dp);
+				scene_render_targets::instance()->end_scene_color(true);
 			}
 			break;
 		case ERM_Unlit:
 			{
+				scene_render_targets::instance()->begin_scene_color(true);
 				drawing_unlit dp;
-				m_world_group.draw_all(&m_view_info, &dp);
-				m_spt_renderer.draw_all_trees(&m_view_info, &dp);
+				
+				m_render_package.draw_all(&m_view_info,&dp);
+				
+				scene_render_targets::instance()->end_scene_color(true);
 			}
 			break;
 		case ERM_Lit:
 			{
 				//!!! 只有World Group接受光照				
-				//-- draw base pass
+				//-- 渲染自发光、静态光（Light map）
+				// 注意：没有自发光，静态光，则需要渲染base color为0，因为后续灯光渲染执行的是颜色累加
+				scene_render_targets::instance()->begin_scene_color(true,true);
+				hemisphere_policy::context context_data;
+				context_data.high_color = m_render_setting.skylight_high_color;
+				context_data.low_color = m_render_setting.skylight_low_color;
+				drawing_base_pass<hemisphere_policy> dp(context_data);		
+				m_render_package.draw_Opaque(&m_view_info,&dp);
+				
+				scene_render_targets::instance()->end_scene_color();
+
+				if (m_ssao)
 				{
-					drawing_base_pass dp;					
-					m_world_group.draw_all(&m_view_info, &dp);
-					m_spt_renderer.draw_all_trees(&m_view_info, &dp);
+					m_ssao->m_occlustion_radius = m_render_setting.ssao_occlustion_radius;
+					m_ssao->m_occlustion_power = m_render_setting.ssao_occlustion_power;
+					m_ssao->m_blocker_power = m_render_setting.ssao_blocker_power;
+					m_ssao->render();
 				}
 
-				//-- 画出那些不受灯光影响的对象
-				{
-					drawing_unlit_filter filter;
-					drawing_unlit dp;
-					m_world_group.draw_all(&m_view_info, &dp, &filter);
-				}
-
-				//-- render dynamic lights
+				//-- 渲染不透明物体的动态光照
+				scene_render_targets::instance()->begin_scene_color();
 				render_lights();
+				scene_render_targets::instance()->end_scene_color(true);
+			
+				scene_render_targets::instance()->begin_scene_color();	
+				m_render_package.draw_Translucent(&m_view_info,&dp);
+				m_render_package.render_env_effect(&m_view_info,&dp);
+				scene_render_targets::instance()->end_scene_color(true);
 			}
 			break;
 		default:
 			nASSERT(0 && "unsupport render mode");
 			break;
-		}//end of switch()
-		scene_render_targets::instance()->end_scene_color();		
+		}//end of switch()		
+	}
+	
+	void nrenderer_d3d9::render_postprocess()
+	{
+		for (size_t i = 0; i < m_postprocess_array.size(); i ++)
+		{
+			m_postprocess_array[i]->render();
+		}
 	}
 
 	void nrenderer_d3d9::render_lights()
@@ -379,73 +782,9 @@ namespace nexus
 		//-- 渲染“不透明物体”，每个light一个pass
 		for(size_t i=0; i<num_lights; i++)
 		{
-			const nrender_light_proxy* lgt = m_lights[i];
-
-			//-- create shadow buffer
-
-			//-- render to scene color
-			switch(lgt->m_type)
-			{
-			case ELight_Point:
-				{
-					drawing_light<point_light_policy, noshadow> dp(lgt);
-					m_world_group.draw_opaque(&m_view_info, &dp);					
-					m_spt_renderer.draw_all_trees(&m_view_info, &dp);
-
-					dp.set_tech(EDrawLight_LowTransPass);
-					m_world_group.draw_mixed_trans(&m_view_info, &dp);					
-				}
-				break;
-			case ELight_Directional:
-				{
-					const ndirectional_light_proxy* dir_lgt = 
-						dynamic_cast<const ndirectional_light_proxy*>(lgt);
-					generate_shadow_buffer(dir_lgt);
-
-					drawing_light<directional_light_policy, shadow_buffer> dp(lgt);
-					dp.set_shadow(m_shadow_buffer.get());
-					m_world_group.draw_opaque(&m_view_info, &dp);
-					
-					//-- shadow map在speed tree的自身阴影上质量不佳，暂时关闭
-					drawing_light<directional_light_policy, noshadow> dp_noshadow(lgt);
-					m_spt_renderer.draw_all_trees(&m_view_info, &dp_noshadow);
-
-					dp.set_tech(EDrawLight_LowTransPass);
-					m_world_group.draw_mixed_trans(&m_view_info, &dp);					
-				}
-				break;
-			default:
-				nASSERT(0 && "unknown light type");
-			}
+			nrender_light_proxy* lgt = m_lights[i];
+			lgt->render(this);				
 		}
-
-		//-- 渲染“透明物体”，对于每个透明物体：每个light一个pass计算出最终颜色，然后blend到scene color buffer
-		{
-			drawing_lit_trans_obj dp(m_lights);
-			m_world_group.draw_mixed_trans(&m_view_info, &dp);
-		}
-
-		//-- 渲染“不需要光照的透明物体”
-		{
-			drawing_unlit_trans dp;
-			m_world_group.draw_unlit_trans(&m_view_info, &dp);
-		}
-	}
-
-	void nrenderer_d3d9::generate_shadow_buffer(const ndirectional_light_proxy* lgt)
-	{
-		shadow_buffer_gen_filter filter;
-
-		m_shadow_buffer->begin_generate(lgt, &m_view_info);
-		m_world_group.draw_opaque(m_shadow_buffer->get_view(), m_shadow_buffer->get_drawing_policy(), &filter);
-		m_world_group.draw_mixed_trans(m_shadow_buffer->get_view(), m_shadow_buffer->get_drawing_policy(), &filter);
-		m_spt_renderer.draw_all_trees(m_shadow_buffer->get_view(), m_shadow_buffer->get_drawing_policy());
-		m_shadow_buffer->end_generate();
-	}
-
-	void nrenderer_d3d9::frame_tree(const nspt_instance* spt)
-	{
-		m_spt_renderer.attach_tree(spt);
 	}
 
 	static d3d_surface_ptr _do_d3d_screen_shot()
@@ -476,19 +815,15 @@ namespace nexus
 		return mem_surface;
 	}
 
-	void nrenderer_d3d9::screen_shot(nimage* blank_img)
+	void nrenderer_d3d9::screen_shot(nimage* blank_img, size_t width, size_t height)
 	{
 		HRESULT hr;
 
 		nASSERT(blank_img != NULL);
-		
-		const D3DSURFACE_DESC& rt_desc = scene_render_targets::instance()->get_back_surface_desc();
-		nASSERT(rt_desc.Format == D3DFMT_A8R8G8B8
-			||rt_desc.Format == D3DFMT_X8R8G8B8);
 		int Bpp = 4;
-		blank_img->create(rt_desc.Width, rt_desc.Height, EPF_A8R8G8B8);
+		blank_img->create(width, height, EPF_A8R8G8B8);
 
-		
+
 		d3d_surface_ptr mem_surface = _do_d3d_screen_shot();
 		//-- copy surface to image
 		D3DLOCKED_RECT lrc;
@@ -496,11 +831,11 @@ namespace nexus
 
 		BYTE* img_pixel = (BYTE*)blank_img->get_pixel();
 		BYTE* surf_data = (BYTE*)lrc.pBits;
-		int img_pitch = rt_desc.Width*Bpp;
-		img_pixel += img_pitch*(rt_desc.Height-1);//从最后一行向上,倒着存放
+		int img_pitch = width * Bpp;
+		img_pixel += img_pitch*(height - 1);//从最后一行向上,倒着存放
 		nASSERT( img_pitch <= lrc.Pitch);
-		
-		for(UINT y=0; y<rt_desc.Height; y++)
+
+		for(UINT y=0; y<height; y++)
 		{
 			memcpy(img_pixel, surf_data, img_pitch);
 
@@ -513,34 +848,30 @@ namespace nexus
 
 	void nrenderer_d3d9::viewport_shot(nimage* blank_img)
 	{
-		HRESULT hr;
+		D3DVIEWPORT9& vp = *(D3DVIEWPORT9*)&m_view_info.m_view_port;
+		screen_shot(blank_img, vp.Width, vp.Height);
+	}
 
-		nASSERT(blank_img != NULL);
-		D3DVIEWPORT9& vp = m_view_info.d3d_view;
-		int Bpp = 4;
-		blank_img->create(vp.Width, vp.Height, EPF_A8R8G8B8);
+	void nrenderer_d3d9::back_surface_shot( nimage* blank_img )
+	{
+		const D3DSURFACE_DESC& rt_desc = scene_render_targets::instance()->get_back_surface_desc();
+		nASSERT(rt_desc.Format == D3DFMT_A8R8G8B8
+			||rt_desc.Format == D3DFMT_X8R8G8B8);
+		screen_shot(blank_img, rt_desc.Width, rt_desc.Height);
+	}
 
-		d3d_surface_ptr mem_surface = _do_d3d_screen_shot();
-		//-- copy surface to image
-		D3DLOCKED_RECT lrc;
-		hr = mem_surface->LockRect(&lrc, NULL, D3DLOCK_READONLY);
-		BYTE* surf_data = (BYTE*)lrc.pBits;
-		int line_start = vp.X*Bpp;
+	int nrenderer_d3d9::register_device_handler(handler_device_lost hlost, handler_device_reset hreset)
+	{
+		return d3d_device_manager::instance()->register_device_handler(hlost, hreset);
+	}
 
-		BYTE* img_pixel = (BYTE*)blank_img->get_pixel();		
-		int img_pitch = vp.Width*Bpp;
-		img_pixel += img_pitch*(vp.Height-1);//从最后一行向上,倒着存放
-		nASSERT( img_pitch <= lrc.Pitch);
+	void nrenderer_d3d9::unregister_device_handler(int id)
+	{
+		d3d_device_manager::instance()->unregister_device_handler(id);
+	}
 
-		for(UINT y=0; y<vp.Height; y++)
-		{
-			int line = vp.Y+y;			
-
-			memcpy(img_pixel-y*img_pitch,
-				surf_data+line*lrc.Pitch+line_start, 
-				img_pitch);			
-		}	
-
-		hr = mem_surface->UnlockRect();
+	IDirect3DBaseTexture9*	nrenderer_d3d9::get_texture(EEngineTexture ETex)
+	{
+		return m_engine_textures[ETex];
 	}
 }//namespace nexus

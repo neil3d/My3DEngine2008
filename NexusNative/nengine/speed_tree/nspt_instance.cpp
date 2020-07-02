@@ -57,8 +57,8 @@ namespace nexus
 		, m_nFrondLodLevel(0)
 		, m_fFrondAlphaValue(84.0f / 255.0f)
 		, m_bBillboardIsActive(false)
-		, m_fBillboardFadeOut(0.0f),
-		m_hit_id(-1)
+		, m_fBillboardFadeOut(0.0f)
+		, owner(NULL)
 	{
 		mat_set_identity(mat_world);
 		set_rotation(0);

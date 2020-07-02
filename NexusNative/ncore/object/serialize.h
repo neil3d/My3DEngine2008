@@ -30,6 +30,39 @@ namespace nexus
 	}
 
 	template<typename T>
+	inline narchive& nserialize(narchive& ar, std::set<T>& obj_set, const TCHAR* array_name)
+	{
+		if( ar.is_loading() )
+		{
+			size_t s = 0;
+			ar.array_begin(array_name, s);
+			for (size_t i=0; i<s; i++)
+			{
+				T obj;
+				nserialize(ar, obj, ELEM_ArrayItem);
+				ar.array_next();
+				obj_set.insert(obj);
+			}
+			ar.array_end();
+		}
+		else
+		{
+			size_t s = obj_set.size();
+			ar.array_begin(array_name, s);
+			for(std::set<T>::iterator iter = obj_set.begin();
+				iter != obj_set.end();
+				++iter)
+			{
+				T& obj = *iter;
+				nserialize(ar, obj, ELEM_ArrayItem);			
+				ar.array_next();
+			}
+			ar.array_end();
+		}
+		return ar;
+	}
+
+	template<typename T>
 	inline narchive& nserialize(narchive& ar, std::list<T>& obj_list, const TCHAR* array_name)
 	{
 		if( ar.is_loading() )
@@ -67,7 +100,9 @@ namespace nexus
 	inline narchive& nserialize(narchive& ar, std::vector<T>& obj_array, const TCHAR* array_name)
 	{	
 		bool is_pod = IS_POD<T>::value; 
-		if(is_pod)
+		bool blob_mode = is_pod && ar.blob_enabled();
+
+		if(blob_mode)
 		{
 			if(ar.is_loading())
 			{
@@ -109,7 +144,7 @@ namespace nexus
 					nserialize(ar, obj, ELEM_ArrayItem);			
 					ar.array_next();
 				}
-			}// endof if
+			}// end of if
 
 			ar.array_end();
 		}
@@ -178,7 +213,7 @@ namespace nexus
 	template<> struct IS_POD<type>\
 	{ static const bool value = true; };
 
-	IMPL_PRIM_SERIAL(bool)
+	//IMPL_PRIM_SERIAL(bool)
 	IMPL_PRIM_SERIAL(int)
 	IMPL_PRIM_SERIAL(unsigned int)
 	IMPL_PRIM_SERIAL(char)	
@@ -191,11 +226,20 @@ namespace nexus
 	IMPL_PRIM_SERIAL(nstring)
 	IMPL_PRIM_SERIAL(std::string)
 
-	template<> inline narchive& nserialize(narchive& ar, unsigned char& prim, const TCHAR* obj_name) \
+	template<> inline narchive& nserialize(narchive& ar, unsigned char& prim, const TCHAR* obj_name)
 	{	
 		unsigned short t = prim;
 		ar.serial(obj_name, t);	
 		prim = (unsigned char)t;
+		return ar;	
+	}
+
+	// 明确的将bool类型序列化成 “1” or “0”
+	template<> inline narchive& nserialize(narchive& ar, bool& prim, const TCHAR* obj_name)
+	{	
+		unsigned short t = prim ? 1 : 0;
+		ar.serial(obj_name, t);	
+		prim = (t == 1) ? true : false;
 		return ar;	
 	}
 

@@ -8,6 +8,7 @@ namespace nexus
 		mat_set_identity(m_mat_view);
 		mat_set_identity(m_mat_view_inv);
 		mat_set_identity(m_mat_project);
+		b_ortho = false;
 	}
 
 	ncamera::~ncamera(void)
@@ -30,7 +31,7 @@ namespace nexus
 
 	void ncamera::set_perspective(float FOV, int viewport_w, int viewport_h, float zNear, float zFar)
 	{
-		float aspect = (float)viewport_w/viewport_h;
+		float aspect = (float)viewport_w/(float)viewport_h;
 		mat_set_perspective_LH(m_mat_project, FOV, aspect, zNear, zFar);
 
 		m_fov = FOV;
@@ -38,23 +39,24 @@ namespace nexus
 		m_viewport_h = viewport_h;
 		m_znear = zNear;
 		m_zfar = zFar;
+		b_ortho = false;
 	}
 
 
 	// The rows of a square matrix can be interpreted as the basis vectors of a coordinate space
 	vector3 ncamera::get_view_x() const
 	{
-		return m_mat_view.get_axis_x();
+		return m_mat_view_inv.get_axis_x();
 	}
 
 	vector3 ncamera::get_view_y() const
 	{
-		return m_mat_view.get_axis_y();
+		return m_mat_view_inv.get_axis_y();
 	}
 
 	vector3 ncamera::get_view_z() const
 	{
-		return m_mat_view.get_axis_z();
+		return m_mat_view_inv.get_axis_z();
 	}
 
 	vector3 ncamera::get_eye_pos() const
@@ -142,6 +144,7 @@ namespace nexus
 		m_fov = -1;
 
 		mat_set_ortho_LH(m_mat_project, w, h, zNear, zFar);
+		b_ortho = true;
 	}
 
 	npoint ncamera::world2screen(const vector3& wpt) const
@@ -156,5 +159,27 @@ namespace nexus
 		ret.y = long(-(trans.y-1.0f)*0.5f*float(m_viewport_h));
 
 		return ret;
+	}
+
+	nexus::vector4 ncamera::world2screen_with_depth( const vector3& wpt ) const
+	{
+		vector4 ret;
+		vector4 trans(wpt.x,wpt.y,wpt.z,1.0f);
+		trans = mat_transform(trans, m_mat_view);
+		trans = mat_transform(trans, m_mat_project);
+		ret.w = trans.w/(m_zfar-m_znear);
+		trans /= trans.w;
+
+		
+		ret.x = long((trans.x+1.0f)*0.5f*float(m_viewport_w));
+		ret.y = long(-(trans.y-1.0f)*0.5f*float(m_viewport_h));
+		ret.z = trans.z;
+		return ret;
+	}
+
+	void ncamera::set_fov( float value )
+	{
+		set_perspective(m_fov,m_viewport_w,m_viewport_h,m_znear,m_zfar);
+		m_fov = value;
 	}
 }//namespace nexus

@@ -19,3 +19,5 @@ using namespace nexus;
 
 // .Net namespace
 using namespace System;
+using namespace System::ComponentModel;
+using namespace System::Collections;

@@ -11,9 +11,4 @@ namespace NexusEngine
 	{
 		return dynamic_cast<nmesh_component*>(RawPtr);
 	}
-
-	void NMeshComponent::ReplaceMaterial(int lod, int mtlID, NMaterial^ mtl)
-	{
-		NativePtr->replace_material(lod, mtlID, mtl->GetSmartPtr());
-	}
 }//namespace NexusEngine

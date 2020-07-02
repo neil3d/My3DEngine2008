@@ -20,10 +20,10 @@ namespace Design
 		Type^ type = Color4f::typeid;
 		array<PropertyDescriptor^>^ propArray =
 		{
-			gcnew FieldPropertyDescriptor(type->GetField("Red")),
-			gcnew FieldPropertyDescriptor(type->GetField("Green")),
-			gcnew FieldPropertyDescriptor(type->GetField("Blue")),
-			gcnew FieldPropertyDescriptor(type->GetField("Alpha")),
+			gcnew FieldPropertyDescriptor(type->GetField("R")),
+			gcnew FieldPropertyDescriptor(type->GetField("G")),
+			gcnew FieldPropertyDescriptor(type->GetField("B")),
+			gcnew FieldPropertyDescriptor(type->GetField("A")),
 		};
 
 		m_Properties = gcnew PropertyDescriptorCollection(propArray);
@@ -151,8 +151,8 @@ namespace Design
 		if( propertyValues == nullptr )
 			throw gcnew ArgumentNullException( "propertyValues" );
 
-		return gcnew Color4f( safe_cast<float>( propertyValues["Alpha"] ), safe_cast<float>( propertyValues["Red"] ),
-			safe_cast<float>( propertyValues["Green"] ), safe_cast<float>( propertyValues["Blue"] ) );
+		return gcnew Color4f( safe_cast<float>( propertyValues["A"] ), safe_cast<float>( propertyValues["R"] ),
+			safe_cast<float>( propertyValues["G"] ), safe_cast<float>( propertyValues["B"] ) );
 	}
 
 	bool Color4Converter::GetPropertiesSupported(ITypeDescriptorContext^)

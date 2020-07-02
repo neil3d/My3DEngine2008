@@ -1,13 +1,16 @@
 #include "StdAfx.h"
+#include "timer/nprofile.h"
 #include "noctree_scene.h"
+#include "../renderer/nrenderer_base.h"
 
 namespace nexus
 {
 	nDEFINE_CLASS(noctree_scene, nscene_manager)
 
-
 	noctree_scene::noctree_scene(void) :
 		m_bshow_prim_octree(false),
+		m_prim_count(0),
+		m_light_count(0),
 		m_prim_octrant( new prim_octree_type)
 	{
 	}
@@ -16,24 +19,38 @@ namespace nexus
 	{
 	}
 
-	void noctree_scene::render_visible(const nviewport& view)
+	void noctree_scene::get_visible_primitive(const nfrustum& view_frustum,render_package_base* package)
 	{
-		m_frustum = view.frustum;
-
 		// Iterate over the octree nodes containing the query point.
 		nASSERT(m_prim_octrant);
+		
+		//START_PROFILE_COUNTER( _T("octree_scene") );
+		m_cull_prim =0;
 		for ( prim_octree_type::const_iterator pri_it( *m_prim_octrant );
 			pri_it.has_pending_node(); pri_it.advance() )
 		{
 			const prim_octree_type::octreenode_ptr	curr_node	= pri_it.get_curr_node();
 			const octree_node_bounds&				curr_bound	= pri_it.get_curr_boud();
+			box_sphere_bounds bound;
 
-			if( m_frustum.aabbox_partial_in_frustum( curr_bound.center,curr_bound.extent ) )
+			if(  view_frustum.aabbox_partial_in_frustum( curr_bound.center,curr_bound.extent ))
 			{
-				render_octreenode( curr_node, view );
-			}
-			else
-			{
+				std::set<nprimitive_component*> curr_elements = curr_node->get_curr_contents( );
+				for ( std::set<nprimitive_component*>::iterator comp_it = curr_elements.begin();
+					comp_it != curr_elements.end(); ++comp_it)
+				{
+					// 再进行一次视锥裁剪
+					m_cull_prim++;
+					nprimitive_component* prim = *comp_it; 
+					if( prim->get_visible())
+					{
+						if(view_frustum.intersect_bounds(prim->get_bounds()))
+						{
+							prim->render(package);
+						}
+					}
+				}
+
 				// push children
 				for ( int i=0; i< 8; ++i )
 				{
@@ -44,16 +61,23 @@ namespace nexus
 				}
 			}
 		}
-		
-		for( std::set<nlight_component*>::iterator iter = m_light_set.begin();
-			iter != m_light_set.end();
+		//END_PROFILE_COUNTER( _T("octree_scene") );
+	}
+
+	void noctree_scene::get_visible_light(const nfrustum& view_frustum,vector<nlight_component*>& out_lgts)
+	{
+		for( std::set<nlight_component*>::iterator iter = m_lgt_set.begin();
+			iter != m_lgt_set.end();
 			++iter)
 		{
 			nlight_component* lgt = *iter;
 
-			if(lgt->get_owner()->get_visible())
-			{
-				lgt->render( view );
+			if( lgt->get_visible())
+			{		
+				if(view_frustum.intersect_bounds(lgt->get_bounds()))
+				{
+					out_lgts.push_back(lgt);
+				}
 			}
 		}
 	}
@@ -108,71 +132,140 @@ namespace nexus
 		}
 	}
 
-	void noctree_scene::render_octreenode( prim_octree_type::octreenode_ptr pNode, const nviewport& view )
-	{
-		std::set<nprimitive_component*> curr_elements = pNode->get_curr_contents( );
-		for ( std::set<nprimitive_component*>::iterator comp_it = curr_elements.begin();
-			comp_it != curr_elements.end(); ++comp_it)
-		{
-			// 再进行一次视锥裁剪
-			nprimitive_component* prim = *comp_it; 
-			if( prim 
-				&& prim->get_owner() 
-				&& prim->get_owner()->get_visible()
-				&& m_frustum.intersect_bounds(prim->get_bounds()) 
-				)
-			{
-				prim->render(view);
-			}
-		}
-
-		// for children
-		for ( int i=0; i< 8; ++i )
-		{
-			if( pNode->has_child(i) )
-			{
-				render_octreenode( pNode->get_child(i), view );
-			}
-		}
-	}
-
 	void noctree_scene::clear_all()
 	{
 		m_prim_octrant->remove_all();
-		//m_light_octrant.remove_all();
+		m_lgt_set.clear();
+
+		m_prim_count = 0;
+		m_light_count = 0;
 	}
 
 	void noctree_scene::add_primitive(nprimitive_component* prim)
 	{
 		m_prim_octrant->add_content( prim );
+
+		for( std::set<nlight_component*>::iterator iter = m_lgt_set.begin();
+			iter != m_lgt_set.end();
+			++iter)
+		{
+			(*iter)->add_affect_prim(prim);
+		}
+
+		m_prim_count ++;
 	}
 
 	void noctree_scene::remove_primitive(nprimitive_component* prim)
 	{
 		m_prim_octrant->remove_content( prim );
 
+		for( std::set<nlight_component*>::iterator iter = m_lgt_set.begin();
+			iter != m_lgt_set.end();
+			++iter)
+		{
+			(*iter)->remove_affect_prim(prim);
+		}
+
+		m_light_count --;
 	}
 
 	void noctree_scene::move_primitive(nprimitive_component* prim)
 	{
 		m_prim_octrant->move_content( prim );
+
+		for( std::set<nlight_component*>::iterator iter = m_lgt_set.begin();
+			iter != m_lgt_set.end();
+			++iter)
+		{
+			nlight_component* lgt = *iter;
+			lgt->remove_affect_prim(prim);
+			lgt->add_affect_prim(prim);
+		}
 	}
 
 	void noctree_scene::add_light(nlight_component* lgt)
 	{
-		m_light_set.insert( lgt );
+		m_lgt_set.insert(lgt);
+		m_light_count ++;
+
+		lgt->clear();
+		if (lgt->m_type == ELight_Point)
+		{
+			npoint_light_component* point_light = (npoint_light_component*)lgt;
+			for ( prim_octree_type::const_iterator pri_it( *m_prim_octrant );
+					pri_it.has_pending_node(); pri_it.advance() )
+			{
+				const prim_octree_type::octreenode_ptr	curr_node	= pri_it.get_curr_node();
+				const octree_node_bounds&				curr_bound	= pri_it.get_curr_boud();
+
+				if( curr_bound.extent*sqrtf(3) + point_light->get_radius() >vec_distance(curr_bound.center , point_light->get_bounds().origin) )
+				{
+					std::set<nprimitive_component*> curr_elements = curr_node->get_curr_contents();
+					for ( std::set<nprimitive_component*>::iterator comp_it = curr_elements.begin();
+						comp_it != curr_elements.end(); ++comp_it)
+					{
+						nprimitive_component* prim = *comp_it; 
+						point_light->add_affect_prim(prim);
+					}
+
+					// push children
+					for ( int i=0; i< 8; ++i )
+					{
+						if( curr_node->has_child(i) )
+						{
+							pri_it.push_children( i );
+						}
+					}
+				}
+			}
+		}
+		else if (lgt->m_type == Elight_Spot)
+		{
+			nspot_light_component* spot_light = (nspot_light_component*)lgt;
+			for ( prim_octree_type::const_iterator pri_it( *m_prim_octrant );
+				pri_it.has_pending_node(); pri_it.advance() )
+			{
+				const prim_octree_type::octreenode_ptr	curr_node	= pri_it.get_curr_node();
+				const octree_node_bounds&				curr_bound	= pri_it.get_curr_boud();
+
+				const nfrustum& view_frustum = spot_light->view_info.frustum;
+				if(  view_frustum.aabbox_partial_in_frustum( curr_bound.center,curr_bound.extent ))
+				{
+					std::set<nprimitive_component*> curr_elements = curr_node->get_curr_contents();
+					for ( std::set<nprimitive_component*>::iterator comp_it = curr_elements.begin();
+						comp_it != curr_elements.end(); ++comp_it)
+					{
+						nprimitive_component* prim = *comp_it; 
+						if (prim->get_visible()
+							&&prim->accept_dynamic_light()
+							&&view_frustum.intersect_bounds(prim->get_bounds()))
+						{
+							spot_light->add_affect_prim(prim);
+						}
+					}
+
+					// push children
+					for ( int i=0; i< 8; ++i )
+					{
+						if( curr_node->has_child(i) )
+						{
+							pri_it.push_children( i );
+						}
+					}
+				}
+			}
+		}
 	}
 
 	void noctree_scene::remove_light(nlight_component* lgt)
 	{
-		m_light_set.erase( lgt );
+		m_lgt_set.erase(lgt);
+		m_light_count --;
 	}
 
-	void noctree_scene::move_light(nlight_component* /*lgt*/)
+	void noctree_scene::move_light(nlight_component* lgt)
 	{
-		// @todo:
-		//m_light_set.move_content( lgt );
-	}
-
-	
+		remove_light(lgt);
+		add_light(lgt);
+	}	
 }//namespace nexus

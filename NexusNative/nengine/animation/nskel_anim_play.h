@@ -12,10 +12,31 @@ namespace nexus
 		virtual ~nskel_anim_play(void);
 
 		void init(nresource_skeletal_anim_set::ptr anim_set, bool auto_play);
-		virtual void advance_anim(float delta_time);
 
-		void play_anim(const nstring& seq_name, bool loop, float start_time = 0);
-		void stop_anim();
+		virtual void tick_anim(float delta_time);
+
+		virtual void set_anim(const nstring& sequence);
+		virtual void play_anim(bool loop, float rate, float start_time);
+		virtual void stop_anim();
+		
+		virtual void set_position(float new_time, bool fire_notifies);
+
+		// 获取当前anim sequence剩余时间
+		virtual float get_time_left() const;
+		// 获取当前anim sequence总长度
+		virtual float get_anim_length() const;
+		// 获取当前anim sequence总帧数
+		virtual size_t get_anim_frame() const;
+		// 获取当前anim sequence
+		virtual const TCHAR* get_anim_playing() const;
+
+		// advance animation
+		virtual void advance_by(float move_deta, float delta_time, bool fire_notifies); 
+
+		virtual void issue_notifies(float delta_time);
+
+		virtual void on_anim_end(const nstring& sequence, float played_time);
+
 
 		void update_matrix_palette();
 
@@ -27,6 +48,9 @@ namespace nexus
 				return NULL;
 		}
 	private:
+		virtual void set_anim(nskeletal_anim_sequence::ptr sequence);
+
+	private:
 		nresource_skeletal_anim_set::ptr	m_anim_set;
 		nskeletal_anim_sequence::ptr		m_cur_sequence;
 
@@ -34,6 +58,7 @@ namespace nexus
 		size_t			m_next_frame;
 		bool			m_matrix_dirty;
 
+		float			m_rate;
 		float			m_frame_time;
 		bool			m_playing;
 		enum EAnimLoop	m_loop_mode;

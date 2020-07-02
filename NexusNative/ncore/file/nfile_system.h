@@ -79,7 +79,9 @@ namespace nexus
 		//-- "文件包/文件夹"操作-----------------------------------------------------
 		virtual void open_package(const nstring& pkg_name) = 0;
 		virtual void close_package(const nstring& pkg_name) = 0;
-		
+		virtual void create_directory(const nstring& pkg_name,const nstring& dir)=0;
+		virtual void remove_directory(const nstring& pkg_name,const nstring& dir)=0;
+		virtual bool rename_directory(const nstring& pkg_name,const nstring& old_name,const nstring& new_name)=0;
 		//-- 文件操作 -----------------------------------------------------
 		/**
 		 *	打开某个package中的某个文件
@@ -99,6 +101,8 @@ namespace nexus
 		virtual time_t get_file_time(const nstring& pkg_name, const nstring& file_name) = 0;
 
 		virtual bool file_exists(const nstring& pkg_name, const nstring& file_name) = 0;
+
+		virtual nstring get_full_path(const nstring& pkg_name, const nstring& file_name) const = 0;
 
 		nDECLARE_VIRTUAL_CLASS(nfile_system)
 	};

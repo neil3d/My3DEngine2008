@@ -7,6 +7,8 @@
 #pragma once
 #include "NActor.h"
 #include "NMath.h"
+#include "NTerrainMtlSetup.h"
+#include "NTerrainDecoSetup.h"
 
 namespace NexusEngine
 {
@@ -21,12 +23,39 @@ namespace NexusEngine
 
 		//!	设置位置和Scale, 不支持旋转
 		void Move(Vector3 pos, Vector3 scale);
-		
+
+		//!
+		void GetWorldHeight(float worldX, float worldZ);
+		void GetTileHeight(int tileX, int tileZ);
+
+		//! 高度图宽度和高度
+		property UInt32 HeightMapWidth
+		{
+			UInt32 get()
+			{
+				return NativePtr->get_map_width();
+			}
+		}
+
+		property UInt32 HeightMapHeight
+		{
+			UInt32 get()
+			{
+				return NativePtr->get_map_height();
+			}
+		}
+
+		NTerrainMtlSetup^ GetMaterial()	{	return m_mtlSetup; }
+
+		NTerrainDecoSetup^ GetDeco()	{return m_DecoSetup;}
+
+	private:
+		NTerrainMtlSetup^	m_mtlSetup;
+		NTerrainDecoSetup^	m_DecoSetup;
 		//-- Native Wratoer
 	public:
 		NTerrainActor(nexus::nterrain_actor::ptr nativeTrn);		
 		nterrain_actor::ptr GetSmartPtr();		
-		
 	protected:
 		property nterrain_actor* NativePtr
 		{

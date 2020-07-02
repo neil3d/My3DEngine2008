@@ -17,19 +17,37 @@ namespace nexus
 		nskeletal_mesh_component(const nstring& name_str);
 		virtual ~nskeletal_mesh_component(void);
 
-		void reset_resource(nresource_skeletal_mesh::ptr res_mesh, bool cpu_skin);
+		void reset_resource(nresource_skeletal_mesh::ptr res_mesh, bool cpu_skin);		
+		void reset_resource(const resource_location& loc, bool cpu_skin);		
 		nskel_anim_controller::ptr reset_anim_controller(const nstring& anim_ctrl_class_name);
+		void bind_anim_controller(nskel_anim_controller::ptr anim_ctrl)
+		{
+			m_anim_ctrl = anim_ctrl;
+		}
 
 		void draw_skeleton(nrender_primitive_draw_interface* PDI);
 
 		virtual void _destroy();
 		virtual void update(float delta_time, const nviewport& view);
-		virtual void render(const nviewport& view);
+		virtual void render(class render_package_base* rpb);
 
-		virtual nrender_mesh* get_render_mesh(int lod);
-		virtual nmaterial_base* get_material(int lod, int mtl_id);
+		virtual nmtl_base* get_material(int lod, int mtl_id);
+
+		virtual void _on_device_lost(int param);
+		virtual bool _on_device_reset(int param);
+
+		virtual void _update_transform(const object_space& parent_space);
+
+		virtual void on_event(nevent_base& evt);		
+
+		// 动画相关接口
+	
+	private:
+		virtual void create_render_mesh();
 
 	protected:
+		void on_resource_ready();
+
 		nresource_skeletal_mesh::ptr	m_mesh_res;
 		nskel_anim_controller::ptr		m_anim_ctrl;
 		

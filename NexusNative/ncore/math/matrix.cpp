@@ -5,6 +5,14 @@ namespace nexus
 {
 	vector3 vector3::zero(0,0,0);
 	vector3 vector3::one(1,1,1);
+	
+	const matrix44 matrix44::identity
+		(
+		1,	0,	0,	0,
+		0,	1,	0,	0,
+		0,	0,	1,	0,
+		0,	0,	0,	1
+		);
 
 	nCoreAPI void mat_set_identity(matrix44& mat)
 	{
@@ -122,29 +130,75 @@ namespace nexus
 		mat._41 = 0;	mat._42 = 0;	mat._43 = 0;	mat._44 = 1;
 	}
 
-	nCoreAPI matrix44 operator * (const matrix44& lv, const matrix44& rv)
+	nCoreAPI matrix44 operator * (const matrix44& m1, const matrix44& m2)
 	{
-		return matrix44(
-			lv._11*rv._11 + lv._12*rv._21 + lv._13*rv._31 + lv._14*rv._41,
-			lv._11*rv._12 + lv._12*rv._22 + lv._13*rv._32 + lv._14*rv._42,	
-			lv._11*rv._13 + lv._12*rv._23 + lv._13*rv._33 + lv._14*rv._43,
-			lv._11*rv._14 + lv._12*rv._24 + lv._13*rv._34 + lv._14*rv._44,
+		union 
+		{ 
+			__m128 r[4];
+			_matrix44 matrix;
+		}  lv,rv,result;
+		
+		lv.matrix = *(_matrix44*)&m1;
+		rv.matrix = *(_matrix44*)&m2;
 
-			lv._21*rv._11 + lv._22*rv._21 + lv._23*rv._31 + lv._24*rv._41,
-			lv._21*rv._12 + lv._22*rv._22 + lv._23*rv._32 + lv._24*rv._42,
-			lv._21*rv._13 + lv._22*rv._23 + lv._23*rv._33 + lv._24*rv._43,
-			lv._21*rv._14 + lv._22*rv._24 + lv._23*rv._34 + lv._24*rv._44,
-
-			lv._31*rv._11 + lv._32*rv._21 + lv._33*rv._31 + lv._34*rv._41,
-			lv._31*rv._12 + lv._32*rv._22 + lv._33*rv._32 + lv._34*rv._42,
-			lv._31*rv._13 + lv._32*rv._23 + lv._33*rv._33 + lv._34*rv._43,
-			lv._31*rv._14 + lv._32*rv._24 + lv._33*rv._34 + lv._34*rv._44,
-
-			lv._41*rv._11 + lv._42*rv._21 + lv._43*rv._31 + lv._44*rv._41,
-			lv._41*rv._12 + lv._42*rv._22 + lv._43*rv._32 + lv._44*rv._42,
-			lv._41*rv._13 + lv._42*rv._23 + lv._43*rv._33 + lv._44*rv._43,
-			lv._41*rv._14 + lv._42*rv._24 + lv._43*rv._34 + lv._44*rv._44
-			);
+		// Use vW to hold the original row
+		__m128 vW = lv.r[0];
+		// Splat the component X,Y,Z then W
+		__m128 vX = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(0,0,0,0));
+		__m128 vY = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(1,1,1,1));
+		__m128 vZ = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(2,2,2,2));
+		vW = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(3,3,3,3));
+		// Perform the opertion on the first row
+		vX = _mm_mul_ps(vX,rv.r[0]);
+		vY = _mm_mul_ps(vY,rv.r[1]);
+		vZ = _mm_mul_ps(vZ,rv.r[2]);
+		vW = _mm_mul_ps(vW,rv.r[3]);
+		// Perform a binary add to reduce cumulative errors
+		vX = _mm_add_ps(vX,vZ);
+		vY = _mm_add_ps(vY,vW);
+		vX = _mm_add_ps(vX,vY);
+		result.r[0] = vX;
+		// Repeat for the other 3 rows
+		vW = lv.r[1];
+		vX = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(0,0,0,0));
+		vY = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(1,1,1,1));
+		vZ = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(2,2,2,2));
+		vW = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(3,3,3,3));
+		vX = _mm_mul_ps(vX,rv.r[0]);
+		vY = _mm_mul_ps(vY,rv.r[1]);
+		vZ = _mm_mul_ps(vZ,rv.r[2]);
+		vW = _mm_mul_ps(vW,rv.r[3]);
+		vX = _mm_add_ps(vX,vZ);
+		vY = _mm_add_ps(vY,vW);
+		vX = _mm_add_ps(vX,vY);
+		result.r[1] = vX;
+		vW = lv.r[2];
+		vX = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(0,0,0,0));
+		vY = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(1,1,1,1));
+		vZ = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(2,2,2,2));
+		vW = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(3,3,3,3));
+		vX = _mm_mul_ps(vX,rv.r[0]);
+		vY = _mm_mul_ps(vY,rv.r[1]);
+		vZ = _mm_mul_ps(vZ,rv.r[2]);
+		vW = _mm_mul_ps(vW,rv.r[3]);
+		vX = _mm_add_ps(vX,vZ);
+		vY = _mm_add_ps(vY,vW);
+		vX = _mm_add_ps(vX,vY);
+		result.r[2] = vX;
+		vW = lv.r[3];
+		vX = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(0,0,0,0));
+		vY = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(1,1,1,1));
+		vZ = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(2,2,2,2));
+		vW = _mm_shuffle_ps(vW,vW,_MM_SHUFFLE(3,3,3,3));
+		vX = _mm_mul_ps(vX,rv.r[0]);
+		vY = _mm_mul_ps(vY,rv.r[1]);
+		vZ = _mm_mul_ps(vZ,rv.r[2]);
+		vW = _mm_mul_ps(vW,rv.r[3]);
+		vX = _mm_add_ps(vX,vZ);
+		vY = _mm_add_ps(vY,vW);
+		vX = _mm_add_ps(vX,vY);
+		result.r[3] = vX;
+		return *(matrix44*)&result.matrix;
 	}
 
 	nCoreAPI void mat_translate(matrix44& mat, float tx, float ty, float tz)

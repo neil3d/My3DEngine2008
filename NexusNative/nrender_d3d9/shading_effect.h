@@ -13,7 +13,7 @@
 
 namespace nexus
 {
-	struct d3d_view_info;
+	class nview_info;
 	class vertex_factory_type;
 	class shader_compile_environment;
 
@@ -22,9 +22,11 @@ namespace nexus
 		EVSP_WorldViewProject = 0,
 		EVSP_LocalToWorld,
 		EVSP_WorldToLocal,
+		EVSP_ViewProject,
 		EVSP_EyePos,
 		EVSP_RunTime,
-
+		EVSP_ScreenScaleBias,
+		EPS_RT_SceneColor,
 		EPS_RT_SceneDepth,
 
 		EVSP_Max
@@ -35,9 +37,12 @@ namespace nexus
 		"SYS_WorldViewProject",
 		"SYS_LocalToWorld",
 		"SYS_WorldToLocal",
+		"SYS_ViewProject",
 		"SYS_EyePos",
 		"SYS_RunTime",
-		"RT_SceneDepth",
+		"SYS_ScreenScaleBias",
+		"RT_SceneColor",
+		"RT_SceneDepth"
 	};
 
 	/**
@@ -51,6 +56,8 @@ namespace nexus
 
 		d3d9_shading_effect(void);
 		virtual ~d3d9_shading_effect(void);
+
+		virtual void set_render_state(enum ERenderState rs, int val);		
 
 		virtual void set_int(const std::string& name, int val)
 		{
@@ -119,10 +126,7 @@ namespace nexus
 			}
 		}
 
-		void set_system_parameter(const d3d_view_info* view, const nrender_proxy* obj);		
-
-		void create_effect(void* bin_code, size_t code_size);
-		void create_effect(shader_compile_environment* env);
+		void create_effect(void* bin_code, size_t code_size);		
 		ID3DXEffect* get_d3d_effect()	{	return m_d3d_effect.get();}
 
 		//-- ID3DXEffect接口的简单封装
@@ -144,9 +148,25 @@ namespace nexus
 
 			HRESULT hr = m_d3d_effect->SetFloatArray(param_handle, val, count);
 		}
+
+		//! 限定只使用1个pass
+		inline void begin()
+		{
+			m_d3d_effect->Begin(NULL, 0);
+			m_d3d_effect->BeginPass(0);
+		}
+
+		inline void end()
+		{
+			m_d3d_effect->EndPass();
+			m_d3d_effect->End();
+		}
+
+		void set_system_parameter(const nview_info* view,const matrix44& world);		
 	protected:
-		d3d_effect_ptr	m_d3d_effect;
-		D3DXHANDLE		m_vs_parameter[EVSP_Max];
+		d3d_effect_ptr			m_d3d_effect;
+	//	effect_state_manager	m_state_mgr;
+		D3DXHANDLE				m_vs_parameter[EVSP_Max];
 	};
 
 
@@ -154,11 +174,17 @@ namespace nexus
 	{
 		nstring	drawing_policy_name;
 		nstring	vertex_factory_name;
-		nstring	material_template_name;
+		nstring	mtl_shader_name;
 		nstring mod_name;
 		unsigned int name_crc;
 
-		void make_name_crc();
+		shading_effect_name(
+										const nstring& drawing_policy_name,
+										const nstring	& vertex_factory_name,
+										const nstring	& mtl_shader_name,
+										const nshader_modifier* mesh_mod,
+										const nshader_modifier* mtl_mod
+				);
 	};
 
 	inline bool operator < (const shading_effect_name& v1, const shading_effect_name& v2)
@@ -173,9 +199,7 @@ namespace nexus
 	class shading_effect_lib
 	{
 	public:
-		shading_effect_lib(void):m_default_mtl(NULL),m_default_mtl_two_side(NULL)
-		{
-		}
+		shading_effect_lib(void);
 		virtual ~shading_effect_lib(void)	{}
 
 		static shading_effect_lib* instance();
@@ -183,12 +207,12 @@ namespace nexus
 		void init()
 		{
 			m_dp_type_list.create_all_type();
-			m_shader_cache.load_from_file();
+			//m_shader_cache.load_from_file();
 		}
 
 		void close()
 		{
-			m_shader_cache.save_to_file();
+			//m_shader_cache.save_to_file();
 		}
 
 		drawing_policy_type::ptr get_draw_policy_type(const nstring& dp_name)
@@ -197,32 +221,24 @@ namespace nexus
 		}
 		
 		d3d9_shading_effect* acquire_shader(drawing_policy_type* dp_type, vertex_factory_type* vf_type, 
-			const nmaterial_base* mtl, const nshader_modifier* mod);
-
-		d3d9_shading_effect* acquire_shader_default_mtl(drawing_policy_type* dp_type, vertex_factory_type* vf_type, 
-			const nshader_modifier* mod, bool two_sided);
-
+			const nmtl_tech_shader* mtl_shader, const nshader_modifier* mesh_mod,const nshader_modifier* mtl_mod);
+		
 		void destroy()
 		{
 			m_dp_type_list.clear();
-			m_shader_map.clear();
+			m_shader_map.clear();			
+			m_shader_cache.clear();
 		}
-
-		virtual void set_default_material(nmaterial_base* mtl, nmaterial_base* mtl_two_sided)
-		{
-			m_default_mtl = mtl;
-			m_default_mtl_two_side = mtl_two_sided;
-		}
-
 	private:
 		d3d9_shading_effect::ptr create_shader(drawing_policy_type* dp_type, vertex_factory_type* vf_type, 
-			const nmaterial_base* mtl, const nshader_modifier* mod);
+			const nmtl_tech_shader* mtl_shader, const nshader_modifier* mesh_mod,const nshader_modifier* mtl_mod);
+
+		void on_device_lost(int param);
+		bool on_device_reset(int param);
 	private:
 		typedef std::map<shading_effect_name, d3d9_shading_effect::ptr> shader_map;		
-		shader_map			m_shader_map;
-		nmaterial_base*		m_default_mtl;
-		nmaterial_base*		m_default_mtl_two_side;
-
+		shader_map		m_shader_map;
+		
 		dp_type_list	m_dp_type_list;
 		shader_cache	m_shader_cache;	// shader二进制代码cache
 	};

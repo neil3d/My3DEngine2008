@@ -13,17 +13,34 @@ namespace NexusEngine
 		return dynamic_cast<nlight_component*>(RawPtr);
 	}
 
-	void NLightComponent::CreatePointLight()
+	NPointLightComponent::NPointLightComponent(nexus::npoint_light_component::ptr nativeComp)
+		: NLightComponent(nativeComp)
 	{
-		NativePtr->create_point_light();
-		
-		m_lgtProxy = gcnew NPointLightProxy(NativePtr->get_point_light());
 	}
 
-	void NLightComponent::CreateDirectionalLight()
+	npoint_light_component* NPointLightComponent::NativePtr::get()
 	{
-		NativePtr->create_directional_light();
-		
-		m_lgtProxy = gcnew NDirectionalLightProxy(NativePtr->get_directional_light());
+		return dynamic_cast<npoint_light_component*>(RawPtr);
 	}
+
+	NDirectionalLightComponent::NDirectionalLightComponent(nexus::ndirectional_light_component::ptr nativeComp)
+		: NLightComponent(nativeComp)
+	{
+	}
+
+	ndirectional_light_component* NDirectionalLightComponent::NativePtr::get()
+	{
+		return dynamic_cast<ndirectional_light_component*>(RawPtr);
+	}
+
+	NSpotLightComponent::NSpotLightComponent(nexus::nspot_light_component::ptr nativeComp)
+		: NLightComponent(nativeComp)
+	{
+	}
+
+	nspot_light_component* NSpotLightComponent::NativePtr::get()
+	{
+		return dynamic_cast<nspot_light_component*>(RawPtr);
+	}
+
 }//namespace NexusEngine

@@ -19,7 +19,10 @@ namespace nexus
 		virtual void on_mouse_left_up();
 		virtual void on_mouse_right_down(const npoint& pt);
 		virtual void on_mouse_right_up();
+		virtual void on_mouse_middle_down(const npoint& pt);
+		virtual void on_mouse_middle_up();
 		virtual void on_mouse_wheel(int delta) = 0;
+		virtual bool on_key_down(unsigned int key);
 		virtual void on_mouse_move(const npoint& pt, bool ctrl_down) = 0;
 		virtual void zoom_extents(const AABBox& box, const ncamera* cam)
 		{
@@ -45,6 +48,8 @@ namespace nexus
 	protected:
 		npoint		m_left_drag_pt;
 		bool		m_left_down;
+		npoint		m_middle_drag_pt;
+		bool		m_middle_down;
 		npoint		m_right_drag_pt;
 		bool		m_right_down;
 
@@ -67,15 +72,19 @@ namespace nexus
 		void move_look_at(const vector3& delta)	{	m_look_at+=delta;}
 		void move_yaw(float y)	{	m_yaw += y;}
 		void move_pitch(float p)	{	m_pitch += p;}	
+		void move_roll(float delta_roll)	{	m_roll += delta_roll;}	
 
-		void set_look_at(const vector3& look_at)	{	m_look_at = look_at;}
+		void set_look_at(const vector3& look_at)	{	m_last_look_at=m_look_at;	m_look_at = look_at;}
 		void zoom_extents(const AABBox& box, const ncamera* cam);		
 
+		vector3 get_direction() const;
+
 		vector3	m_eye_pos;
-		vector3	m_look_at;
+		vector3	m_look_at,
+			m_last_look_at;
 		float	m_yaw,
-			m_pitch,
-			m_roll;
+				m_pitch,
+				m_roll;
 		float	m_dist;
 
 		vector3	m_forward,

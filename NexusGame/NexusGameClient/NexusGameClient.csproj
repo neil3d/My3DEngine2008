@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3B7308AC-9FCC-41B2-B3C2-E8D0633732A7}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NexusGameClient</RootNamespace>
+    <AssemblyName>NexusGameClient</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>NexusGame.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.VisualStudio.TeamSystem.Data.UnitTesting, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Combat\TakeDamageListener.cs" />
+    <Compile Include="Combat\SpellDataDefine.cs" />
+    <Compile Include="Camera\CameraGameplay.cs" />
+    <Compile Include="Camera\CameraScreenShakeModifier.cs" />
+    <Compile Include="Camera\GameCameraModifier.cs" />
+    <Compile Include="Combat\AuraCollection.cs" />
+    <Compile Include="Combat\SpellCollection.cs" />
+    <Compile Include="Controller\AnimMeshAvatar.cs" />
+    <Compile Include="Controller\CharacterControllerCollection.cs" />
+    <Compile Include="Controller\GameCharacterController.cs" />
+    <Compile Include="Controller\ICharacterAvatar.cs" />
+    <Compile Include="Controller\LocalPlayerController.cs" />
+    <Compile Include="Controller\RemoteCharacterController.cs" />
+    <Compile Include="Controller\SkeletalMeshAvatar.cs" />
+    <Compile Include="Core\GameEngine.cs" />
+    <Compile Include="Core\GameHud.cs" />
+    <Compile Include="Core\GameInput.cs" />
+    <Compile Include="Core\GamePlayerInput.cs" />
+    <Compile Include="Controller\GameReplicateMoveCallback.cs" />
+    <Compile Include="Core\GameViewport.cs" />
+    <Compile Include="Core\GameViewportControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\GameWidgetsRender.cs" />
+    <Compile Include="Event\GameEvent.cs" />
+    <Compile Include="Form\Game.cs" />
+    <Compile Include="Form\GameClient.cs" />
+    <Compile Include="Form\GameWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frame\AccountLoginFrame.cs" />
+    <Compile Include="Frame\CreateRoleFrame.cs" />
+    <Compile Include="Frame\GameHelper.cs" />
+    <Compile Include="Frame\GamingMainFrame.cs" />
+    <Compile Include="Frame\GamingFrame.cs" />
+    <Compile Include="Frame\GamingCombatFrame.cs" />
+    <Compile Include="Frame\IGameFrame.cs" />
+    <Compile Include="Frame\GameFrameManager.cs" />
+    <Compile Include="Frame\LoadingFrame.cs" />
+    <Compile Include="Frame\MiniMapFrame.cs" />
+    <Compile Include="Frame\SelectRoleFrame.cs" />
+    <Compile Include="Network\ClientNetMessageListener.cs" />
+    <Compile Include="Controller\GameSavedMove.cs" />
+    <Compile Include="Network\ProtocolCharacter.cs" />
+    <Compile Include="Network\ProtocolChat.cs" />
+    <Compile Include="Network\ProtocolDefine.cs" />
+    <Compile Include="Network\ProtocolLoading.cs" />
+    <Compile Include="Network\ProtocolLogin.cs" />
+    <Compile Include="Network\ProtocolMap.cs" />
+    <Compile Include="Network\ProtocolMovement.cs" />
+    <Compile Include="Network\ProtocolSpell.cs" />
+    <Compile Include="Network\ProtocolStat.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.zh-CHT.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="SpecialMoves\SpecialMoveBase.cs" />
+    <Compile Include="SpecialMoves\SpecialMoveEvent.cs" />
+    <Compile Include="SpecialMoves\SpecialMove_Dead.cs" />
+    <Compile Include="SpecialMoves\SpecialMove_SpellCasting.cs" />
+    <Compile Include="SpecialMoves\SpecialMove_TakeDamage.cs" />
+    <Compile Include="SpecialMoves\SpecialMove_SpellPrepare.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NexusManaged\NexusEngineCLI\NexusEngineCLI.vcproj">
+      <Project>{1C2F58EF-63FC-4A85-A67F-5B5BC9721BDF}</Project>
+      <Name>NexusEngineCLI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NexusManaged\NexusEngineExtension\NexusEngineExtension.csproj">
+      <Project>{D2E3F033-A6A5-498C-AF55-327FCA4278EF}</Project>
+      <Name>NexusEngineExtension</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NexusManaged\NexusGameFramework\Nexus.GameFramework.csproj">
+      <Project>{9DFF3F83-5D4D-4E00-B425-EBFABAC7B99B}</Project>
+      <Name>Nexus.GameFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NexusManaged\NexusGUI\Nexus.GUI.csproj">
+      <Project>{BB2799D5-9835-40ED-932A-6AF9A61B37F9}</Project>
+      <Name>Nexus.GUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NexusNetwork\NexusNetwork.vcproj">
+      <Project>{1633F77C-CE05-447A-93C8-242AA11905FB}</Project>
+      <Name>NexusNetworkCLI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NexusGameSplash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NexusGame.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Actor\" />
+    <Folder Include="Att\" />
+    <Folder Include="Command\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

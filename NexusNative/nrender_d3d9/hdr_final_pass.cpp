@@ -32,7 +32,7 @@ namespace nexus
 
 		//--
 		std::string effect_code;
-		load_shder_source(_T("shader_d3d9/post_process/hdr_final.fx"), effect_code);
+		load_shader_source(_T("shader_d3d9/post_process/hdr_final.fx"), effect_code);
 
 		ID3DXEffect* d3d_eft = NULL;
 		hr = D3DXCreateEffect(device,

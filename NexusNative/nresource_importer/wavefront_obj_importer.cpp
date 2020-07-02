@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include <iostream>
 #include <fstream>
 #include <limits>
@@ -49,7 +49,7 @@ namespace nexus
 				float x, y, z;
 				in_file >> x >> y >> z;
 
-				pos_array.push_back(vector3(x,y,z));
+				pos_array.push_back(vector3(x,y,-z));
 			}
 			else if( cmd == _T("vt"))	// vertex textrue coord
 			{
@@ -63,7 +63,7 @@ namespace nexus
 				float x, y, z;
 				in_file >> x >> y >> z;
 
-				normal_array.push_back(vector3(x,y,z));
+				normal_array.push_back(vector3(x,y,-z));
 			}
 			else if( cmd == _T("f"))	// face
 			{
@@ -72,14 +72,14 @@ namespace nexus
 					normal_index=-1;
 
 				// triangle only
-				vertex vert;								
+			
+				vertex_traits  traits[3];
+				vertex vert[3];
 				for(int i=0; i<3; i++)
 				{
-					memset(&vert, 0, sizeof(vertex));
-
 					// OBJ format uses 1-based arrays
 					in_file >> pos_index;
-					vert.pos = pos_array[pos_index-1];
+					vert[i].pos = pos_array[pos_index-1];
 
 					if( '/' == in_file.peek() )
 					{
@@ -89,7 +89,7 @@ namespace nexus
 						{
 							// Optional texture coordinate
 							in_file >> tex_index;
-							vert.tex = tex_array[ tex_index-1 ];
+							vert[i].tex = tex_array[ tex_index-1 ];
 						}
 
 						if( '/' == in_file.peek() )
@@ -98,14 +98,13 @@ namespace nexus
 
 							// Optional vert normal
 							in_file >> normal_index;
-							vert.normal = normal_array[ normal_index-1 ];
+							vert[i].normal = normal_array[ normal_index-1 ];
 						}
 					}
 
-					vertex_traits vt;
-					vt.pos_index = pos_index;
-					vt.normal_index = normal_index;
-					vt.tex_index = tex_index;
+					traits[i].pos_index = pos_index;
+					traits[i].normal_index = normal_index;
+					traits[i].tex_index = tex_index;
 
 					if(!cur_section) //  必须在face命令前收到usemtl命令，否则cur_section未创建
 					{
@@ -113,9 +112,12 @@ namespace nexus
 						cur_section->m_primitive_type = EDraw_TriangleList;		
 						cur_section->m_material_id = ret->m_secton_array.size();
 					}
-					cur_section->m_index_buffer.append_index(
-						add_vertex(vt, vert));
-				}//endof for()
+				}
+
+				cur_section->m_index_buffer.append_index(add_vertex(traits[0],vert[0]));
+				cur_section->m_index_buffer.append_index(add_vertex(traits[2],vert[2]));
+				cur_section->m_index_buffer.append_index(add_vertex(traits[1],vert[1]));
+				//endof for()
 				total_face++;
 			}
 			else if( cmd == _T("usemtl"))	// 根据材质切分section
@@ -168,7 +170,7 @@ namespace nexus
 
 		//--
 		generate_tangent(ret);
-
+		
 		//--
 		ret->m_bounding_box = compute_bounding_box();
 

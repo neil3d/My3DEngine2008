@@ -4,6 +4,7 @@
 #include "nrenderer_d3d9.h"
 
 #pragma comment(lib,"d3d9.lib")
+#pragma comment(lib,"dxguid.lib")
 #ifdef _DEBUG
 #	pragma comment(lib,"d3dx9d.lib")
 #else
@@ -19,14 +20,23 @@ namespace nexus
 	 //--
 	d3d_device_manager::d3d_device_manager(void)
 	{
+		m_device_handler_id = 0;
 	}
 
 	d3d_device_manager::~d3d_device_manager(void)
 	{
 	}
 
-	void d3d_device_manager::create_device(HWND hRenderWnd, size_t width, size_t height, size_t color_bits, bool bWindowed)
+	void d3d_device_manager::create_device(const render_config& cfg)
 	{
+		m_cfg = cfg;
+
+		HWND hRenderWnd = (HWND)cfg.window_handle;
+		size_t width = cfg.width;
+		size_t height = cfg.height;
+		size_t color_bits = cfg.color_bits;
+		bool bWindowed = cfg.bWindowed;
+
 		//-- create d3d9 object
 		d3d_ptr<IDirect3D9> d3d9_obj = Direct3DCreate9(D3D_SDK_VERSION);
 		if( !d3d9_obj )
@@ -85,10 +95,22 @@ namespace nexus
 		//--
 		m_d3d9 = d3d9_obj;
 		m_device.reset(d3d9_device);
+		m_d3d_present_param = present_param;
+
+		// 创建UI sprite 
+		ID3DXSprite* new_sprite = NULL;
+		hr = D3DXCreateSprite(d3d9_device,&new_sprite);
+		if( FAILED(hr) )
+		{
+			THROW_D3D_HRESULT(hr, _T("create font sprite faild."));
+		}
+		m_ui_sprite.reset( new_sprite );
+		new_sprite=0;
 	}
 
 	void d3d_device_manager::destroy_device()
 	{
+		m_ui_sprite.reset();
 		int device_ref = m_device.reset();
 		int d3d_ref = m_d3d9.reset();
 
@@ -136,11 +158,63 @@ namespace nexus
 		//D3D9 Doc : Setting a new render target will cause the viewport to be set to the full size of the new render target.
 		HRESULT hr;
 
-		const D3DVIEWPORT9& vp = nrenderer_d3d9::instance()->get_view_info()->d3d_view;
+		const D3DVIEWPORT9& vp =*(D3DVIEWPORT9*)&(nrenderer_d3d9::instance()->get_view_info()->m_view_port);
 		hr = m_device->SetRenderTarget(i, prt);
 
 		m_device->SetViewport(&vp);
 
 		return hr;
+	}
+
+	int d3d_device_manager::register_device_handler(handler_device_lost hlost, handler_device_reset hreset)
+	{
+		int id = m_device_handler_id;
+		m_device_handler_id++;
+		m_on_device_lost.insert( make_pair(id, hlost) );
+		m_on_device_reset.insert( make_pair(id, hreset) );
+
+		return id;
+	}
+
+	void d3d_device_manager::unregister_device_handler(int id)
+	{
+		m_on_device_lost.erase(id);
+		m_on_device_reset.erase(id);
+	}
+
+	void d3d_device_manager::on_device_lost(int param)
+	{
+		HRESULT hr;
+		//-- 处理自己管理的资源
+		if( m_ui_sprite )
+			hr = m_ui_sprite->OnLostDevice();
+
+		//-- 调用所有handler
+		for (std::map<int, handler_device_lost>::iterator iter = m_on_device_lost.begin();
+			iter != m_on_device_lost.end();
+			++iter)
+		{
+			handler_device_lost handler = iter->second;
+			handler(param);
+		}			
+	}
+
+	bool d3d_device_manager::on_device_reset(int param)
+	{
+		//-- 处理自己管理的资源
+		if( m_ui_sprite )
+			m_ui_sprite->OnResetDevice();
+
+		//-- 调用所有handler
+		for (std::map<int, handler_device_reset>::iterator iter = m_on_device_reset.begin();
+			iter != m_on_device_reset.end();
+			++iter)
+		{
+			handler_device_reset handler = iter->second;
+			if( !handler(param) )
+				return false;
+		}// end of for
+
+		return true;
 	}
 }//namespace nexus

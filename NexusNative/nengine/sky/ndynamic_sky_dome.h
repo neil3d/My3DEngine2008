@@ -2,7 +2,7 @@
 #define _NEXUS_DYNAMIC_SKY_DOME_H_
 #include "sky_base.h"
 #include "../mesh/mesh_vertex_data.h"
-#include "../material/nmaterial.h"
+#include "../material/nmtl_static.h"
 #include "../renderer/nrender_dynamic_mesh_indexed.h"
 
 namespace nexus
@@ -15,13 +15,11 @@ namespace nexus
 		virtual ~nsky_dome_vertex_data(void);
 
 		//--
-		virtual size_t get_num_stream() const	{	return 2;}
+		virtual size_t get_num_stream() const	{	return 1;}
 		virtual vertex_stream* get_stream(size_t stream_index)	
 		{
-			if(stream_index == 0)
-				return &m_pos_stream;
-			else
-				return &m_color_stream;
+			(void)stream_index;
+			return &m_pos_stream;
 		}
 		virtual nstring get_vertex_type_name() const;
 		virtual nstring get_vertex_factory_name() const;
@@ -30,7 +28,6 @@ namespace nexus
 		void init(float radius, int tesselation, index_buffer16& faces);		
 		std::vector<vector3>& get_normal_array()	{	return m_normal_array;}
 	private:
-		vertex_stream			m_color_stream;
 		std::vector<vector3>	m_normal_array;	// 渲染时不用，但是需要用来更新颜色
 	};
 
@@ -51,7 +48,7 @@ namespace nexus
 
 		virtual enum EDepthGroup get_depth_group() const;
 		virtual void update(float delta_time, const nviewport& view);
-		virtual nmaterial_base* get_material(int lod, int mtl_id);		
+		virtual nmtl_base* get_material(int lod, int mtl_id);		
 		virtual nrender_mesh* get_render_mesh(int lod);		
 
 		vector3 get_sun_dir() const;
@@ -96,7 +93,7 @@ namespace nexus
 	private:
 		nsky_dome_vertex_data	m_vert_data;
 		render_res_ptr<nrender_dynamic_mesh_indexed>	m_mesh;
-		nmaterial	m_mtl;
+		nmtl_static	m_mtl;
 
 		void rebuild_colors(bool update_render_mesh);
 		vector4 get_vertex_color(const vector3& vert_normal);

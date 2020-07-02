@@ -1,64 +1,80 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "nterrain_actor.h"
-#include "nquad_tree_terrain.h"
-#include "terrain_water.h"
 #include "../util/perlin.h"
 #include "../image/nimage.h"
 #include "../framework/nengine.h"
-#include "height_map_util.h"
+#include "../../ncore/height_map/height_map_util.h"
+#include "../physics/nphys_util.h"
+#include "nterrain_chunk.h"
+#include "nterrain_deco_chunk_base.h"
 
 namespace nexus
 {
 	nDEFINE_NAMED_CLASS(nterrain_actor, nactor)
 
 	nterrain_actor::nterrain_actor(const nstring& name_str)
-		: nactor(name_str), m_chunk_size(65)
+		: nactor(name_str), m_chunk_size(65),m_phys_height_field(NULL)
 	{
 		m_frozen = true;
+		m_depth_group = EDG_WorldGeometry;
 	}
 
 	nterrain_actor::~nterrain_actor(void)
 	{
 	}
 
-	const TCHAR* const TRN_RENDER_COMPONENT_NAME = _T("quad_tree_trn_render");
-	const TCHAR* const TRN_WATER_COMPONENT_NAME = _T("terrain_water_comp");
 	void nterrain_actor::create(size_t w, size_t h, unsigned short init_h, size_t chunk_size)
 	{
 		nASSERT(w > 0 && h > 0);
 		nASSERT(chunk_size < 256);
 
 		m_chunk_size = chunk_size;
-		//-- create height map
+
+		//-- clear old data
+		m_mtl_setup.reset(this);
+		m_deco_setup.reset(this);
+		m_chunks.clear();
+
+		//-- create maps
 		m_height_map.create(w, h, init_h);
+		m_viz_map.create(w, h, 1);
 
-		//--
-		nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
-
-		//-- create render heightmap texutre
-		m_heightmap_tex.reset( rres_mgr->alloc_heightmap() );
-		m_heightmap_tex->create(w, h);
-
-		//-- create components
-		shared_ptr<nquad_tree_terrain> comp = create_component_t<nquad_tree_terrain>(TRN_RENDER_COMPONENT_NAME);
-		comp->create(&m_height_map, m_heightmap_tex.get(), chunk_size);
-
-		//--
-		m_trn_component = comp;
+		//-- create chunk components
+		create_chunks();
+		
 	}
 
-	void nterrain_actor::create_water(int water_h, size_t chunk_size)
+	void nterrain_actor::create_chunks()
 	{
-		shared_ptr<nterrain_water> water_comp = create_component_t<nterrain_water>(TRN_WATER_COMPONENT_NAME);
-		water_comp->create(water_h, chunk_size);
+		size_t w = m_height_map.get_width();
+		size_t h = m_height_map.get_height();
 
-		//--
-		m_water_component = water_comp;
+		int yc = (h-1)/(m_chunk_size-1);
+		int xc = (w-1)/(m_chunk_size-1);
+		for(int y=0; y<yc; y++)
+		{
+			for(int x=0; x<xc; x++)
+			{
+				std::wostringstream ss;
+				ss << _T("trn_chunk_") << x << _T('_') << y;
+
+				nterrain_chunk::ptr ck = create_component_t<nterrain_chunk>( ss.str() );
+				int px = x*(m_chunk_size-1);
+				int py = y*(m_chunk_size-1);
+				ck->create( px, py, m_chunk_size );
+
+				//-- 虽然基类已经保存了components list，这里重复保存一次，方便处理
+				m_chunks.push_back(ck);
+			}
+		}//end of for()
+
+		m_deco_setup.create_chunks();
 	}
+
 
 	void nterrain_actor::generate_noise(nrect rc, int numOctaves, float amplitude, float frequency)
 	{
-		_clip_rect(rc.left, rc.top, rc.right, rc.bottom, 
+		clip_rect(rc.left, rc.top, rc.right, rc.bottom, 
 			m_height_map.get_width(), m_height_map.get_height());
 
 		if( rc.get_width() <= 0
@@ -81,24 +97,7 @@ namespace nexus
 		}//end of for	
 
 		//--
-		m_trn_component->post_heightmap_change(rc, &m_height_map);
-	}
-
-	void nterrain_actor::create_material_basic(const resource_location& texture_loc)
-	{
-		m_trn_component->create_material_basic(texture_loc);
-	}
-
-	void nterrain_actor::create_water_material_basic(const resource_location& texture_loc)
-	{
-		m_water_component->create_material_basic(texture_loc);
-	}
-
-	void nterrain_actor::create_water_material_natural(int render_target_w, int render_target_h,
-		const resource_location& detail_map, const resource_location& bump_map)
-	{
-		m_water_component->create_material_natural(render_target_w, render_target_h,
-			detail_map, bump_map);
+		post_heightmap_change(rc);
 	}
 
 	void nterrain_actor::import_heightmap(const nstring& img_file_name)
@@ -130,17 +129,16 @@ namespace nexus
 		img.destroy();
 
 		//--
-		m_trn_component->post_heightmap_change(nrect(0,0,img_w,img_h),
-			&m_height_map);
+		post_heightmap_change( nrect(0,0,img_w,img_h) );			
 	}
 
-	ntexture_splatting::ptr nterrain_actor::create_texture_splatting(size_t alpha_w, size_t alpha_h)
-	{
-		return m_trn_component->create_texture_splatting(alpha_w, alpha_h);
-	}
+	
 
-	bool nterrain_actor::line_check(ncheck_result& ret, const vector3& start, const vector3& end)
+	bool nterrain_actor::line_check(ncheck_result& ret, const vector3& start, const vector3& end, ELineCheckType check_type)
 	{
+		if( !(check_type&ELCT_Terrain) )
+			return false;
+
 		if( !m_height_map.is_valid() )
 			return false;
 
@@ -153,7 +151,7 @@ namespace nexus
 		vector3 line_dir = vec_normalize(end-start);
 
 		vector3 wpt;
-		while(true)
+		while(test_len < max_test_len)
 		{
 			wpt = start + line_dir*test_len;
 			pt = world2tile(wpt.x, wpt.z);
@@ -175,9 +173,6 @@ namespace nexus
 			}
 
 			test_len += step;
-
-			if(test_len > max_test_len)
-				break;
 		}
 
 		return find;
@@ -227,18 +222,81 @@ namespace nexus
 		if(region.get_width() > 0
 			&& region.get_height() > 0)
 		{
-			m_trn_component->post_heightmap_change(region, &m_height_map);
+			// 目前是一个简单的遍历，如果需要的话可以使用quad tree去优化
+			for( st_chunk_array::iterator iter = m_chunks.begin();
+				iter != m_chunks.end();
+				++iter )
+			{
+				(*iter)->post_heightmap_change(region);
+			}// end of for()
 		}
 	}
 
-	nmaterial_base* nterrain_actor::get_material()
+	void nterrain_actor::post_vizmap_change(const nrect& region)
 	{
-		return m_trn_component->get_material();
+		if(region.get_width() > 0
+			&& region.get_height() > 0)
+		{
+			for( st_chunk_array::iterator iter = m_chunks.begin();
+				iter != m_chunks.end();
+				++iter )
+			{
+				(*iter)->post_vizmap_change(region);
+			}// end of for()
+		}
+	}
+
+	void nterrain_actor::_post_material_create()
+	{
+		for( st_chunk_array::iterator iter = m_chunks.begin();
+			iter != m_chunks.end();
+			++iter )
+		{
+			(*iter)->_post_material_create(&m_mtl_setup);
+		}// end of for()
+	}
+
+	void nterrain_actor::_post_layer_alpha_change(const nstring& layer_name, const nrect& region)
+	{
+		if(region.get_width() > 0
+			&& region.get_height() > 0)
+		{
+			for( st_chunk_array::iterator iter = m_chunks.begin();
+				iter != m_chunks.end();
+				++iter )
+			{
+				(*iter)->_post_layer_alpha_change(layer_name, region);
+			}// end of for()
+		}
+	}
+
+	//void nterrain_actor::post_deco_layer_change( nterrain_deco_layer* layer,const nrect& region )
+	//{
+	//	if(region.get_width() > 0
+	//		&& region.get_height() > 0)
+	//	{
+	//		for( st_chunk_array::iterator iter = m_chunks.begin();
+	//			iter != m_chunks.end();
+	//			++iter )
+	//		{
+	//			(*iter)->_post_deco_layer_change(layer, region);
+	//		}// end of for()
+	//	}
+	//}
+
+	void nterrain_actor::_post_terrain_layer_change()
+	{
+		for( st_chunk_array::iterator iter = m_chunks.begin();
+			iter != m_chunks.end();
+			++iter )
+		{
+			(*iter)->_post_layer_change();
+		}// end of for()
 	}
 
 	void nterrain_actor::serialize(narchive& ar)
 	{
-		nactor::serialize(ar);
+		nactor::serialize_basic_property(ar);
 
 		//------------------------------------------
 		nSERIALIZE(ar, m_chunk_size);
@@ -262,63 +320,225 @@ namespace nexus
 		//-- 存取height map
 		nstring pkg_name = ar.get_file()->get_package();
 		nstring file_name = ar.get_file()->get_file_name();
+		nstring folder;
 		nstring hmap_file_name;
 
 		nstring::size_type fpos = file_name.find_last_of(_T("/"));
 		if( fpos != nstring::npos )
-			hmap_file_name = file_name.substr(0, fpos+1);
+			folder = file_name.substr(0, fpos+1);
 		
-		hmap_file_name += m_name.name_str;
+		hmap_file_name = folder+m_name.name_str;
 		hmap_file_name += _T("_hmap.raw");
 
 		if( ar.is_loading() )
 		{
 			m_height_map.create(hmap_w, hmap_h, 0);
-			load_height_map_as_raw(m_height_map, pkg_name, hmap_file_name);
+			load_height_map_as_raw(nengine::instance()->get_file_sys(),
+				m_height_map, pkg_name, hmap_file_name);
 		}
 		else
 		{
-			save_height_map_as_raw(m_height_map, pkg_name, hmap_file_name);
+			save_height_map_as_raw(nengine::instance()->get_file_sys(),
+				m_height_map, pkg_name, hmap_file_name);
 		}		
+
+		//-- 存取viz map
+		nstring vmap_file_name = folder+m_name.name_str;
+		vmap_file_name += _T("_vmap.raw");
+
+		nfile_system* fs = nengine::instance()->get_file_sys();
+		if( ar.is_loading() )
+		{
+			m_viz_map.create(hmap_w, hmap_h, true);
+			m_viz_map.load_raw(fs, pkg_name, vmap_file_name);
+		}
+		else
+		{
+			m_viz_map.save_raw(fs, pkg_name, vmap_file_name);
+		}
+
+		//-- 存取材质
+		if( ar.is_loading() )
+		{
+			m_mtl_setup.reset( this );
+			m_deco_setup.reset(this);
+		}
+		nstring mtl_setup_class = m_mtl_setup.reflection_get_class()->get_name();
+		ar.object_begin(_T("m_mtl_setup"), mtl_setup_class);
+		m_mtl_setup.serialize(ar);
+		ar.object_end();
+
+		nstring deco_setup_class = m_deco_setup.reflection_get_class()->get_name();
+		ar.object_begin(_T("m_deco_setup"), deco_setup_class);
+		m_deco_setup.serialize(ar);
+		ar.object_end();
 	}
 
 	void nterrain_actor::_level_loaded(nlevel* level_ptr)
 	{
 		m_owner = level_ptr;
-
-		//-- create render heightmap texutre
-		nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
-		m_heightmap_tex.reset( rres_mgr->alloc_heightmap() );
-		m_heightmap_tex->create(m_height_map.get_width(),
-			m_height_map.get_height());
-
+		
 		//--
-		for(st_component_list::iterator iter = m_component_list.begin();
-			iter != m_component_list.end();
-			++iter)
-		{
-			nactor_component::ptr comp = *iter;
-			if( comp->get_name().name_str == TRN_RENDER_COMPONENT_NAME )
-				m_trn_component = boost::dynamic_pointer_cast<nquad_tree_terrain>(comp);
-			else if( comp->get_name().name_str == TRN_WATER_COMPONENT_NAME )
-				m_water_component = boost::dynamic_pointer_cast<nterrain_water>(comp);
-			comp->_level_loaded(this);
-		}
-
-		nrect rc(0,0,
-			m_height_map.get_width(),
-			m_height_map.get_height()
-			);
-		this->post_heightmap_change(rc);
+		create_chunks();	
+		_post_material_create();
+		_post_terrain_layer_change();
 	}
 
 	void nterrain_actor::_destroy()
 	{
 		nactor::_destroy();
 
-		m_height_map.destroy();
-		m_heightmap_tex.reset();
-		m_trn_component.reset();
-		m_water_component.reset();
+		m_height_map.destroy();				
+		m_viz_map.destroy();
+		m_mtl_setup.reset(this);
+		m_chunks.clear();
 	}
+
+
+	// physics interfaces
+	void nterrain_actor::init_phys()
+	{
+		if( m_phys_body_instance.get() != NULL )
+		{
+			nLog_Error( _T("Recreate physics actor...") );
+			return;
+		}
+
+		NxPhysicsSDK* nx_sdk = nengine::instance()->get_phys_engine()->get_nx_physics_sdk();
+		if( nx_sdk == NULL ) return;
+
+		nlevel* level_owner = get_owner();
+		if( level_owner == NULL )return;
+		nphys_scene* phys_scene = level_owner->get_phys_scene();
+		if( phys_scene == NULL || !phys_scene->is_valid_scene() ) return;
+		NxScene* nx_scene = phys_scene->get_nx_scene();
+
+		int nb_columns = m_height_map.get_width();
+		int nb_rows = m_height_map.get_height();
+		const vector3&  terrain_scale = get_scale();
+
+
+		int default_material = phys_scene->get_default_mat()->getMaterialIndex(); 
+		int hole_material = default_material + 1; 
+
+		NxHeightFieldDesc HFDesc;
+		HFDesc.nbColumns		= nb_columns;
+		HFDesc.nbRows			= nb_rows;
+		HFDesc.samples			= new NxHeightFieldSample[nb_columns*nb_rows];
+		HFDesc.sampleStride		= sizeof(NxHeightFieldSample);
+		HFDesc.flags			= NX_HF_NO_BOUNDARY_EDGES;
+
+		char* curr_byte = (char*)HFDesc.samples;
+		for ( int row_index=0; row_index<nb_rows; row_index++ )
+		{
+			for ( int col_index=0; col_index<nb_columns; col_index++ )
+			{
+				NxHeightFieldSample* curr_sample = (NxHeightFieldSample*)curr_byte;
+				curr_sample->height = m_height_map.get_value( row_index, col_index);
+				curr_sample->tessFlag = NX_HF_0TH_VERTEX_SHARED;
+
+				//@todo: set hold Material
+				curr_sample->materialIndex0 = default_material;
+				curr_sample->materialIndex1 = default_material;
+
+				curr_byte += HFDesc.sampleStride;
+			}
+		}
+
+		m_phys_height_field = nx_sdk->createHeightField(HFDesc);
+
+		// data has been copied, we can free our buffer
+		delete [] HFDesc.samples;
+
+		if ( m_phys_height_field == NULL )
+		{
+			nLog_Error(_T("Can not create height field ..."));
+			return;
+		}
+
+		NxHeightFieldShapeDesc TerrainShapeDesc;
+		TerrainShapeDesc.heightField	= m_phys_height_field;
+		TerrainShapeDesc.shapeFlags		= NX_SF_FEATURE_INDICES | NX_SF_VISUALIZATION;
+		TerrainShapeDesc.heightScale	= terrain_scale.y * physx::engine_to_nx_scale;
+		TerrainShapeDesc.rowScale		= terrain_scale.x * physx::engine_to_nx_scale;
+		TerrainShapeDesc.columnScale	= terrain_scale.z * physx::engine_to_nx_scale;
+		TerrainShapeDesc.meshFlags		= 0;
+		TerrainShapeDesc.materialIndexHighBits = 0;
+		TerrainShapeDesc.holeMaterial	= hole_material;
+		TerrainShapeDesc.groupsMask		= physx::create_groups_mask(PhysCC_Default, NULL);
+
+		//@ todo: Per-triangle materials for terrain...
+
+		// Create actor description and instance it.
+		NxActorDesc TerrainActorDesc;
+		TerrainActorDesc.shapes.pushBack(&TerrainShapeDesc);
+		TerrainActorDesc.body		   = NULL;
+		TerrainActorDesc.globalPose.t = physx::nx_vector_conv(m_space.location);
+
+		TerrainActorDesc.compartment = phys_scene->get_rigidbody_compartment();
+		nASSERT( TerrainActorDesc.isValid() );
+		NxActor* terrain_actor = nx_scene->createActor(TerrainActorDesc);
+		if(terrain_actor)
+		{
+			m_phys_body_instance.reset( nconstruct<nphys_body_instance>( _T("nphys_body_instance") ) );
+			m_phys_body_instance->m_nx_actor = terrain_actor;
+			m_phys_body_instance->m_owner_cmp = NULL;
+			m_phys_body_instance->m_owner_actor = this;
+
+			terrain_actor->userData = &m_phys_body_instance;
+		}
+		else
+		{
+			nLog_Error( _T("Could not create terrain NxActor..") );
+		}
+	}
+
+	void nterrain_actor::simulate_phys(float /*delta_time*/)
+	{
+
+	}
+
+	void nterrain_actor::release_phys()
+	{
+		nlevel* level_owner = get_owner();
+		if( level_owner == NULL )return;
+		NxPhysicsSDK* nx_sdk = nengine::instance()->get_phys_engine()->get_nx_physics_sdk();
+		if( nx_sdk == NULL )return;
+		nphys_scene* phys_scene = level_owner->get_phys_scene();
+		if( phys_scene == NULL || !phys_scene->is_valid_scene() ) return;
+
+		if( m_phys_body_instance.get() != NULL )
+		{
+			if ( m_phys_body_instance->m_nx_actor )
+			{
+				phys_scene->get_nx_scene()->releaseActor( *(m_phys_body_instance->m_nx_actor) );
+			}
+		}
+		if( m_phys_height_field != NULL )
+		{
+			nx_sdk->releaseHeightField(*m_phys_height_field);
+		}
+		m_phys_body_instance.reset();
+	}
+
+	nactor::ptr nterrain_actor::clone()
+	{
+		return nactor::ptr();
+	}
+
+	nterrain_chunk::ptr nterrain_actor::get_chunk( float x,float y )
+	{
+		npoint pt = world2tile(x, y);
+		size_t w = m_height_map.get_width();
+		size_t h = m_height_map.get_height();
+
+		int yc = (h-1)/(m_chunk_size-1);
+		int xc = (w-1)/(m_chunk_size-1);
+
+		int cx=pt.x/(m_chunk_size-1);	if(cx>=xc) return nterrain_chunk::ptr();
+		int cy=pt.y/(m_chunk_size-1);	if(cy>=yc) return nterrain_chunk::ptr();
+
+		return m_chunks[cy*yc+cx];		
+	}
+
 }//namespace nexus

@@ -55,16 +55,16 @@ namespace nexus
 		//-- sphere test
 		// For each plane, see if sphere is on negative side
 		// If so, object is not visible
-		for (int p = 0; p < 6; ++p)
-		{
-			// If the distance from sphere center to plane is negative, and 'more negative' 
-			// than the radius of the sphere, sphere is outside frustum
-			if (m_planes[p].dist_to_point(bounds.origin) < -bounds.sphere_radius)
-			{
-				// ALL corners on negative side therefore out of view
-				return false;
-			}
-		}//end of for
+		//for (int p = 0; p < 6; ++p)
+		//{
+		//	// If the distance from sphere center to plane is negative, and 'more negative' 
+		//	// than the radius of the sphere, sphere is outside frustum
+		//	if (m_planes[p].dist_to_point(bounds.origin) < -bounds.sphere_radius)
+		//	{
+		//		// ALL corners on negative side therefore out of view
+		//		return false;
+		//	}
+		//}//end of for
 
 		//-- aabbox test
 		vector3 pt[8];
@@ -73,23 +73,32 @@ namespace nexus
 		// Go through all of the corners of the box and check then again each plane
 		// in the frustum.  If all of them are behind one of the planes, then it most
 		// like is not in the frustum.
+		__m128 nx,ny,nz,d,px,py,pz;
+
 		for(int i=0;i<6;i++)
 		{
-			if(m_planes[i].dist_to_point(pt[0]) > 0)
+			const vector3& normal = m_planes[i].normal;
+			float dist = m_planes[i].dist;
+
+			nx =  _mm_set_ps(normal.x,normal.x,normal.x,normal.x);
+			ny = _mm_set_ps(normal.y,normal.y,normal.y,normal.y);
+			nz = _mm_set_ps(normal.z,normal.z,normal.z,normal.z);
+			d =	_mm_set_ps(dist,dist,dist,dist);
+
+			px = _mm_set_ps( pt[0].x,pt[1].x,pt[2].x,pt[3].x );
+			py = _mm_set_ps( pt[0].y,pt[1].y,pt[2].y,pt[3].y );
+			pz = _mm_set_ps( pt[0].z,pt[1].z,pt[2].z,pt[3].z );
+
+			__m128 result = _mm_add_ps(_mm_add_ps(_mm_add_ps(_mm_mul_ps(nx,px),_mm_mul_ps(ny,py)),_mm_mul_ps(nz,pz)),d);
+			if (_mm_movemask_ps( _mm_cmpgt_ps(result, _mm_setzero_ps()) ))
 				continue;
-			if(m_planes[i].dist_to_point(pt[1]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[2]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[3]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[4]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[5]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[6]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[7]) > 0)
+
+			px = _mm_set_ps( pt[4].x,pt[5].x,pt[6].x,pt[7].x );
+			py = _mm_set_ps( pt[4].y,pt[5].y,pt[6].y,pt[7].y );
+			pz = _mm_set_ps( pt[4].z,pt[5].z,pt[6].z,pt[7].z );
+
+			result = _mm_add_ps(_mm_add_ps(_mm_add_ps(_mm_mul_ps(nx,px),_mm_mul_ps(ny,py)),_mm_mul_ps(nz,pz)),d);
+			if (_mm_movemask_ps( _mm_cmpgt_ps(result, _mm_setzero_ps()) ))
 				continue;
 
 			//如果所有点在任何一个平面的外面,则BOX在外面
@@ -158,23 +167,31 @@ namespace nexus
 		// Go through all of the corners of the box and check then again each plane
 		// in the frustum.  If all of them are behind one of the planes, then it most
 		// like is not in the frustum.
+		__m128 nx,ny,nz,d,px,py,pz;
 		for(int i=0;i<6;i++)
 		{
-			if(m_planes[i].dist_to_point(pt[0]) > 0)
+			const vector3& normal = m_planes[i].normal;
+			float dist = m_planes[i].dist;
+
+			nx = _mm_set_ps(normal.x,normal.x,normal.x,normal.x);
+			ny = _mm_set_ps(normal.y,normal.y,normal.y,normal.y);
+			nz = _mm_set_ps(normal.z,normal.z,normal.z,normal.z);
+			d =	_mm_set_ps(dist,dist,dist,dist);
+
+			px = _mm_set_ps( pt[0].x,pt[1].x,pt[2].x,pt[3].x );
+			py = _mm_set_ps( pt[0].y,pt[1].y,pt[2].y,pt[3].y );
+			pz = _mm_set_ps( pt[0].z,pt[1].z,pt[2].z,pt[3].z );
+
+			__m128 result = _mm_add_ps(_mm_add_ps(_mm_add_ps(_mm_mul_ps(nx,px),_mm_mul_ps(ny,py)),_mm_mul_ps(nz,pz)),d);
+			if (_mm_movemask_ps( _mm_cmpgt_ps(result, _mm_setzero_ps()) ))
 				continue;
-			if(m_planes[i].dist_to_point(pt[1]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[2]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[3]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[4]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[5]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[6]) > 0)
-				continue;
-			if(m_planes[i].dist_to_point(pt[7]) > 0)
+
+			px = _mm_set_ps( pt[4].x,pt[5].x,pt[6].x,pt[7].x );
+			py = _mm_set_ps( pt[4].y,pt[5].y,pt[6].y,pt[7].y );
+			pz = _mm_set_ps( pt[4].z,pt[5].z,pt[6].z,pt[7].z );
+
+			result = _mm_add_ps(_mm_add_ps(_mm_add_ps(_mm_mul_ps(nx,px),_mm_mul_ps(ny,py)),_mm_mul_ps(nz,pz)),d);
+			if (_mm_movemask_ps( _mm_cmpgt_ps(result, _mm_setzero_ps()) ))
 				continue;
 
 			//如果所有点在任何一个平面的外面,则BOX在外面

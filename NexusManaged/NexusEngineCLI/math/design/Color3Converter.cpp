@@ -21,9 +21,9 @@ namespace Design
 		Type^ type = Color3::typeid;
 		array<PropertyDescriptor^>^ propArray =
 		{
-			gcnew FieldPropertyDescriptor(type->GetField("Red")),
-			gcnew FieldPropertyDescriptor(type->GetField("Green")),
-			gcnew FieldPropertyDescriptor(type->GetField("Blue")),
+			gcnew FieldPropertyDescriptor(type->GetField("R")),
+			gcnew FieldPropertyDescriptor(type->GetField("G")),
+			gcnew FieldPropertyDescriptor(type->GetField("B")),
 		};
 
 		m_Properties = gcnew PropertyDescriptorCollection(propArray);
@@ -31,7 +31,7 @@ namespace Design
 
 	bool Color3Converter::CanConvertTo(ITypeDescriptorContext^ context, Type^ destinationType)
 	{
-		if( destinationType == String::typeid || destinationType == InstanceDescriptor::typeid )
+		if( destinationType == String::typeid )
 			return true;
 		else
 			return ExpandableObjectConverter::CanConvertTo(context, destinationType);
@@ -100,8 +100,8 @@ namespace Design
 				}
 
 				TypeConverter^ colorConverter = TypeDescriptor::GetConverter(Color::typeid);
-				Color4f value( safe_cast<Color>( colorConverter->ConvertFromString( context, culture, string ) ) );
-				return gcnew Color3( value.R, value.G, value.B );
+				Color4f color( safe_cast<Color>( colorConverter->ConvertFromString( context, culture, string ) ) );
+				return gcnew Color3( color.R, color.G, color.B );
 			}
 			else if( stringArray->Length == 3 )
 			{
@@ -141,8 +141,8 @@ namespace Design
 		if( propertyValues == nullptr )
 			throw gcnew ArgumentNullException( "propertyValues" );
 
-		return gcnew Color3( safe_cast<float>( propertyValues["Red"] ),
-			safe_cast<float>( propertyValues["Green"] ), safe_cast<float>( propertyValues["Blue"] ) );
+		return gcnew Color3( safe_cast<float>( propertyValues["R"] ),
+			safe_cast<float>( propertyValues["G"] ), safe_cast<float>( propertyValues["B"] ) );
 	}
 
 	bool Color3Converter::GetPropertiesSupported(ITypeDescriptorContext^)

@@ -5,6 +5,8 @@ namespace NexusEngine
 {
 	public value struct ObjectSpace
 	{
-	
+		Vector3	location;
+		Vector3 rotation;
+		Vector3	scale;
 	};
 }//namespace NexusEngine

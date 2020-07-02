@@ -6,7 +6,7 @@
 */
 #pragma once
 #include "NPrimitiveComponent.h"
-#include "NMaterial.h"
+#include "NMtlBase.h"
 
 namespace NexusEngine
 {
@@ -15,9 +15,7 @@ namespace NexusEngine
 	*/
 	public ref class NMeshComponent : public NPrimitiveComponent
 	{
-	public:
-		//!	指定材质替代resource对象所包含的材质
-		void ReplaceMaterial(int lod, int mtlID, NMaterial^ mtl);
+	public:		
 
 		//-- Native wrapper
 	public:
@@ -26,6 +24,19 @@ namespace NexusEngine
 		property nmesh_component* NativePtr
 		{
 			nmesh_component* get();
-		}		
+		}
+		
+		property bool bInstance
+		{
+			bool get()
+			{
+				return NativePtr->enable_instance();
+			}
+
+			void set(bool bTrue)
+			{
+				NativePtr->set_enable_instance(bTrue);
+			}
+		}
 	};
 }//namespace NexusEngine

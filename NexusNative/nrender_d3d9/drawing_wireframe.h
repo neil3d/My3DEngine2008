@@ -18,9 +18,8 @@ namespace nexus
 		drawing_wireframe(void);
 		virtual ~drawing_wireframe(void);
 
-		virtual void draw_mesh(const d3d_view_info* view, const nrender_proxy* obj);
-	
 		static void create_type(dp_type_list& type_list);
+		void setup_effect(d3d9_shading_effect* effect_ptr, const nprimitive_component* mesh_comp);
 	protected:
 		static nstring	s_dp_name_str;
 	};

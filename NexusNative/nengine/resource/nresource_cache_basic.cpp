@@ -51,4 +51,17 @@ namespace nexus
 		mutex::scoped_lock lk(m_mutex);
 		return m_resource_map.size();
 	}
+
+	void nresource_cache_basic::accept_visitor(nresource_cache_visitor* v, int param)
+	{
+		mutex::scoped_lock lk(m_mutex);
+		v->begin();
+		for (resource_map::iterator iter=m_resource_map.begin();
+			iter != m_resource_map.end();
+			++iter)
+		{
+			v->handle_resource(iter->second, param);
+		}
+		v->end();
+	}
 }//namespace nexus

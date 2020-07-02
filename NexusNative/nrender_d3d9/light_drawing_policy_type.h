@@ -9,6 +9,7 @@
 #define _NEXUS_D3D9_LIGHT_DRAWING_POLICY_TYPE_H_
 
 #include "drawing_policy_type.h"
+#include "util.h"
 
 namespace nexus
 {
@@ -31,25 +32,24 @@ namespace nexus
 				out_code = m_light_code;
 				return true;
 			}
-			else if(_stricmp(include_name, "shadow.hlsl") == 0)
-			{
-				out_code = m_shadow_code;
-				return true;
-			}
 
 			return false; 
 		}
 
-		virtual void load_shader_file();
-		
+		virtual void load_shader_file()
+		{			
+			nstring dp_name = _T("shader_d3d9/drawing_light.fx");
+			load_shader_source(dp_name, shader_source);
+			load_shader_source(m_light_policy, m_light_code);
+		}
 
 	public:
 		nstring	m_light_policy;
-		nstring	m_shadow_policy;
+		//nstring	m_shadow_policy;
 
 	private:
 		std::string	m_light_code;
-		std::string	m_shadow_code;
+		//std::string	m_shadow_code;
 	};
 }//namespace nexus
 

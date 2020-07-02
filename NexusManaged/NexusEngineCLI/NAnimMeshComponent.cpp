@@ -37,9 +37,31 @@ namespace NexusEngine
 		END_NATIVE_GUARD
 	}
 
-	void NAnimMeshComponent::PlayAnim(String^ seqName, bool loop, float startTime)
+	void NAnimMeshComponent::PlayAnim( bool loop, float rate, float startTime )
+	{
+		NativePtr->play_anim(loop, rate, startTime);
+	}
+	void NAnimMeshComponent::StopAnim()
+	{
+		const nmesh_anim_controller::ptr ac = NativePtr->get_anim_controller();
+		if(ac)
+		{
+			ac->stop_anim();
+		}
+	}
+
+	void NAnimMeshComponent::SetAnim( String^ seqName )
 	{
 		pin_ptr<const wchar_t> szSeqName = PtrToStringChars(seqName);
-		NativePtr->play_anim(szSeqName, loop, startTime);
+		NativePtr->set_anim(szSeqName);
+	}
+
+	void NAnimMeshComponent::SetPosition( float newTime, bool fireNotifies )
+	{
+		const nmesh_anim_controller::ptr ac = NativePtr->get_anim_controller();
+		if(ac)
+		{
+			ac->set_position(newTime, fireNotifies);
+		}
 	}
 }//namespace NexusEngine

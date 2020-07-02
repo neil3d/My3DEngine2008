@@ -8,7 +8,7 @@ namespace NexusEditor
     /// <summary>
     /// 绘制基本的editor界面元素
     /// </summary>
-    class NEWidgetsRender : NRenderElement
+    public class NEWidgetsRender : NRenderElement
     {
         private List<NEViewport> m_viewports;
 

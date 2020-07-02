@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <boost/bind.hpp>
 #include "nengine.h"
 #include "nsubsystem.h"
 #include "../resource/nresource_manager.h"
@@ -53,7 +54,7 @@ namespace nexus
 	{
 		nexus_init_core();
 
-		nlog::instance()->init(_T("nlog_file"), _T("nexus.log"));
+		//nlog::instance()->init(_T("nlog_file"), _T("nexus.log"));
 		//-- plugins
 		load_plugins();
 
@@ -83,12 +84,22 @@ namespace nexus
 		m_renderer->set_file_system(m_file_sys, cfg.engine_data_pkg);
 		m_renderer->init(m_config);
 
+		//--
+		m_renderer->register_device_handler(
+			boost::bind(&nengine::on_device_lost, this, _1),
+			boost::bind(&nengine::on_device_reset, this, _1) );
+
 		//-- render resource manager
 		nstring render_res_mgr_class_name = m_renderer->get_resource_manager_class_name();
 		m_render_res_mgr.reset(create_plugin_class_object<nrender_resource_manager>(render_res_mgr_class_name));
 
-		nresource_manager::instance()->init();
+		nresource_manager::instance()->init(cfg.resource_cache_class, cfg.resource_io_class);
 		//--
+
+		//-- create physics engine
+		m_physics_engine.reset( nconstruct<nphysics_engine>( _T("nphysics_engine") ));
+		m_physics_engine->init(cfg.phys_cfg);
+
 		nLog_Info(_T("Nexus engine init succeeded!\r\n"));
 	}
 
@@ -128,24 +139,35 @@ namespace nexus
 		return m_plugin_array.size();
 	}
 
-	void nengine::update(float delta_time)
+	void nengine::update(float delta_time,const nviewport& view)
 	{
+		nresource_manager::instance()->dispatch_events();
+		m_physics_engine->update(delta_time);
+
 		for(st_level_list::iterator iter = m_level_list.begin();
 			iter != m_level_list.end();
 			++iter)
 		{
-			(*iter)->update(delta_time, m_cur_view);
+			(*iter)->update(delta_time, view);
 		}
 	}
 
 	void nengine::render(const nviewport& view)
 	{
+		if( !m_renderer )
+			return;
+
 		for(st_level_list::iterator iter= m_level_list.begin();
 			iter != m_level_list.end();
 			++iter)
 		{
 			(*iter)->render_scene_captures(view);
-			(*iter)->render(view, NULL);
+			(*iter)->render(view);
+		}
+
+		if (!m_level_list.empty())
+		{
+			m_renderer->present(view.handle_wnd);
 		}
 	}
 
@@ -154,20 +176,38 @@ namespace nexus
 		return m_renderer.get();
 	}
 
+	nphysics_engine* nengine::get_phys_engine()
+	{
+		return m_physics_engine.get();
+	}
+
 	void nengine::close()
 	{
 		m_renderer->close(); // 注意:内部使用文件系统保存Shader Cache,所以必须保证文件系统此时是可用的
 
 		m_level_list.clear();
+		
+		m_physics_engine->destroy();
+		m_physics_engine.reset();
 
 		resource_importer_manager::instance()->destroy();
-		m_renderer.reset();		
+		nresource_manager::instance()->close();
+
+		m_render_res_mgr->destory();
+		m_renderer.reset();	
 		m_render_res_mgr.reset();
 		m_file_sys.reset();
 		m_plugin_array.clear();
 
 		size_t res_leak = nresource_manager::instance()->get_num_resource_cached();
+		if( res_leak != 0 )
+		{
+			nLog_Warning( _T("resource leak: %u"), res_leak );
+		}
 		nimage::close_image_sdk();
+		
+		// 关闭LOG
+		//nlog::instance()->close();
 	}
 
 	nrender_resource_manager* nengine::get_render_res_mgr()
@@ -192,17 +232,64 @@ namespace nexus
 		return new_lv;
 	}
 
+	void nengine::serialize_level_desc(const resource_location& folder, enum EFileMode fmode, nlevel_desc& ld)
+	{
+		resource_location file_loc = folder;
+		file_loc.file_name += _T("/level_desc.xml");		
+				
+		narchive::ptr ar_ptr = narchive::open_xml_archive(get_file_sys(),
+			fmode, file_loc.pkg_name, file_loc.file_name);		
+		
+		nstring dummy(_T("class_level_desc"));
+		ar_ptr->object_begin(_T("level_desc"), dummy);
+		
+		ar_ptr->serial(_T("level_class"), ld.class_name);
+		ar_ptr->serial(_T("object_name"), ld.object_name);
+		ar_ptr->serial(_T("num_actors"), ld.num_actors);
+
+		ar_ptr->object_end();
+
+		ar_ptr->close();
+	}
+
 	void nengine::save_level(const nstring& lv_name, const resource_location& loc, nlevel_serialize_callback* callback)
 	{
 		for(st_level_list::iterator iter= m_level_list.begin();
 			iter != m_level_list.end();
 			++iter)
 		{
-			if((*iter)->get_name() == lv_name)
+			nlevel::ptr lv_ptr = *iter;
+			if(lv_ptr->get_name() == lv_name)
 			{
-				resource_location file_loc=loc;
-				file_loc.file_name += _T("/main.xml");		
-				level_serialize(*iter, file_loc, EFileWrite, callback);
+				//-- 保存level描述信息
+				nlevel_desc ld;
+				ld.class_name = lv_ptr->reflection_get_class()->get_name();;
+				ld.object_name = lv_ptr->get_name();
+				ld.num_actors = lv_ptr->get_num_actors();
+				serialize_level_desc(loc, EFileWrite, ld);
+
+				if (callback)
+					callback->set_level_desc(ld);				
+
+				//-- 保存level对象
+				lv_ptr->do_serialize(loc, EFileWrite, callback);
+				break;
+			}
+		}
+	}
+
+
+	void nengine::export_level( const nstring& lv_name, const resource_location& loc )
+	{
+		for(st_level_list::iterator iter= m_level_list.begin();
+			iter != m_level_list.end();
+			++iter)
+		{
+			nlevel::ptr lv_ptr = *iter;
+			if(lv_ptr->get_name() == lv_name)
+			{
+				//-- 保存level对象
+				lv_ptr->export_level(loc);
 				break;
 			}
 		}
@@ -210,44 +297,33 @@ namespace nexus
 
 	nlevel::ptr nengine::load_level(const resource_location& loc, nlevel_serialize_callback* callback)
 	{
-		resource_location file_loc=loc;
-		file_loc.file_name += _T("/main.xml");		
-		nlevel::ptr new_level = level_serialize(nlevel::ptr(), file_loc, EFileRead, callback);
+		nlevel_desc ld;
+		serialize_level_desc(loc, EFileRead, ld);
+		if (callback)
+			callback->set_level_desc(ld);
 
-		// add to list
-		nASSERT( new_level );	
-		m_level_list.push_back(new_level);
-
+		nlevel::ptr new_level = create_level(ld.object_name, ld.class_name);
+		new_level->init();
+		new_level->do_serialize(loc, EFileRead, callback);		
+	
 		return new_level;
-	}
-
-	nlevel::ptr nengine::level_serialize(nlevel::ptr lv, const resource_location& loc, enum EFileMode fmode, nlevel_serialize_callback* callback)
-	{
-		nlevel::set_serialize_callback(callback);
-		nfile_system* fs = nengine::instance()->get_file_sys();
-		nfile::ptr file_ptr = fs->open_file(loc.pkg_name, loc.file_name, fmode);
-
-		narchive::ptr ar_ptr;
-		if(fmode == EFileRead)
-			ar_ptr = narchive::create_xml_reader();
-		else
-		{
-			nASSERT( fmode == EFileWrite );
-			ar_ptr = narchive::create_xml_writer();
-		}
-		ar_ptr->open(file_ptr);
-
-		nserialize(*ar_ptr, lv, _T("level_obj"));			
-
-		ar_ptr->close();
-		nlevel::set_serialize_callback(NULL);
-		return lv;
 	}
 
 	void nengine::destroy_level(nlevel::ptr lv_ptr)
 	{
 		m_level_list.remove(lv_ptr);
 		lv_ptr->_destroy();
+	}
+
+	void nengine::begin_play()
+	{
+		// for create physics data 
+		for(st_level_list::iterator iter= m_level_list.begin();
+			iter != m_level_list.end();
+			++iter)
+		{
+			(*iter)->init_level_phys();
+		}
 	}
 
 	void nengine::destroy_level(const nstring& lv_name)
@@ -278,5 +354,91 @@ namespace nexus
 		hit_hash = 
 			eng->get_render_res_mgr()->alloc_hit_proxy_hash();
 		hit_hash->create(cfg.width, cfg.height);
+		_enable_hit_hash = true;
+
+		//-- 创建了资源之后，需要绑定device lost处理
+		if( _device_handler_id==-1 )
+		{
+			nrenderer_base* rnd = nengine::instance()->get_renderer();
+			_device_handler_id = rnd->register_device_handler(
+				boost::bind(&nviewport::_on_device_lost, this, _1),
+				boost::bind(&nviewport::_on_device_reset, this, _1) );
+		}
 	}
+
+	nviewport::nviewport(void):x(0),y(0),width(800),height(600),min_z(0),max_z(1),
+		handle_wnd(NULL),show_flags(0),render_mode(ERM_Lit),
+		near_lod(200),far_lod(2000),lod_bias(0)
+	{
+		hit_hash = NULL;
+		_enable_hit_hash = false;
+		_device_handler_id = -1;
+		enable_dynamic_shadow = true;
+	}
+
+	nviewport::~nviewport(void)
+	{
+		destroy();
+	}
+
+	void nviewport::destroy()
+	{
+		widgets_render.reset();
+		if(hit_hash)
+		{
+			hit_hash->release();
+			hit_hash = NULL;
+		}
+		
+		if( _device_handler_id!=-1 )
+		{
+			nrenderer_base* rnd = nengine::instance()->get_renderer();
+			rnd->unregister_device_handler(_device_handler_id);
+			_device_handler_id = -1;
+		}
+	}
+
+	void nviewport::_on_device_lost(int param)
+	{
+		UNREFERENCED_PARAMETER(param);
+		if(hit_hash)
+		{
+			hit_hash->release();
+			hit_hash = NULL;
+		}
+	}
+
+	bool nviewport::_on_device_reset(int param)
+	{
+		UNREFERENCED_PARAMETER(param);
+		if(_enable_hit_hash)
+			create_hit_hash();
+		return true;
+	}
+
+	void nengine::on_device_lost(int param)
+	{
+		for(st_level_list::iterator iter = m_level_list.begin();
+			iter != m_level_list.end();
+			++iter)
+		{
+			nlevel::ptr lv = (*iter);
+			lv->_on_device_lost(param);
+		}
+	}
+
+	bool nengine::on_device_reset(int param)
+	{
+		for(st_level_list::iterator iter = m_level_list.begin();
+			iter != m_level_list.end();
+			++iter)
+		{
+			nlevel::ptr lv = (*iter);
+			bool ret = lv->_on_device_reset(param);
+			if( !ret )
+				return false;
+		}
+		return true;
+	}
+
 }//namespace nexus

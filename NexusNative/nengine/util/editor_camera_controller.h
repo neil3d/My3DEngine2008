@@ -25,8 +25,10 @@ namespace nexus
 		void move_yaw(float y)	{	m_compute.move_yaw(y);}
 		void move_pitch(float p)	{	m_compute.move_pitch(p);}	
 
-		void on_mouse_wheel(int delta);
-		void on_mouse_move(const npoint& pt, bool ctrl_down);
+		virtual void on_mouse_wheel(int delta);
+		virtual void on_mouse_move(const npoint& pt, bool ctrl_down);
+
+		virtual bool on_key_down(unsigned int key);
 
 		virtual void zoom_extents(const AABBox& box, const ncamera* cam)
 		{

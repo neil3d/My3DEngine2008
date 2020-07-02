@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FD81A5CB-BEC5-4B58-9A40-161BD87CF74D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LinqToCodedom</RootNamespace>
+    <AssemblyName>LinqToCodedom</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <StartupObject>
+    </StartupObject>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>e2cd.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CodeDomExtensions\Statement.cs" />
+    <Compile Include="CodeDomExtensions\TryCatch.cs" />
+    <Compile Include="CodeDomExtensions\Ctor.cs" />
+    <Compile Include="CodeDomExtensions\Property.cs" />
+    <Compile Include="CodeDomExtensions\Object.cs" />
+    <Compile Include="CodeDomExtensions\Event.cs" />
+    <Compile Include="CodeDomExtensions\Method.cs" />
+    <Compile Include="CodeDomExtensions\Namespace.cs" />
+    <Compile Include="CodeDomExtensions\TypeDeclaration\Operator.cs" />
+    <Compile Include="CodeDomExtensions\TypeDeclaration\Ctor.cs" />
+    <Compile Include="CodeDomExtensions\TypeDeclaration\Delegate.cs" />
+    <Compile Include="CodeDomExtensions\TypeDeclaration\Event.cs" />
+    <Compile Include="CodeDomExtensions\TypeDeclaration\Field.cs" />
+    <Compile Include="CodeDomExtensions\TypeDeclaration\Property.cs" />
+    <Compile Include="CodeDomExtensions\TypeDeclaration\Method.cs" />
+    <Compile Include="CodeDomExtensions\TypeMember\Event.cs" />
+    <Compile Include="CodeDomExtensions\TypeMember\Ctor.cs" />
+    <Compile Include="CodeDomExtensions\TypeMember\Field.cs" />
+    <Compile Include="CodeDomExtensions\TypeMember\Method.cs" />
+    <Compile Include="CodeDomExtensions\TypeMember\Property.cs" />
+    <Compile Include="CodeDomExtensions\TypeMember\TypeMember.cs" />
+    <Compile Include="CodeDomTreeProcessor.cs" />
+    <Compile Include="Generator\CodeDom.cs" />
+    <Compile Include="Generator\Declarations\Class.cs" />
+    <Compile Include="Generator\Declarations\Attribute.cs" />
+    <Compile Include="Generator\Declarations\Const.cs" />
+    <Compile Include="Generator\Declarations\PartialMethod.cs" />
+    <Compile Include="Generator\Declarations\Operator.cs" />
+    <Compile Include="Generator\Declarations\Ctor.cs" />
+    <Compile Include="Generator\Declarations\Delegate.cs" />
+    <Compile Include="Generator\Declarations\Event.cs" />
+    <Compile Include="Generator\Declarations\Field.cs" />
+    <Compile Include="Generator\Declarations\Method.cs" />
+    <Compile Include="Generator\Declarations\Property.cs" />
+    <Compile Include="Generator\Declarations\StructField.cs" />
+    <Compile Include="Generator\Delegates.cs" />
+    <Compile Include="Generator\Extensions\CodeCustomEvent.cs" />
+    <Compile Include="Generator\Extensions\CodeGenerator.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Generator\Extensions\CodeAssignExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeContinueStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeBreakStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeDoStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeVarStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeWhileStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeSwitchStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeNotExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeTernaryExpression.cs" />
+    <Compile Include="Generator\Extensions\CodePartialMethod.cs" />
+    <Compile Include="Generator\Extensions\CodeUnaryExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeBinaryExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeMultidimensionalArrayCreateExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeIdentityEqualityExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeDefaultProperty.cs" />
+    <Compile Include="Generator\Extensions\CodeParamExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeReadonlyField.cs" />
+    <Compile Include="Generator\Extensions\CodeLambdaExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeLambdaStatements.cs" />
+    <Compile Include="Generator\Extensions\CodeSnippetStatement.cs" />
+    <Compile Include="Generator\Lambda.cs" />
+    <Compile Include="Generator\Statements\assign.cs" />
+    <Compile Include="Generator\Statements\attach.cs" />
+    <Compile Include="Generator\Extensions\CodeAsExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeMemberOperatorOverride.cs" />
+    <Compile Include="Generator\Extensions\CodeForeachStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeIsExpression.cs" />
+    <Compile Include="Generator\Extensions\CodeLockStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeUsingStatement.cs" />
+    <Compile Include="Generator\Extensions\CodeXorExpression.cs" />
+    <Compile Include="Generator\Statements\continue-break.cs" />
+    <Compile Include="Generator\Statements\switch.cs" />
+    <Compile Include="Generator\Statements\while.cs" />
+    <Compile Include="Generator\Statements\do.cs" />
+    <Compile Include="Generator\Statements\foreach.cs" />
+    <Compile Include="Generator\Statements\lock.cs" />
+    <Compile Include="Generator\Statements\using.cs" />
+    <Compile Include="Generator\Statements\trycatch.cs" />
+    <Compile Include="Generator\Statements\declare.cs" />
+    <Compile Include="Generator\Statements\for.cs" />
+    <Compile Include="Generator\Statements\if.cs" />
+    <Compile Include="Generator\Statements\label.cs" />
+    <Compile Include="Generator\Statements\return.cs" />
+    <Compile Include="Generator\Statements\stmt.cs" />
+    <Compile Include="Generator\Statements\throw.cs" />
+    <Compile Include="References\LateBinding.cs" />
+    <Compile Include="CodeDomGenerator.cs" />
+    <Compile Include="CodeDomExtensions\TypeDeclaration\TypeDeclaration.cs" />
+    <Compile Include="Visitors\CodeExpressionVisitor.cs" />
+    <Compile Include="Visitors\CodeStatementVisitor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="References\References.cs" />
+    <Compile Include="Visitors\QueryVisitor.cs" />
+    <Compile Include="Visitors\StaticVisitor.cs" />
+    <Compile Include="Visitors\VisitorContext.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CodeDom.cd" />
+    <None Include="Define.cd" />
+    <None Include="e2cd.snk" />
+    <None Include="Emit.cd" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

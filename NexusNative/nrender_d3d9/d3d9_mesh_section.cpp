@@ -3,12 +3,19 @@
 #include "d3d_device_manager.h"
 #include "d3d_exception.h"
 #include "mesh_func.h"
+#include "../nengine/util/hud_info.h"
 
 namespace nexus
 {
 	d3d9_mesh_section::d3d9_mesh_section(void)
 		: m_valid_index_count(0)
 	{
+		for (int i = 0; i < EDP_Num; i ++)
+		{
+			cache_effect[i].effect = NULL;
+			cache_effect[i].mtl = NULL;
+		}
+
 		m_base_vertex_index = 0;
 	}
 
@@ -84,13 +91,26 @@ namespace nexus
 		IDirect3DDevice9* d3d_device = d3d_device_manager::instance()->get_device();
 		HRESULT hr;
 
+		UINT primitive_count = 0;
+		if(m_draw_limit > 0)
+			primitive_count = (UINT)m_draw_limit;
+		else
+			primitive_count = (UINT)m_primitive_count;
+		
+		g_hud_info.draw_call_count++;
+		//return;
 		if(m_index_buffer)
 		{
-			hr = d3d_device->DrawIndexedPrimitive(m_d3d_pm_type, 0, 0, (UINT)num_vert, 0, (UINT)m_primitive_count);
+			hr = d3d_device->DrawIndexedPrimitive(m_d3d_pm_type, 0, 0, (UINT)num_vert, 0, primitive_count);
 		}
 		else
 		{
-			hr = d3d_device->DrawPrimitive(m_d3d_pm_type, 0, (UINT)m_primitive_count);
+			hr = d3d_device->DrawPrimitive(m_d3d_pm_type, 0, primitive_count);
+		}
+
+		if (FAILED(hr))
+		{
+			_asm { int 3 };
 		}
 	}
 

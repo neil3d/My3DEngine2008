@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="LinqToCodedom.Generator.Define">
+    <Position X="2" Y="0.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAACAAAwAAJgAhAAAgAAAIAEAAAAAQAAgAA=</HashCode>
+      <FileName>Generator\Declarations\Attribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

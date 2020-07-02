@@ -28,15 +28,27 @@ namespace NexusEditor.ResourceEditor
 
         static public NActor CreateActor(NResourceLoc resLoc)
         {
-            string actorName = "ResourceActor_";
-            actorName += DateTime.Now.ToFileTime();
+            string actorName = resLoc.FileExtension.ToUpper()+"_ResActor["+resLoc.FileName+"]";            
+            actorName += DateTime.Now.Ticks.ToString();
 
             NLevel mainLv = NLevelEditorEngine.Instance.MainLevel;
             NActor newActor = mainLv.CreateActor(actorName, "nactor");
+            if(newActor==null)
+            {
+                return null;
+            }
             CreateActorComponent(newActor, resLoc);                       
 
             return newActor;
         }
+
+		static public NActor ReplaceActor(NActor actor,NResourceLoc resLoc)
+		{
+			actor.RemoveAllComponents();
+			CreateActorComponent(actor, resLoc);
+			actor.UpdateComponentsTransform();
+			return actor;
+		}
 
         static public bool AcceptResoruceFile(NResourceLoc res)
         {

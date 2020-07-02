@@ -15,8 +15,8 @@ namespace nexus
 
 		void begin_update();
 		void end_update();
-	private:
-		rt_item	m_render_target;	// render target 无法lock，所以搞了另外一个surface
+	private:		
+		rt_item			m_render_target;	// render target 无法lock，所以搞了另外一个surface
 		d3d_surface_ptr m_hd_buffer;
 	};
 }//namespace nexus

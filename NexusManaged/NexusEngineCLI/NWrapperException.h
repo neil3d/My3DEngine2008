@@ -17,9 +17,14 @@ namespace NexusEngine
 	public:
 		NexusNativeException(System::String^ info);
 		NexusNativeException(const TCHAR* szInfo);
+		NexusNativeException(const char* szInfo);
 	};
 
 #define BEGIN_NATIVE_GUARD try{
 #define END_NATIVE_GUARD } catch(nexus::nexception& ne)\
-	{throw gcnew NexusNativeException(ne.what().c_str());}
+	{throw gcnew NexusNativeException(ne.what().c_str());}\
+	catch(std::exception& ne)\
+	{throw gcnew NexusNativeException(ne.what());}\
+	catch(...)\
+	{throw gcnew System::Exception(_T("unknown native code exception"));}
 }//namespace NexusEngine

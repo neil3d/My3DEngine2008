@@ -1,6 +1,7 @@
 #ifndef _NEXUS_D3D9_VERTEX_FACTORY_STATIC_H_
 #define _NEXUS_D3D9_VERTEX_FACTORY_STATIC_H_
 #include "d3d9_vertex_factory.h"
+#include "d3d_device_manager.h"
 
 namespace nexus
 {

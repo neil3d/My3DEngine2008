@@ -15,61 +15,47 @@ namespace NexusEditor.EditorMain
     /// </summary>
     public partial class TerrainSplattingLayerForm : Form
     {
-        private uint m_layerIndex;
+        private int m_layerIndex;
         private NETerrainTextureLayerProp m_layer;
         public event EventHandler LayerApplied;
 
         public TerrainSplattingLayerForm()
         {
-            InitializeComponent();
-            m_layer = new NETerrainTextureLayerProp();
-            m_layerIndex = 0;
+            InitializeComponent();            
+        }
+
+        public NETerrainTextureLayerProp Data
+        {
+            get { return m_layer; }
+        }
+
+        public int LayerIndex
+        {
+            get { return m_layerIndex; }
         }
 
         private void buttonApplyLayerProperty_Click(object sender, EventArgs e)
         {
-            NTerrainEditor trnEd = NLevelEditorEngine.Instance.TerrainEd;
-            if (trnEd.Empty())
-            {
-                NexusEditor.Program.ShowError("Terrain Actor NOT Bind.");
-                this.Hide();
-                return;
-            }
-
-            if (m_layer.TextureRes.ToString() == "None")
-            {
-                NexusEditor.Program.ShowError("Please Input Texture Resource Location.");
-                return;
-            }
-
-            try
-            {
-                trnEd.SplatSetLayer(m_layerIndex,
-                    m_layer.TextureRes, m_layer.UVScale, m_layer.UVRotate);
-                if (LayerApplied != null)
-                    LayerApplied(this, new EventArgs());
-                this.Hide();
-            }
-            catch (System.Exception ex)
-            {
-                NexusEditor.Program.ShowException(ex, "Terrain Material Layer Set FAILED!");
-            }         
+            if (LayerApplied != null)
+                LayerApplied(this, new EventArgs());
+            this.Close();
         }
 
-        public void BindLayer(uint layer)
+        public void BindLayer(int layer)
         { 
             m_layerIndex = layer;
 
             NTerrainEditor trnEd = NLevelEditorEngine.Instance.TerrainEd;
-            NResourceLoc loc = new NResourceLoc();
-            Vector2 scale = new Vector2();
-            float rotate = 0;
+            if (trnEd.Empty())
+            {
+                NexusEditor.Program.ShowError("当前地形编辑器没有绑定对象.");
+                this.Close();
+                return;
+            }
 
-            trnEd.SplatGetLayer((uint)layer, ref loc, ref scale, ref rotate);
+            NTerrainMtlSetup mtl = trnEd.GetMaterial();
 
-            m_layer.TextureRes = loc;
-            m_layer.UVRotate = rotate;
-            m_layer.UVScale = scale;
+            m_layer.data = mtl.GetLayerData(layer);
 
             this.propertyGridLayer.SelectedObject = m_layer;
         }
@@ -77,6 +63,14 @@ namespace NexusEditor.EditorMain
         private void buttonClose_Click(object sender, EventArgs e)
         {
             this.Hide();
+        }
+
+        private void TerrainSplattingLayerForm_Load(object sender, EventArgs e)
+        {
+            m_layer = new NETerrainTextureLayerProp();
+            m_layerIndex = 0;
+
+            this.propertyGridLayer.SelectedObject = m_layer;
         }
     }
 }

@@ -42,12 +42,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\NexusNative;..\..\NexusNative\ncore"
+				AdditionalIncludeDirectories="..\..\NexusNative;..\..\NexusNative\ncore;..\..\External\NexusExternal\boost_1_40_0;..\..\NexusGame\ngameframework;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\DXSDK_Aug2009\Include;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;_DEBUG"
+				GeneratePreprocessedFile="0"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				EnablePREfast="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -61,9 +63,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(NoInherit)"
+				OutputFile="..\..\debug\$(ProjectName).dll"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\FFT;..\..\External\NexusExternal\DXSDK_Aug2009\Lib\x86;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
+				SubSystem="2"
+				RandomizedBaseAddress="0"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -80,6 +87,7 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+				EnableFxCop="false"
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
@@ -114,7 +122,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\NexusNative;..\..\NexusNative\ncore"
+				AdditionalIncludeDirectories="..\..\NexusNative;..\..\NexusNative\ncore;..\..\External\NexusExternal\boost_1_40_0;..\..\NexusGame\ngameframework;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\DXSDK_Aug2009\Include;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -134,6 +142,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(NoInherit)"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\FFT;..\..\External\NexusExternal\DXSDK_Aug2009\Lib\x86;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -191,6 +200,10 @@
 			AssemblyName="WindowsBase, Version=3.0.0.0, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
 			MinFrameworkVersion="196608"
 		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{D2E3F033-A6A5-498C-AF55-327FCA4278EF}"
+			RelativePathToProject=".\NexusManaged\NexusEngineExtension\NexusEngineExtension.csproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -202,6 +215,14 @@
 			</File>
 			<File
 				RelativePath=".\NActor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NCameraModifier.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NCameraModifier.h"
 				>
 			</File>
 			<File
@@ -306,6 +327,14 @@
 				RelativePath=".\NFileSystem.h"
 				>
 			</File>
+			<File
+				RelativePath=".\NXmlSerialize.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NXmlSerialize.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Math"
@@ -316,6 +345,14 @@
 			</File>
 			<File
 				RelativePath=".\Color.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ColorRect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ColorRect.h"
 				>
 			</File>
 			<File
@@ -342,6 +379,42 @@
 				RelativePath=".\ObjectSpace.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Rect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Rect.h"
+				>
+			</File>
+			<Filter
+				Name="Design"
+				>
+				<File
+					RelativePath=".\ColorConverter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ColorConverter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ColorRectConverter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ColorRectConverter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RectConverter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\RectConverter.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Editor"
@@ -367,19 +440,35 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nactor_handles.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\nactor_handles.h"
-				>
-			</File>
-			<File
 				RelativePath=".\NActorEditorBase.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\NActorEditorBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NActorMoveCommand.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NActorMoveCommand.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NavigateMapEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NavigateMapEditor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NEditorCommandManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NEditorCommandManager.h"
 				>
 			</File>
 			<File
@@ -391,11 +480,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\NEditorLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NEditorLog.h"
+				RelativePath=".\NTerrainBrush.h"
 				>
 			</File>
 			<File
@@ -419,19 +504,35 @@
 			Name="Terrain"
 			>
 			<File
-				RelativePath=".\NQuadTreeTerrain.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NQuadTreeTerrain.h"
-				>
-			</File>
-			<File
 				RelativePath=".\NTerrainActor.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\NTerrainActor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NTerrainDecoLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NTerrainDecoLayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NTerrainDecoSetup.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NTerrainDecoSetup.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NTerrainMtlSetup.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NTerrainMtlSetup.h"
 				>
 			</File>
 		</Filter>
@@ -452,6 +553,22 @@
 			</File>
 			<File
 				RelativePath=".\NAnimMeshComponent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NAvatarActor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NAvatarActor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NFogComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NFogComponent.h"
 				>
 			</File>
 			<File
@@ -487,6 +604,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NSkeletalMeshComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSkeletalMeshComponent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSkyComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSkyComponent.h"
+				>
+			</File>
+			<File
 				RelativePath=".\NSpeedTreeComponent.cpp"
 				>
 			</File>
@@ -502,6 +635,14 @@
 				RelativePath=".\NStaticMeshComponent.h"
 				>
 			</File>
+			<File
+				RelativePath=".\NWaterComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NWaterComponent.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Renderer"
@@ -515,11 +656,31 @@
 				>
 			</File>
 			<File
-				RelativePath=".\NRenderLight.cpp"
+				RelativePath=".\NRenderFont.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\NRenderLight.h"
+				RelativePath=".\NRenderFont.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NRenderResource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NRenderResourceManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NRenderResourceManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NUICanvas.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NUICanvas.h"
 				>
 			</File>
 			<File
@@ -559,6 +720,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NResourceSkeletalAnimSet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NResourceSkeletalAnimSet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NResourceSkeletalMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NResourceSkeletalMesh.h"
+				>
+			</File>
+			<File
 				RelativePath=".\NResourceStaticMesh.cpp"
 				>
 			</File>
@@ -572,6 +749,14 @@
 			</File>
 			<File
 				RelativePath=".\NResourceTexture.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NResourceTextureAtlas.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NResourceTextureAtlas.h"
 				>
 			</File>
 			<File
@@ -595,6 +780,22 @@
 			Name="Util"
 			>
 			<File
+				RelativePath=".\NativeEngineHelper.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NativeEngineHelper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NativeLogRedirect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NativeLogRedirect.h"
+				>
+			</File>
+			<File
 				RelativePath=".\NEditorCameraController.cpp"
 				>
 			</File>
@@ -610,6 +811,14 @@
 				RelativePath=".\NLog.h"
 				>
 			</File>
+			<File
+				RelativePath=".\PointerHelper.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PointerHelper.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Material"
@@ -623,27 +832,43 @@
 				>
 			</File>
 			<File
-				RelativePath=".\NMaterial.cpp"
+				RelativePath=".\NMtlBase.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\NMaterial.h"
+				RelativePath=".\NMtlBase.h"
 				>
 			</File>
 			<File
-				RelativePath=".\NMaterialBase.cpp"
+				RelativePath=".\NMtlCommon.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\NMaterialBase.h"
+				RelativePath=".\NMtlCommon.h"
 				>
 			</File>
 			<File
-				RelativePath=".\NMaterialTemplate.cpp"
+				RelativePath=".\NMtlDynamic.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\NMaterialTemplate.h"
+				RelativePath=".\NMtlDynamic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NMtlStatic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NMtlStatic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NMtlTechShader.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NMtlTechShader.h"
 				>
 			</File>
 		</Filter>
@@ -842,6 +1067,334 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="Font"
+			>
+			<File
+				RelativePath=".\FontDescription.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FontDescription.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FontDescriptionConverter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FontDescriptionConverter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FontEnum.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NFontManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NFontManager.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="SpecialEffect"
+			>
+			<File
+				RelativePath=".\NDistribution.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistribution.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionAll.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionColor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionColor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionFloat.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionFloat.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionVector2.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionVector2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionVector3.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NDistributionVector3.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectCylinder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectCylinder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectGrid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectGrid.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectParticleEmitter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectParticleEmitter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectQuad.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NEffectQuad.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NResourceSpecialEffect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NResourceSpecialEffect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpecialEffectInstance.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpecialEffectInstance.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SubUV.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SubUV.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="AI"
+			>
+			<File
+				RelativePath=".\GraphBitmap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GraphBitmap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GraphNavigationMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GraphNavigationMap.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Game"
+			>
+			<File
+				RelativePath=".\NStartPointActor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NStartPointActor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NTriggerActor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NTriggerActor.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="GameFramework"
+			>
+			<File
+				RelativePath=".\NCharacterController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NCharacterController.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NCharacterStatData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NCharacterStatData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NGameLevel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NGameLevel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NLocalCharacterController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NLocalCharacterController.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NRemoteCharacterController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NRemoteCharacterController.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSavedMove.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSavedMove.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ReplicateMoveCallback.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReplicateMoveCallback.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="AttData"
+			>
+			<File
+				RelativePath=".\NAttDataHelper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NCharacterFields.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NCharacterFields.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NCombatInterop.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NCombatInterop.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NLevelupInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NLevelupInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpellAuraInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpellAuraInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpellEffectInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpellEffectInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpellInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpellInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpellTalentTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSpellTalentTable.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Animation"
+			>
+			<File
+				RelativePath=".\NSkeletalAnimPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSkeletalAnimPlayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSkeletalAnimSequence.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NSkeletalAnimSequence.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\AssemblyInfo.cpp"

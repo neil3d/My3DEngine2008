@@ -15,6 +15,8 @@ namespace nexus
 
 		void create(size_t w, size_t h, EPixelFormat fmt);
 
+		void blit(const nimage& source, int dest_x, int dest_y, int src_x, int src_y, size_t src_w, size_t src_h);
+
 		void load_from_file(const nstring& file_name);
 		void save_to_file(const nstring& file_name);
 		void destroy();
@@ -26,6 +28,7 @@ namespace nexus
 		size_t get_height() const;
 		
 		void* get_pixel() const;
+		size_t _get_image_id() const;
 	private:
 		struct	impl;
 		impl*	m_impl;

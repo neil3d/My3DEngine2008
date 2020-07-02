@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\NexusNative\ncore"
+				AdditionalIncludeDirectories="..\..\NexusNative\ncore;..\..\External\NexusExternal\boost_1_40_0;..\..\NexusGame\ngameframework;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\DXSDK_Aug2009\Include;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,8 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="..\..\debug\$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\FFT;..\..\External\NexusExternal\DXSDK_Aug2009\Lib\x86;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
@@ -117,8 +118,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\NexusNative\ncore"
+				AdditionalIncludeDirectories="..\..\NexusNative\ncore;..\..\External\NexusExternal\boost_1_40_0;..\..\NexusGame\ngameframework;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\DXSDK_Aug2009\Include;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				MinimalRebuild="true"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -137,7 +139,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\external\boost\lib;..\..\..\external\DirectX\Lib\x86"
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\FFT;..\..\External\NexusExternal\DXSDK_Aug2009\Lib\x86;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -196,6 +198,14 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="gameframwork"
+			>
+			<File
+				RelativePath=".\gameframwork\test_level_resource.cpp"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\main.cpp"
 			>
@@ -214,6 +224,10 @@
 		</File>
 		<File
 			RelativePath=".\test_mem.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\test_profile.cpp"
 			>
 		</File>
 		<File

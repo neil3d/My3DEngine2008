@@ -52,7 +52,7 @@ namespace NexusEditor.ResourceEditor
             {
                 e.Cancel = true;
 
-                if (ResetResource("Are You Sure CLOSE StaticMeshEd?"))
+                if (ResetResource(NexusEditor.Properties.Resources.CloseStaticMeshChecking))
                     this.Hide();
             }
         }
@@ -87,9 +87,10 @@ namespace NexusEditor.ResourceEditor
                         m_prop.Name = fileName.FileNameNoExtension;
                     }
 
-                    using (NWaitCursor wc = new NWaitCursor(this))
+                    using (NexusEngineExtension.NWaitCursor wc = new NexusEngineExtension.NWaitCursor(this))
                     {
                         m_resStaticMesh.ImportLOD(dlg.SelectedLOD, dlg.SelectedFile);
+                        m_resStaticMesh.PostEditChange(true);
                         m_preview.ShowStaticMesh(m_resStaticMesh);
                         RefreshLOD();
                     }
@@ -137,7 +138,7 @@ namespace NexusEditor.ResourceEditor
         {
             try
             {
-                using (NWaitCursor wc = new NWaitCursor(this))
+                using (NexusEngineExtension.NWaitCursor wc = new NexusEngineExtension.NWaitCursor(this))
                 {
                     NResourceLoc resLoc = new NResourceLoc(pkg, file);
                     m_resStaticMesh = NResourceManager.Instance.LoadStaticMesh(
@@ -159,31 +160,6 @@ namespace NexusEditor.ResourceEditor
             }            
         }
 
-        private void btnCreateMtl_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                MaterialProperty mtlProp = this.propertyGridMtl.SelectedObject as MaterialProperty;
-                if (mtlProp != null)
-                {
-                    NResourceLoc tempLoc = mtlProp.TemplateLoc;                    
-                    NMaterial mtl = new NMaterial(mtlProp.Name);
-                    mtl.Create(tempLoc);
-
-                    int lod = this.comboBoxLOD.SelectedIndex;
-                    int sec = this.comboBoxSection.SelectedIndex;
-                    m_resStaticMesh.ImportSetMaterial(lod, sec, mtl);
-
-                    mtlProp.BindMaterial(mtl);
-                    this.propertyGridMtl.SelectedObject = mtlProp;
-                }
-            }
-            catch (System.Exception ex)
-            {
-                NexusEditor.Program.ShowException(ex, "Create Material FAILED");
-            }            
-        }
-
         private void comboBoxLOD_SelectedIndexChanged(object sender, EventArgs e)
         {
             int lod = this.comboBoxLOD.SelectedIndex;
@@ -201,29 +177,10 @@ namespace NexusEditor.ResourceEditor
         {
             int lod = this.comboBoxLOD.SelectedIndex;
             int sec = this.comboBoxSection.SelectedIndex;
-            
-            NMaterial mtl = m_resStaticMesh.GetMaterial(lod, sec) as NMaterial;
 
-            MaterialProperty mtlProp = new MaterialProperty(mtl);
+			StaticMeshMaterialProperty mtlProp = new StaticMeshMaterialProperty(m_resStaticMesh, lod, sec);
 
-            //-- apply default material setting
-            if (mtl == null)
-            {
-                mtlProp.Name = string.Format("Mtl_L{0}S{1}", lod, sec);
-                mtlProp.TemplateLoc = m_importDefault.MaterialTemplateRes;
-            }
-
-            this.propertyGridMtl.SelectedObject = mtlProp;
-        }
-        
-
-        private void buttonApplyMtlProperty_Click(object sender, EventArgs e)
-        {
-            MaterialProperty mtlProp = this.propertyGridMtl.SelectedObject as MaterialProperty;
-            if (mtlProp != null)
-            {
-                mtlProp.ApplyChange();                
-            }
+			this.propertyGridMtl.SelectedObject = mtlProp;
         }
 
         private bool ResetResource(string confirmTxt)
@@ -255,42 +212,38 @@ namespace NexusEditor.ResourceEditor
 
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.ResetResource("Are You Sure RESET?");
+            this.ResetResource(NexusEditor.Properties.Resources.ResetChecking);
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (m_resStaticMesh != null)
             {
-                NResourceLoc loc;
-
-                if (m_prop.Name == m_prop.Location)
-                {
-                    loc = new NResourceLoc(m_prop.Name);
-                }
-                else
-                {
-                    loc = NLevelEditorEngine.Instance.CurrentFolder;
-                    if (!loc.IsValid())
-                    {
-                        NexusEditor.Program.ShowError("Please Select a Folder in Resource Manager File System Tree!");
-                        return;
-                    }
-
-                    string saveFileName = string.Format("{0}/{1}.nmdl",
-                        loc.FileName, m_prop.Name);
-                    loc.FileName = saveFileName;
-                }
-
-                string confirmTxt = string.Format("Save As [{1}]",
-                    m_resStaticMesh.Name, loc.ToString());
-                
-                if (MessageBox.Show(this, confirmTxt, "Save Static Mesh", MessageBoxButtons.OKCancel)
-                    == DialogResult.OK)
-                {
-                    using (NWaitCursor wc = new NWaitCursor(this))
-                        m_resStaticMesh.SaveToFile(loc, this.toolBtnXML.Checked);
-                }
+				using (VirtualFileDialog dlg = new VirtualFileDialog(false, "", "nmdl"))
+				{
+					dlg.SetResourceLocation(NLevelEditorEngine.Instance.CurrentFolder);
+					dlg.Text = "保存模型 ...";
+					int i = m_resStaticMesh.Name.LastIndexOf('\\');
+					if(i==-1)
+					{
+						i = m_resStaticMesh.Name.LastIndexOf('/');
+					}
+					if(i>=0)
+					{
+						dlg.SetFileName(m_resStaticMesh.Name.Substring(i+1, m_resStaticMesh.Name.Length-i-1));
+					}
+					else
+					{
+						dlg.SetFileName(m_resStaticMesh.Name);
+					}
+					
+					if (dlg.ShowDialog(this) == DialogResult.OK)
+					{
+						NResourceLoc loc = dlg.GetResourceLocation();
+						using (NexusEngineExtension.NWaitCursor wc = new NexusEngineExtension.NWaitCursor(this))
+							m_resStaticMesh.SaveToFile(loc, this.toolBtnXML.Checked);
+					}
+				}
             }// end of if
             else
             {
@@ -318,7 +271,7 @@ namespace NexusEditor.ResourceEditor
             if (m_resStaticMesh != null)
             {
                 if (DialogResult.OK !=
-                    MessageBox.Show(this, "Are You Sure Create a NEW Static Mesh?", "Please Confirm", MessageBoxButtons.OKCancel))
+                    MessageBox.Show(this, NexusEditor.Properties.Resources.CreateStaticMeshChecking, NexusEditor.Properties.Resources.Ok, MessageBoxButtons.OKCancel))
                     return;
             }
 
@@ -363,6 +316,7 @@ namespace NexusEditor.ResourceEditor
 
         private void propertyGridMtl_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
+			m_preview.ShowStaticMesh(m_resStaticMesh);
             m_preview.Refresh();
         }
     }

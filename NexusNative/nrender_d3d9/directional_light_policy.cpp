@@ -23,17 +23,4 @@ namespace nexus
 
 		dp_type->m_light_policy = ss.str();
 	}
-
-	void directional_light_policy::set_effect_parameter(d3d9_shading_effect* effect_ptr, const nrender_light_proxy* lgt)
-	{
-		lighting_policy::set_effect_parameter(effect_ptr, lgt);
-
-
-		nASSERT(lgt->m_type == ELight_Directional);
-		const ndirectional_light_proxy* dir_lgt = static_cast<const ndirectional_light_proxy*>(lgt);
-
-		HRESULT hr;
-		vector3 lgtDir = -dir_lgt->m_direction;	// todo: why?
-		hr = effect_ptr->set_float_array_by_semantic("LGT_DIRECTION", lgtDir);				
-	}
 }//namespace nexus

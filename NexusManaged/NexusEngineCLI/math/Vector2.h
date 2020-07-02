@@ -7,6 +7,8 @@ using System::Runtime::InteropServices::OutAttribute;
 
 namespace NexusEngine
 {
+	using namespace NexusEngineExtension;
+
 	value class Quaternion;
 	value class Matrix;
 	value class Vector3;	
@@ -18,6 +20,7 @@ namespace NexusEngine
 	[System::Serializable]
 	[System::Runtime::InteropServices::StructLayout( System::Runtime::InteropServices::LayoutKind::Sequential, Pack = 8 )]
 	[System::ComponentModel::TypeConverter( NexusEngine::Design::Vector2Converter::typeid )]
+	[XmlClassSerializable("Vector2",false)]
 	public value class Vector2 : System::IEquatable<Vector2>
 	{
 	public:
@@ -25,12 +28,14 @@ namespace NexusEngine
 		/// Gets or sets the X component of the vector.
 		/// </summary>
 		/// <value>The X component of the vector.</value>
+		[XmlFieldSerializable("x")]
 		float x;
 
 		/// <summary>
 		/// Gets or sets the Y component of the vector.
 		/// </summary>
 		/// <value>The Y component of the vector.</value>
+		[XmlFieldSerializable("y")]
 		float y;
 		
 		property float default[int]
@@ -586,5 +591,16 @@ namespace NexusEngine
 		/// <returns><c>true</c> if <paramref name="value1"/> is the same instance as <paramref name="value2"/> or 
 		/// if both are <c>null</c> references or if <c>value1.Equals(value2)</c> returns <c>true</c>; otherwise, <c>false</c>.</returns>
 		static bool Equals( Vector2% value1, Vector2% value2 );
+
+		//--
+		static Vector2 FromNative(const nexus::vector2& nv)
+		{
+			return Vector2(nv.x, nv.y);
+		}
+
+		nexus::vector2 ToNative()
+		{
+			return nexus::vector2(x,y);
+		}
 	};
 }

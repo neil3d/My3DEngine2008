@@ -17,6 +17,8 @@
     </AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
     <StartupObject>NexusEditor.Program</StartupObject>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationIcon>NEd.ico</ApplicationIcon>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,10 +31,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <ApplicationIcon>NEd.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +41,9 @@
     <OutputPath>..\..\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>3</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,13 +52,18 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Design" />
+    <Reference Include="System.Web.Extensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -84,6 +91,12 @@
     </Compile>
     <Compile Include="EditorMain\CameraCtrlSettingDlg.Designer.cs">
       <DependentUpon>CameraCtrlSettingDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\CreateDecoLayerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\CreateDecoLayerDialog.Designer.cs">
+      <DependentUpon>CreateDecoLayerDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="EditorMain\EditorLogForm.cs">
       <SubType>Form</SubType>
@@ -116,11 +129,106 @@
     <Compile Include="EditorMain\EditorMainForm.Terrain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EditorMain\TerrainBasicMtlDlg.cs">
+    <Compile Include="EditorMain\EditorOptions.cs" />
+    <Compile Include="EditorMain\EditorOptionsDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EditorMain\TerrainBasicMtlDlg.Designer.cs">
-      <DependentUpon>TerrainBasicMtlDlg.cs</DependentUpon>
+    <Compile Include="EditorMain\EditorOptionsDlg.Designer.cs">
+      <DependentUpon>EditorOptionsDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\GlobalSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\GlobalSetting.Designer.cs">
+      <DependentUpon>GlobalSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\LogTextFormOutput.cs" />
+    <Compile Include="EditorMain\Settings.cs" />
+    <Compile Include="EditorMain\TerrainDecoLayerProperty.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\TerrainDecoLayerProperty.designer.cs">
+      <DependentUpon>TerrainDecoLayerProperty.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\VirtualFileDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\VirtualFileDialog.Designer.cs">
+      <DependentUpon>VirtualFileDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\AttInfo\AttributeInfoEditor.cs" />
+    <Compile Include="ResourceEditor\AttInfo\ResAttributeInfoEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\AttInfo\ResAttributeInfoEditor.Designer.cs">
+      <DependentUpon>ResAttributeInfoEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\CreateNewCurve.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\CreateNewCurve.Designer.cs">
+      <DependentUpon>CreateNewCurve.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\DistributionEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\DistributionEditor.Designer.cs">
+      <DependentUpon>DistributionEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\Importor\GameAttributeImportor.cs" />
+    <Compile Include="ResourceEditor\Importor\IImportor.cs" />
+    <Compile Include="ResourceEditor\MaterialEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\MaterialEditor.Designer.cs">
+      <DependentUpon>MaterialEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\RecentFile.cs" />
+    <Compile Include="ResourceEditor\ResAnimMeshResourcePreview.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ResXEditor\ResXEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ResXEditor\ResXEditor.Designer.cs">
+      <DependentUpon>ResXEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\Skeletal\ResAnimSetEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\Skeletal\ResAnimSetEditor.Designer.cs">
+      <DependentUpon>ResAnimSetEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\Skeletal\ResResourceAnimSetPreview.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\Skeletal\ResSkeletalMeshProperty.cs" />
+    <Compile Include="UI Control\EXListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="EditorMain\LayerManagerDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\LayerManagerDlg.Designer.cs">
+      <DependentUpon>LayerManagerDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\LevelLocDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\LevelLocDlg.Designer.cs">
+      <DependentUpon>LevelLocDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\NavigationMapDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\NavigationMapDlg.Designer.cs">
+      <DependentUpon>NavigationMapDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\NewTerrainMaterial.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\NewTerrainMaterial.Designer.cs">
+      <DependentUpon>NewTerrainMaterial.cs</DependentUpon>
     </Compile>
     <Compile Include="EditorMain\TerrainNoiseDlg.cs">
       <SubType>Form</SubType>
@@ -134,18 +242,13 @@
     <Compile Include="EditorMain\TerrainSplattingLayerForm.Designer.cs">
       <DependentUpon>TerrainSplattingLayerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="EditorMain\TerrainSplattingMtlDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditorMain\TerrainSplattingMtlDlg.Designer.cs">
-      <DependentUpon>TerrainSplattingMtlDlg.cs</DependentUpon>
-    </Compile>
     <Compile Include="EditorMain\TerrainToolsDlg.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EditorMain\TerrainToolsDlg.Designer.cs">
       <DependentUpon>TerrainToolsDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="HotKeyDefine.cs" />
     <Compile Include="NActorEditor.cs" />
     <Compile Include="EditorMain\NEMainViewport.cs">
       <SubType>Component</SubType>
@@ -163,25 +266,35 @@
     <Compile Include="NControl\CollapsibleGroupBox.designer.cs">
       <DependentUpon>CollapsibleGroupBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="NControl\NWaitCursor.cs" />
-    <Compile Include="NControl\Spalsh.cs">
-      <SubType>Form</SubType>
+    <Compile Include="NControl\NCurveEditorCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NControl\NCurveEditorCtrl.Designer.cs">
+      <DependentUpon>NCurveEditorCtrl.cs</DependentUpon>
     </Compile>
     <Compile Include="NEViewPort.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="NEWidgetsRender.cs" />
     <Compile Include="NLevelEditorEngine.cs" />
+    <Compile Include="NWin32API.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="EditorMain\ActorListDlg.resx">
       <DependentUpon>ActorListDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="EditorMain\CameraCtrlSettingDlg.resx">
       <DependentUpon>CameraCtrlSettingDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\CreateDecoLayerDialog.resx">
+      <DependentUpon>CreateDecoLayerDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="EditorMain\EditorLogForm.resx">
       <DependentUpon>EditorLogForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="EditorMain\EditorMainForm.resx">
       <DependentUpon>EditorMainForm.cs</DependentUpon>
@@ -191,12 +304,36 @@
       <DependentUpon>AboutBoxNexus.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\EditorOptionsDlg.resx">
+      <DependentUpon>EditorOptionsDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\GlobalSetting.resx">
+      <DependentUpon>GlobalSetting.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\LayerManagerDlg.resx">
+      <DependentUpon>LayerManagerDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\LevelLocDlg.resx">
+      <DependentUpon>LevelLocDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\NavigationMapDlg.resx">
+      <DependentUpon>NavigationMapDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditorMain\NewTerrainDlg.resx">
       <DependentUpon>NewTerrainDlg.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="EditorMain\TerrainBasicMtlDlg.resx">
-      <DependentUpon>TerrainBasicMtlDlg.cs</DependentUpon>
+    <EmbeddedResource Include="EditorMain\NewTerrainMaterial.resx">
+      <DependentUpon>NewTerrainMaterial.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\TerrainDecoLayerProperty.resx">
+      <DependentUpon>TerrainDecoLayerProperty.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="EditorMain\TerrainNoiseDlg.resx">
@@ -207,16 +344,20 @@
       <DependentUpon>TerrainSplattingLayerForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="EditorMain\TerrainSplattingMtlDlg.resx">
-      <DependentUpon>TerrainSplattingMtlDlg.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="EditorMain\TerrainToolsDlg.resx">
       <DependentUpon>TerrainToolsDlg.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\VirtualFileDialog.resx">
+      <DependentUpon>VirtualFileDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="NControl\CollapsibleGroupBox.resx">
       <DependentUpon>CollapsibleGroupBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NControl\NCurveEditorCtrl.resx">
+      <DependentUpon>NCurveEditorCtrl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="NEViewPort.resx">
@@ -225,23 +366,63 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\AttInfo\ResAttributeInfoEditor.resx">
+      <DependentUpon>ResAttributeInfoEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\CreateNewCurve.resx">
+      <DependentUpon>CreateNewCurve.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\DistributionEditor.resx">
+      <DependentUpon>DistributionEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ResourceEditor\ImportLODDlg.resx">
       <DependentUpon>ImportLODDlg.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\MakeTextureAtlasDlg.resx">
+      <DependentUpon>MakeTextureAtlasDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\MaterialEditor.resx">
+      <DependentUpon>MaterialEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="ResourceEditor\ResAnimMeshEditor.resx">
       <DependentUpon>ResAnimMeshEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\ResXEditor\ResXEditor.resx">
+      <DependentUpon>ResXEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\Skeletal\ResAnimSetEditor.resx">
+      <DependentUpon>ResAnimSetEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ResourceEditor\ResourceEditorForm.resx">
       <DependentUpon>ResourceEditorForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\ResSFXEditor.resx">
+      <DependentUpon>ResSFXEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="ResourceEditor\ResStaticMeshEditor.resx">
       <DependentUpon>ResStaticMeshEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\ResTextureAtlasViewer.resx">
+      <DependentUpon>ResTextureAtlasViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\SFXElement.resx">
+      <DependentUpon>SFXElement.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ResourceEditor\SpeedTreeViewer.resx">
@@ -252,15 +433,56 @@
       <DependentUpon>StaticMeshEdOptionsDlg.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
+    <EmbeddedResource Include="Properties\Resources.en-US.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.en-US.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.zh-CHT.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI Control\TimeGrid.resx">
+      <DependentUpon>TimeGrid.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI Control\Timeline.resx">
+      <DependentUpon>Timeline.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI Control\TimelineStreamList.resx">
+      <DependentUpon>TimelineStreamList.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UIEditor\NGUIRenderControl.resx">
+      <DependentUpon>NGUIRenderControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UIEditor\UIEditor.resx">
+      <DependentUpon>UIEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UIEditor\UISetWindowPosition.resx">
+      <DependentUpon>UISetWindowPosition.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UIEditor\UISetWindowSize.resx">
+      <DependentUpon>UISetWindowSize.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.en-US.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.en-US.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -272,6 +494,12 @@
     </Compile>
     <Compile Include="ResourceEditor\ImportLODDlg.Designer.cs">
       <DependentUpon>ImportLODDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\MakeTextureAtlasDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\MakeTextureAtlasDlg.Designer.cs">
+      <DependentUpon>MakeTextureAtlasDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="ResourceEditor\MaterialParamEdit.cs" />
     <Compile Include="ResourceEditor\MaterialProperty.cs" />
@@ -297,6 +525,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ResourceEditor\ResProperty.cs" />
+    <Compile Include="ResourceEditor\ResSFXEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ResSFXEditor.Designer.cs">
+      <DependentUpon>ResSFXEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="ResourceEditor\ResStaticMeshEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -304,6 +538,18 @@
       <DependentUpon>ResStaticMeshEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="ResourceEditor\ResStaticMeshProperty.cs" />
+    <Compile Include="ResourceEditor\ResTextureAtlasViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ResTextureAtlasViewer.Designer.cs">
+      <DependentUpon>ResTextureAtlasViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\SFXElement.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\SFXElement.Designer.cs">
+      <DependentUpon>SFXElement.cs</DependentUpon>
+    </Compile>
     <Compile Include="ResourceEditor\SpeedTreeViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -317,14 +563,71 @@
       <DependentUpon>StaticMeshEdOptionsDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="ResourceEditor\ThumbnailManager.cs" />
+    <Compile Include="UI Control\TimeGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI Control\TimeGrid.Designer.cs">
+      <DependentUpon>TimeGrid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI Control\Timeline.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI Control\Timeline.Designer.cs">
+      <DependentUpon>Timeline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI Control\TimelineStream.cs" />
+    <Compile Include="UI Control\TimelineStreamList.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI Control\TimelineStreamList.Designer.cs">
+      <DependentUpon>TimelineStreamList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UIEditor\NGUIRenderControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UIEditor\NGUIWidgetsRender.cs" />
+    <Compile Include="UIEditor\UIEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UIEditor\UIEditor.Designer.cs">
+      <DependentUpon>UIEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UIEditor\UIEditorCommands.cs" />
+    <Compile Include="UIEditor\UIEditorEventArg.cs" />
+    <Compile Include="UIEditor\UIFileQurery.cs" />
+    <Compile Include="UIEditor\UISetWindowPosition.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UIEditor\UISetWindowPosition.Designer.cs">
+      <DependentUpon>UISetWindowPosition.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UIEditor\UISetWindowSize.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UIEditor\UISetWindowSize.Designer.cs">
+      <DependentUpon>UISetWindowSize.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NexusEngineCLI\NexusEngineCLI.vcproj">
       <Project>{1C2F58EF-63FC-4A85-A67F-5B5BC9721BDF}</Project>
       <Name>NexusEngineCLI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NexusEngineExtension\NexusEngineExtension.csproj">
+      <Project>{D2E3F033-A6A5-498C-AF55-327FCA4278EF}</Project>
+      <Name>NexusEngineExtension</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NexusGameFramework\Nexus.GameFramework.csproj">
+      <Project>{9DFF3F83-5D4D-4E00-B425-EBFABAC7B99B}</Project>
+      <Name>Nexus.GameFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NexusGUI\Nexus.GUI.csproj">
+      <Project>{BB2799D5-9835-40ED-932A-6AF9A61B37F9}</Project>
+      <Name>Nexus.GUI</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="Resources\006.png" />
     <None Include="Resources\037.png" />
     <None Include="Resources\028.png" />
@@ -372,11 +675,59 @@
     <None Include="Resources\1026_p1.bmp" />
     <None Include="Resources\273_23.png" />
     <None Include="Resources\005.png" />
+    <None Include="Resources\folder.gif" />
+    <None Include="Resources\action_go.gif" />
+    <None Include="Resources\action_stop.gif" />
+    <None Include="Resources\controls2.png" />
+    <None Include="Resources\controls9.png" />
+    <None Include="Resources\chinaz 31A_PNG04.png" />
+    <None Include="Resources\active.png" />
+    <None Include="Resources\disactive.png" />
+    <None Include="Resources\add_layer.png" />
+    <None Include="Resources\delete_layer.png" />
+    <None Include="Resources\copy.gif" />
+    <None Include="Resources\cut.gif" />
+    <None Include="Resources\gui.ico" />
+    <None Include="Resources\ActorMode.bmp" />
+    <None Include="ImageListFiles\405_11.png" />
+    <None Include="ImageListFiles\MainToolbar\405_01.png" />
+    <None Include="ImageListFiles\MainToolbar\405_03.png" />
+    <None Include="Resources\bottom_align_columns_16x16.gif" />
     <Content Include="Resources\HeightMap.bmp" />
     <None Include="Resources\nlogo.bmp" />
     <None Include="Resources\minus.bmp" />
     <None Include="Resources\lock.png" />
+    <None Include="Resources\hide.png" />
+    <None Include="Resources\layer.png" />
+    <None Include="Resources\lock_layer.png" />
+    <None Include="Resources\lock_all_layer.png" />
+    <None Include="Resources\move.gif" />
+    <None Include="Resources\nav.gif" />
     <Content Include="Resources\NoTexture.bmp" />
+    <None Include="Resources\table_16x16.gif" />
+    <None Include="Resources\text_align_right_16x161.gif" />
+    <None Include="Resources\text_align_center_16x161.gif" />
+    <None Include="Resources\text_align_left_16x161.gif" />
+    <None Include="Resources\table_align_rows_16x16.gif" />
+    <None Include="Resources\table_align_columns_16x16.gif" />
+    <None Include="Resources\preview_16x161.gif" />
+    <None Include="Resources\preview_16x16.gif" />
+    <None Include="Resources\png-0803.png" />
+    <None Include="Resources\PIE.jpg" />
+    <None Include="Resources\refresh_16x16.gif" />
+    <None Include="Resources\redo1_16x16.gif" />
+    <None Include="Resources\paste.gif" />
+    <None Include="Resources\show_all_layer.png" />
+    <None Include="Resources\unlock_layer.png" />
+    <None Include="Resources\zoom_out.gif" />
+    <None Include="Resources\zoom_in.gif" />
+    <None Include="Resources\undo1_16x16.gif" />
+    <None Include="Resources\text_align_right_16x16.gif" />
+    <None Include="Resources\text_align_left_16x16.gif" />
+    <None Include="Resources\text_align_center_16x16.gif" />
+    <None Include="Resources\visible.png" />
+    <None Include="Resources\Spell_Fire_Fire.png" />
+    <None Include="Resources\Window.bmp" />
     <None Include="Resources\unlock.png" />
     <None Include="Resources\page_white_code.gif" />
     <None Include="Resources\page_white_picture.gif" />
@@ -384,6 +735,11 @@
     <None Include="Resources\zoom.gif" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
@@ -398,6 +754,11 @@
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
       <Visible>False</Visible>

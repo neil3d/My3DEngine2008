@@ -12,6 +12,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -41,15 +44,15 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NCORE_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS"
-				MinimalRebuild="true"
+				AdditionalIncludeDirectories="..\..\External\NexusExternal\boost_1_40_0"
+				PreprocessorDefinitions="NCORE_EXPORTS;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
+				EnablePREfast="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,13 +65,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
+				OutputFile="..\..\debug\$(ProjectName).dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\..\..\external\boost\lib;..\..\External\NexusExternal\boost_1_40_0\stage\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
+				RandomizedBaseAddress="0"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
+				CLRThreadAttribute="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -117,8 +123,168 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\external\boost"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NCORE_EXPORTS;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\External\NexusExternal\boost_1_40_0"
+				PreprocessorDefinitions="NCORE_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS"
+				RuntimeLibrary="2"
+				EnableEnhancedInstructionSet="2"
+				UsePrecompiledHeader="2"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
+				OutputFile="..\..\release\$(ProjectName).dll"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\..\external\boost\lib;..\..\External\NexusExternal\boost_1_40_0\stage\lib"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="0"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+				CLRThreadAttribute="0"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)bin/$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;NCORE_EXPORTS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="2"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories=""
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)bin/$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NCORE_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -136,15 +302,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\external\boost\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				TargetMachine="1"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -236,6 +403,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\math\ncheck_result.h"
+				>
+			</File>
+			<File
 				RelativePath=".\math\nfrustum.cpp"
 				>
 			</File>
@@ -257,6 +428,10 @@
 			</File>
 			<File
 				RelativePath=".\math\rect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\math\vector.cpp"
 				>
 			</File>
 			<File
@@ -366,6 +541,22 @@
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\tinyxml\tinystr.h"
@@ -384,6 +575,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -414,6 +621,22 @@
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\tinyxml\tinyxmlparser.cpp"
@@ -428,6 +651,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -468,6 +707,130 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="event_delegate"
+			>
+			<File
+				RelativePath=".\event_delegate\delegates.h"
+				>
+			</File>
+			<File
+				RelativePath=".\event_delegate\event_arg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\event_delegate\sample.txt"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="rapidxml"
+			>
+			<File
+				RelativePath=".\rapidxml\rapidxml.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\rapidxml\rapidxml_iterators.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\rapidxml\rapidxml_print.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\rapidxml\rapidxml_utils.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="height_map"
+			>
+			<File
+				RelativePath=".\height_map\height_map_util.h"
+				>
+			</File>
+			<File
+				RelativePath=".\height_map\nbit_map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\height_map\nbit_map.h"
+				>
+			</File>
+			<File
+				RelativePath=".\height_map\nheight_map.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="game_map"
+			>
+			<File
+				RelativePath=".\game_map\navigation_map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\game_map\navigation_map.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ai"
+			>
+			<File
+				RelativePath=".\ai\micropather.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ai\micropather.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ai\ngraph_bit_map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ai\ngraph_bit_map.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ai\ngraph_navigation_map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ai\ngraph_navigation_map.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ai\path_result_cache.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ai\path_result_cache.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="timer"
+			>
+			<File
+				RelativePath=".\timer\nprofile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\timer\nprofile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\timer\ntimestamp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\timer\ntimestamp.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\base_define.h"
 			>
@@ -497,6 +860,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ntype_def.h"
+			>
+		</File>
+		<File
 			RelativePath=".\ReadMe.txt"
 			>
 		</File>
@@ -513,6 +880,22 @@
 			</FileConfiguration>
 			<FileConfiguration
 				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					UsePrecompiledHeader="1"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug|x64"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					UsePrecompiledHeader="1"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|x64"
 				>
 				<Tool
 					Name="VCCLCompilerTool"

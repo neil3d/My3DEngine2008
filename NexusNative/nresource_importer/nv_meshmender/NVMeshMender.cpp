@@ -26,8 +26,7 @@ Comments:
 	old nvMeshMender interface for all those using it already
   
 */
-
-
+#include "stdafx.h"
 #include "nvMeshMender.h"
 #include "assert.h"
 

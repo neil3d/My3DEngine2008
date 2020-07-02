@@ -7,6 +7,7 @@ namespace NexusEngine
 		SelectObject,
 		FreeCamera,
 		TerrainMode,
+		NavigateMapMode,
 		SelectMove,
 		SelectRotate,
 		SelectScale,

@@ -87,11 +87,6 @@ namespace nexus
 		//-- ·ÖÅäÄÚ´æ
 		init_pos_stream(num_vert);
 
-		vertex_element_define color_def = {0, 0, EVET_FLOAT4, EVEU_Color, 0};
-		element_array color_def_array;
-		color_def_array.push_back(color_def);
-		m_color_stream.init(color_def_array, num_vert);
-
 		m_normal_array.resize(num_vert);
 
 		//-- Ìî³äpos£¬normal
@@ -259,23 +254,23 @@ namespace nexus
 
 	void ndynamic_sky_dome::rebuild_colors(bool update_render_mesh)
 	{
-		const unsigned int vertexCount = m_vert_data.get_num_vert();
-		vector4* vert_color = (vector4*)m_vert_data.get_stream(1)->get_data();
-		std::vector<vector3>& normal_array = m_vert_data.get_normal_array();
+		//size_t vertexCount = m_vert_data.get_num_vert();
+		//vector4* vert_color = (vector4*)m_vert_data.get_stream(1)->get_data();
+		//std::vector<vector3>& normal_array = m_vert_data.get_normal_array();
 
-		// get vertex color
-		for ( int i = 0; i<vertexCount; ++i ) 
-		{			
-			vert_color[i] = get_vertex_color(normal_array[i]);
-		}
-		vector4 sc = get_vertex_color(get_sun_dir());
-		m_sun_color = color4f(sc.x, sc.y, sc.z, sc.w);
+		//// get vertex color
+		//for ( size_t i = 0; i<vertexCount; ++i ) 
+		//{			
+		//	vert_color[i] = get_vertex_color(normal_array[i]);
+		//}
+		//vector4 sc = get_vertex_color(get_sun_dir());
+		//m_sun_color = color4f(sc.x, sc.y, sc.z, sc.w);
 
-		//--
-		if (update_render_mesh)
-		{
-			m_mesh->update_vertices(&m_vert_data);
-		}
+		////--
+		//if (update_render_mesh)
+		//{
+		//	m_mesh->update_vertices(&m_vert_data);
+		//}
 	}
 
 	vector4 ndynamic_sky_dome::get_vertex_color(const vector3& vert_normal)
@@ -387,7 +382,7 @@ namespace nexus
 	{
 	}
 
-	nmaterial_base* ndynamic_sky_dome::get_material(int lod, int mtl_id)
+	nmtl_base* ndynamic_sky_dome::get_material(int lod, int mtl_id)
 	{
 		(void)lod;
 		(void)mtl_id;
@@ -396,6 +391,7 @@ namespace nexus
 
 	nrender_mesh* ndynamic_sky_dome::get_render_mesh(int lod)
 	{
+		(void)lod;
 		return m_mesh.get();
 	}
 
@@ -411,12 +407,10 @@ namespace nexus
 		m_mesh.reset( rres_mgr->alloc_dynamic_mesh_indexed() );
 		m_mesh->create(EDraw_TriangleList, &m_vert_data, &faces, 0);
 
-		//-- create material
-		nmaterial_script::ptr mtl_temp = 
-			nresource_manager::instance()->load_material_template_script(
+		//-- create material		
+		m_mtl.create_from_hlsl(_T("basic_pass"),
 			resource_location(_T("engine_data:material/SKY_dome.hlsl"))
 			);
-		m_mtl.create(mtl_temp);
 
 		//--
 		m_radius = radius;
@@ -446,7 +440,7 @@ namespace nexus
 	float ndynamic_sky_dome::perez_functionO1( float perezCoeffs[ 5 ], const float thetaSun, const float zenithVal ) 
 	{
 		const float val = ( 1.0f + perezCoeffs[ 0 ] * exp( perezCoeffs[ 1 ] ) ) *
-			( 1.0f + perezCoeffs[ 2 ] * exp( perezCoeffs[ 3 ] * thetaSun ) + perezCoeffs[ 4 ] * sqare( cosf( thetaSun ) ) );
+			( 1.0f + perezCoeffs[ 2 ] * exp( perezCoeffs[ 3 ] * thetaSun ) + perezCoeffs[ 4 ] * square( cosf( thetaSun ) ) );
 		return zenithVal / val;
 	}
 
@@ -460,7 +454,8 @@ namespace nexus
 
 	void ndynamic_sky_dome::update(float delta_time, const nviewport& view)
 	{
-		(void)delta_time;
+		nsky_component::update(delta_time, view);
+
 		mat_set_translation(m_mat_world, view.camera.get_eye_pos());
 	}
 

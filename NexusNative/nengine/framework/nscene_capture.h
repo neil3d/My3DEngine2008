@@ -36,6 +36,9 @@ namespace nexus
 		virtual void capture_scene(nlevel* lv) = 0;
 
 		virtual nrender_target* get_texture_target() = 0;
+
+		virtual void _on_device_lost(int param)		{	(void)param; }
+		virtual bool _on_device_reset(int param)	{	(void)param; return true; }
 	};
 }//namespace nexus
 #endif //_NEXUS_SCENE_CAPTURE_H_

@@ -20,8 +20,7 @@ namespace nexus
 		virtual ~nresource_skeletal_anim_set(void);
 
 		void import_anim_sequence(const nstring& full_path);
-
-		virtual bool ready() const	{	return true;}
+		
 		virtual void serialize(narchive& ar);
 
 		size_t get_num_anim() const	{	return m_anim_array.size();}
@@ -35,6 +34,8 @@ namespace nexus
 
 		nskeleton_define	m_skeleton;
 		sequence_array		m_anim_array;
+
+		nDECLARE_NAMED_CLASS(nresource_skeletal_anim_set)
 	};
 }//namespace nexus
 

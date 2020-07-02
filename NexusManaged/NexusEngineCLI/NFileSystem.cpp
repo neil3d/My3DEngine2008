@@ -66,4 +66,44 @@ namespace NexusEngine
 		long long filetime = binTime * 10000000LL + 116444736000000000LL;
 		return DateTime::FromFileTime(filetime);
 	}
+
+	System::String^ NFileSystem::GetFullPath(System::String^ pkgName, System::String^ fileName)
+	{
+		pin_ptr<const wchar_t> szPkgName = PtrToStringChars(pkgName);		
+		pin_ptr<const wchar_t> szFileName = PtrToStringChars(fileName);		
+
+		nstring ret = NativePtr->get_full_path(szPkgName, szFileName);
+		return gcnew System::String(ret.c_str());
+	}
+
+	bool NFileSystem::IsFileExist( System::String^ pkgName, System::String^ path )
+	{
+		pin_ptr<const wchar_t> szPkgName = PtrToStringChars(pkgName);		
+		pin_ptr<const wchar_t> szFileName = PtrToStringChars(path);		
+
+		return NativePtr->file_exists(szPkgName,szFileName);
+	}
+
+	void NFileSystem::CreateDirectory( System::String^ pkgName, System::String^ path )
+	{
+		pin_ptr<const wchar_t> szPkgName = PtrToStringChars(pkgName);		
+		pin_ptr<const wchar_t> szFileName = PtrToStringChars(path);		
+		NativePtr->create_directory(szPkgName,szFileName);
+	}
+
+	void NFileSystem::DeleteDirectory( System::String^ pkgName, System::String^ path )
+	{
+		pin_ptr<const wchar_t> szPkgName = PtrToStringChars(pkgName);		
+		pin_ptr<const wchar_t> szFileName = PtrToStringChars(path);		
+		NativePtr->remove_directory(szPkgName,szFileName);
+	}
+
+	bool NFileSystem::RenameDirectory( System::String^ pkgName, System::String^ oldName,System::String^ newName )
+	{
+		pin_ptr<const wchar_t> szPkgName = PtrToStringChars(pkgName);		
+		pin_ptr<const wchar_t> oldFileName = PtrToStringChars(oldName);		
+		pin_ptr<const wchar_t> newFileName = PtrToStringChars(newName);		
+		return NativePtr->rename_directory(szPkgName,oldFileName,newFileName);
+	}
+
 }//namespace NexusCore

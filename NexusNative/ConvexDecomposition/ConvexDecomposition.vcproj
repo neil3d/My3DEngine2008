@@ -60,6 +60,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				OutputFile="..\..\debug\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

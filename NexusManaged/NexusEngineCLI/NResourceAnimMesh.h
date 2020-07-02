@@ -1,6 +1,6 @@
 #pragma once
 #include "NResource.h"
-#include "NMaterialBase.h"
+#include "NMtlBase.h"
 
 namespace NexusEngine
 {
@@ -11,7 +11,7 @@ namespace NexusEngine
 		void ImportLOD(int lod, System::String^ fullPath);
 
 		//!	设置某级LOD的材质
-		void ImportSetMaterial(int lod, int sec, NMaterialBase^ mtl);
+		void ImportSetMaterial(int lod, int sec, NMtlBase^ mtl);
 
 		//!	获得LOD级别的个数
 		int  GetNumLOD();
@@ -23,7 +23,7 @@ namespace NexusEngine
 		void GetLODInfo(int lod, [Out]int% numVert, [Out]int% numSec, [Out]int% numTri);
 
 		//!	获得某级LOD的某个Section使用的材质
-		NMaterialBase^ GetMaterial(int lod, int sec);
+		NMtlBase^ GetMaterial(int lod, int sec);
 
 		int GetNumSequence();
 		String^ GetSequenceInfo(int i, [Out]float% length);

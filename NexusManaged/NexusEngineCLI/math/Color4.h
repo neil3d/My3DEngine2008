@@ -8,6 +8,8 @@ using System::Runtime::InteropServices::OutAttribute;
 
 namespace NexusEngine
 {
+	using namespace NexusEngineExtension;
+
 	value class Color3;
 	value class Vector3;
 	value class Vector4;
@@ -18,6 +20,7 @@ namespace NexusEngine
 	[System::Serializable]
 	[System::Runtime::InteropServices::StructLayout(System::Runtime::InteropServices::LayoutKind::Sequential)]
 	[System::ComponentModel::TypeConverter( NexusEngine::Design::Color4Converter::typeid )]
+	[XmlClassSerializable("Color4f",false)]
 	public value class Color4f
 	{
 	internal:
@@ -28,21 +31,25 @@ namespace NexusEngine
 		/// <summary>
 		/// Gets or sets the color's red component.
 		/// </summary>
+		[XmlFieldSerializable("R")]
 		float R;
 
 		/// <summary>
 		/// Gets or sets the color's green component.
 		/// </summary>
+		[XmlFieldSerializable("G")]
 		float G;
 
 		/// <summary>
 		/// Gets or sets the color's blue component.
 		/// </summary>
+		[XmlFieldSerializable("B")]
 		float B;
 
 		/// <summary>
 		/// Gets or sets the color's alpha component.
 		/// </summary>
+		[XmlFieldSerializable("A")]
 		float A;
 
 		/// <summary>
@@ -437,6 +444,35 @@ namespace NexusEngine
 		nexus::color4f ToNative()
 		{
 			return nexus::color4f(R, G, B, A);
+		}
+
+		[Category("Color")]
+		property System::Drawing::Color ColorRGB
+		{
+			System::Drawing::Color get()
+			{
+				return ToColor();
+			}
+			void set(System::Drawing::Color val)
+			{
+				A = 1.0f;
+				R = val.R / 255.0f;
+				G = val.G / 255.0f;
+				B = val.B / 255.0f;
+			}
+		}
+
+		[Category("Color")]
+		property System::Byte Alpha
+		{
+			System::Byte get()
+			{
+				return (System::Byte)(A*255);
+			}
+			void set(System::Byte val)
+			{
+				A = val / 255.0f;
+			}
 		}
 	};
 }

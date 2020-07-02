@@ -14,3 +14,4 @@
 #include "base_depend.h"
 #include <boost/timer.hpp>
 #include "../nengine/renderer/renderer_framework.h"
+#define D3DCOLORALL (D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_RED)

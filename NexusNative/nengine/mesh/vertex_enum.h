@@ -16,6 +16,7 @@ namespace nexus
 		EVEU_Position,
 		EVEU_Normal,
 		EVEU_Tangent,
+		EVEU_Binormal,
 		EVEU_TexCoord,
 		EVEU_BlendIndices,
 		EVEU_BlendWeight,

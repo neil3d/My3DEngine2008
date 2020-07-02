@@ -31,6 +31,15 @@ public:
 		return perlin_noise_2D(vec);
 	};
 
+	float Get(float x,float y,float z)
+	{
+		float vec[3];
+		vec[0] = x;
+		vec[1] = y;
+		vec[2] = z;
+		return perlin_noise_3D(vec);
+	};
+
 	float GetAmplitude(void)
 	{
 		return mAmplitude;
@@ -39,6 +48,7 @@ public:
 private:
 	void init_perlin(int n,float p);
 	float perlin_noise_2D(float vec[2]);
+	float perlin_noise_3D(float vec[3]);
 
 	float noise1(float arg);
 	float noise2(float vec[2]);

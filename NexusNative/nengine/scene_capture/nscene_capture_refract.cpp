@@ -44,7 +44,7 @@ namespace nexus
 		
 		m_view.update();	
 
-		lv->render(m_view, NULL);
+		lv->render(m_view);
 		
 		rnd->resolve_target( m_rt.get() );
 
@@ -69,5 +69,16 @@ namespace nexus
 		m_view.width = render_target_w;
 		m_view.height = render_target_h;
 		m_view.show_flags |= EShow_InSceneCapture;
+	}
+
+	void nscene_capture_refract::_on_device_lost(int param)
+	{
+		m_rt.reset();
+	}
+
+	bool nscene_capture_refract::_on_device_reset(int param)
+	{
+		create(m_view.width, m_view.height);
+		return true;
 	}
 }//namespace nexus

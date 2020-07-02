@@ -6,18 +6,18 @@
 #include "../image/nimage.h"
 #include "../util/perlin.h"
 #include "nterrain_actor.h"
-#include "height_map_util.h"
+#include "../../ncore/height_map/height_map_util.h"
 
 namespace nexus
 {
-	nDEFINE_VIRTUAL_CLASS(nterrain_mtl, nmaterial_base)
+	nDEFINE_VIRTUAL_CLASS(nterrain_mtl, nmtl_base)
 	nDEFINE_NAMED_CLASS(nterrain_mtl_basic, nterrain_mtl)
 	nDEFINE_NAMED_CLASS(ntexture_splatting, nterrain_mtl)
 
 	//////////////////////////////////////////////////////////////////////////
 	// class nterrain_mtl
 	//////////////////////////////////////////////////////////////////////////
-	nterrain_mtl::nterrain_mtl(const nstring& name_str):nmaterial_base(name_str)
+	nterrain_mtl::nterrain_mtl(const nstring& name_str):nmtl_base(name_str)
 	{
 	}
 
@@ -34,34 +34,21 @@ namespace nexus
 	nterrain_mtl_basic::~nterrain_mtl_basic(void)
 	{}
 
+	const TCHAR* const TRN_MTL_BASIC_NAME = _T("TRNMtlTechBasic");
 	void nterrain_mtl_basic::create(const resource_location& texture_loc)
 	{
-		m_template = nresource_manager::instance()->load_material_template_script(
-			resource_location(_T("engine_data:material/TRN_mtl_basic.hlsl"))
-			);
+		//-- 创建pass对象		
+		resource_location shader_loc(_T("engine_data:material/TRN_mtl_basic.hlsl"));
+		create_from_hlsl(TRN_MTL_BASIC_NAME, shader_loc);
 
+		//-- 加载贴图
 		m_diffuse_map = nresource_manager::instance()->load_texture_2d(texture_loc);
 	}
 
-	void nterrain_mtl_basic::draw_effect_param(nshading_effect* effect_ptr) const
+	void nterrain_mtl_basic::setup_effect( nshading_effect* effect_ptr) const
 	{
-		effect_ptr->set_texture("MTL_DiffuseMap", m_diffuse_map->get_render_texture());
-	}
-
-	void nterrain_mtl_basic::serialize(narchive& ar)
-	{
-		nterrain_mtl::serialize(ar);
-
-		resource_location diffuse_tex;
-		if (ar.is_loading())
 		{
-			nSERIALIZE(ar, diffuse_tex);
-			this->create(diffuse_tex);
-		}
-		else
-		{
-			diffuse_tex = m_diffuse_map->get_location();
-			nSERIALIZE(ar, diffuse_tex);
+			effect_ptr->set_texture("MTL_DiffuseMap", m_diffuse_map->get_render_texture());
 		}
 	}
 
@@ -74,37 +61,33 @@ namespace nexus
 	ntexture_splatting::~ntexture_splatting(void)
 	{}
 
+	const TCHAR* const TRN_MTL_SPLAT_NAME = _T("TRNMtlTechSplat");		
 	void ntexture_splatting::_init(size_t w, size_t h)
 	{
-		m_alpha_size.x = w;
-		m_alpha_size.y = h;
-
+		//-- 创建Alpha texture
 		m_alpha_tex.reset(
 			nengine::instance()->get_render_res_mgr()->alloc_alphamap()
 			);
 		m_alpha_tex->create(w, h);
+		
+		//-- 创建tech
 
-		//--
-		nstring engine_pkg_name = nengine::instance()->get_engine_package_name();
-		m_template = nresource_manager::instance()->load_material_template_script(
-			resource_location(engine_pkg_name, _T("material/TRN_tex_splatting.hlsl"))
-			);		
+		resource_location shader_loc(_T("engine_data:material/TRN_tex_splatting.hlsl"));		
+		
+		create_from_hlsl(TRN_MTL_SPLAT_NAME, shader_loc);
 	}
 
-	void ntexture_splatting::set_layer_texture(size_t layer_index, const resource_location& texture_loc)
+	void ntexture_splatting::set_layer_texture(size_t layer_index, 
+		const resource_location& texture_loc,
+		const resource_location& normal_tex_loc )
 	{
-		nASSERT(layer_index < MAX_LAYERS);
+		nASSERT(layer_index < m_layers.size());
 
-		layer_data& layer = m_layers[layer_index];
-
+		mtl_layer_data& layer = m_layers[layer_index];
 		layer.diffuse_tex = nresource_manager::instance()->load_texture_2d(texture_loc);
-
-		//-- 不清空Alpha map
-		if(!layer.alpha_map)
+		if (normal_tex_loc.is_valid())
 		{
-			layer.alpha_map.reset( new nalpha_map );
-			layer.alpha_map->create(m_alpha_size.x, m_alpha_size.y, 0);
-			post_alphamap_change( layer_index, nrect(0,0,m_alpha_size.x,m_alpha_size.y) );
+			layer.normal_tex =  nresource_manager::instance()->load_texture_2d(normal_tex_loc);
 		}
 	}
 
@@ -112,224 +95,164 @@ namespace nexus
 	{
 		nASSERT(layer_index < MAX_LAYERS);
 
-		layer_data& layer = m_layers[layer_index];
-		layer.uv_scale = scale;
-		layer.uv_rotate = rotate;
-		layer.update_uv_mat();
+		mtl_layer_data& layer = m_layers[layer_index];		
+		layer.update_uv_mat(scale, rotate);
 	}
 
-	void ntexture_splatting::get_layer_param(size_t layer_index, resource_location& out_tex, vector2& out_scale, float& out_rotate)
+
+	void ntexture_splatting::setup_effect(nshading_effect* effect_ptr) const
 	{
-		nASSERT(layer_index < MAX_LAYERS);
-
-		layer_data& layer = m_layers[layer_index];
-		
-		if(layer.diffuse_tex)
-			out_tex = layer.diffuse_tex->get_location();
-		out_scale = layer.uv_scale;
-		out_rotate = layer.uv_rotate;
-	}
-
-	void ntexture_splatting::import_layer_alpha(size_t layer_index, const nstring& img_file_name)
-	{
-		nASSERT(layer_index < MAX_LAYERS);
-		nASSERT(layer_index >= 0);
-
-		layer_data& layer = m_layers[layer_index];
-		if( !layer.alpha_map )
+		if (m_layers.empty())
 		{
-			layer.alpha_map.reset( new nalpha_map );
-			layer.alpha_map->create(m_alpha_size.x, m_alpha_size.y, 0);
-		}
-
-		nalpha_map::ptr amap = layer.alpha_map;
-
-		//-- load image
-		nimage img;
-		img.load_from_file(img_file_name);
-		img.convert_format(EPF_R8G8B8);
-
-		size_t img_w = img.get_width();
-		size_t img_h = img.get_height();
-
-		nASSERT(img_w == m_alpha_size.x);
-		nASSERT(img_h == m_alpha_size.y);
-
-		pixel_R8G8B8* pixel = static_cast<pixel_R8G8B8*>(img.get_pixel());
-
-		for(size_t y=0; y<img_h; y++)
-		{
-			for(size_t x=0; x<img_w; x++)
-			{
-				amap->set_value(x, y, pixel->R);
-				pixel++;
-			}
-		}
-
-		img.destroy();
-
-		//--
-		post_alphamap_change( layer_index, nrect(0,0,img_w,img_h) );
-	}
-
-	void ntexture_splatting::draw_effect_param(nshading_effect* effect_ptr) const
-	{
-		matrix44 uv_mat_array[MAX_LAYERS];
-		for(int i=0; i<MAX_LAYERS; i++)
-			uv_mat_array[i] = m_layers[i].uv_mat;
-		effect_ptr->set_matrix_array("TRN_UVTransform", uv_mat_array, MAX_LAYERS);
-		
-		effect_ptr->set_texture("MTL_LayerAlpha", m_alpha_tex.get());
-
-		for(int i=0; i<MAX_LAYERS; i++)
-		{
-			const layer_data& layer = m_layers[i];
-			if( layer.diffuse_tex.get() )
-			{
-				std::ostringstream oss;
-				oss << "MTL_LayerDiffuse" << i;
-
-				effect_ptr->set_texture(oss.str().c_str(), layer.diffuse_tex->get_render_texture());
-			}
-		}
-
-	}
-
-	void ntexture_splatting::post_alphamap_change(size_t layer_index, const nrect& region)
-	{
-		if( layer_index == 0)	// 第0层不需要alpha
 			return;
+		}
 
-		layer_data& layer = m_layers[layer_index];
+		vector<matrix44> uv_mat_array(m_layers.size());
+		float specs[5];
+		float spec_powers[5];
 		
-		if( layer.alpha_map )
+		for(int i=0; i<m_layers.size(); i++)
 		{
-			size_t channel = layer_index-1;
-			m_alpha_tex->copy_alpha(channel,
-				region,
-				layer.alpha_map.get()
-				);
-		}
-	}
-
-	void ntexture_splatting::generate_noise(size_t layer_index, nrect rc, int numOctaves, float amplitude, float frequency)
-	{
-		nASSERT(layer_index < MAX_LAYERS);		
-
-		layer_data& layer = m_layers[layer_index];
-		if( !layer.alpha_map )
-			return;
-
-		nalpha_map::ptr layer_alpha_map = layer.alpha_map;
-
-		if( rc.right == -1 )
-			rc.right = layer_alpha_map->get_width();
-		if( rc.bottom == -1 )
-			rc.bottom = layer_alpha_map->get_height();
-
-		_clip_rect(rc.left, rc.top, rc.right, rc.bottom, 
-			layer_alpha_map->get_width(), layer_alpha_map->get_height());
-
-		if( rc.get_width() <= 0
-			|| rc.get_height() <= 0)
-			return;
-
-		Perlin pn(numOctaves, frequency, amplitude, rand());
-
-		int ix,iy;
-		float xStep = 1.0f/(rc.right-rc.left);
-		float yStep = 1.0f/(rc.bottom-rc.top);
-
-		for(iy=rc.top; iy<rc.bottom; iy++)
-		{
-			for(ix=rc.left; ix<rc.right; ix++)
+			const mtl_layer_data& layer = m_layers[i];
+			nrender_texture* rtx = NULL;
+			rtx = layer.diffuse_tex->get_render_texture();
+			effect_ptr->set_texture(layer.diffuse_name, rtx);	
+			if (layer.normal_tex)
 			{
-				float n = pn.Get(ix*xStep, iy*yStep)+0.5f*amplitude;
-				layer_alpha_map->set_value(ix, iy, unsigned char(fabsf(n)));
+				rtx = layer.normal_tex->get_render_texture();
+				effect_ptr->set_texture(layer.normal_name, rtx);	
 			}
-		}//end of for	
-
-		//--
-		post_alphamap_change(layer_index, rc);
-	}
-
-	void ntexture_splatting::serialize(narchive& ar)
-	{
-		nstring pkg_name = ar.get_file()->get_package();
-		nstring file_name = ar.get_file()->get_file_name();
-		nstring path;
-
-		nstring::size_type fpos = file_name.find_last_of(_T("/"));
-		if( fpos != nstring::npos )
-			path = file_name.substr(0, fpos+1);
-
-		//--
-		nterrain_mtl::serialize(ar);
-
-		nSERIALIZE(ar, m_alpha_size);
-
-		//--
-		nstring layer_class_name(_T("nlayer"));
-		if (ar.is_loading()) // load layers
-		{
-			this->_init(m_alpha_size.x, m_alpha_size.y);
-
-			size_t s = MAX_LAYERS;
-			ar.array_begin(_T("alpha_layers"), s);
-			for(int i=0; i<MAX_LAYERS; i++)
-			{
-				layer_data layer;
-				resource_location layer_diffuse;
-
-				ar.object_begin(ELEM_ArrayItem,layer_class_name);
-				nSERIALIZE(ar, layer.uv_scale);
-				nSERIALIZE(ar, layer.uv_rotate);
-				nSERIALIZE(ar, layer_diffuse);
-				layer.update_uv_mat();
-				ar.object_end();
-				ar.array_next();
-
-				if( layer_diffuse.is_valid() )
-				{
-					this->set_layer_texture(i, layer_diffuse);
-					this->set_layer_uv_param(i, layer.uv_scale, layer.uv_rotate);
-
-					wostringstream os;
-					os << path << m_name
-						<< _T("_alpha_")<<i<<_T(".raw");
-					load_height_map_as_raw(*m_layers[i].alpha_map, pkg_name, os.str());
-					nrect rc(0, 0, m_alpha_size.x, m_alpha_size.y);
-					this->post_alphamap_change(i, rc);
-				}
-			}// end of for
-			ar.array_end();
-		}
-		else // save layers
-		{
-			size_t s = MAX_LAYERS;
 			
-			ar.array_begin(_T("alpha_layers"), s);
-			for(int i=0; i<MAX_LAYERS; i++)
+			specs[i] = layer.spec;
+			spec_powers[i] = layer.spec_power;
+			uv_mat_array[i] = m_layers[i].uv_mat;
+		}// end of for()
+		
+		effect_ptr->set_matrix_array("TRN_UVTransform", &uv_mat_array[0], m_layers.size());
+		effect_ptr->set_texture("MTL_LayerAlpha", m_alpha_tex.get());	
+		effect_ptr->set_float_array("MTL_LayerSpec",specs,5);
+		effect_ptr->set_float_array("MTL_LayerSpecPower",spec_powers,5);
+	}
+
+	void ntexture_splatting::post_alphamap_change(nterrain_mtl_setup* trn_mtl, const nstring& layer_name, const nrect& chunk_rc)
+	{
+		// 检测mtl setup中对这个chunk有效的前5个图层，并保证其顺序
+
+		//--临时：重新计算所有相关图层
+		post_layer_change(trn_mtl, chunk_rc);
+	}
+
+	void ntexture_splatting::mtl_layer_data::operator = (const layer_data& layer)
+	{
+		update_uv_mat(layer.uv_scale, layer.uv_rotate);
+		spec = layer.spec;
+		spec_power = layer.spec_power;
+		diffuse_tex = layer.diffuse_tex;
+		normal_tex = layer.normal_tex;
+	}
+
+	void ntexture_splatting::post_layer_change(nterrain_mtl_setup* trn_mtl, nrect chunk_rc)
+	{
+		chunk_rc.right -= 1;
+		chunk_rc.bottom -= 1;
+
+		// 地形图层产生了增减，移动等，这里简单处理，也就是重建所有图层
+		clear_layers();
+		s_shader_modifier.clear();
+		vector2 uv_scale;
+		float uv_rotate;
+		/*resource_location texture_loc;
+		resource_location normal_tex_loc;*/
+
+		size_t num_setup_layer = trn_mtl->get_num_layers();
+		int j = 0;
+		for (size_t i=0; i<num_setup_layer; i++)
+		{
+			//-- 第一个图层没有alpha
+			if( i == 0)
 			{
-				layer_data& layer = m_layers[i];
-				resource_location layer_diffuse = layer.diffuse_tex->get_location();
+				mtl_layer_data ld;
+				ld = trn_mtl->get_layer_data(i);
+				ld.set_index(j);
 
-				ar.object_begin(ELEM_ArrayItem,layer_class_name);
-				nSERIALIZE(ar, layer.uv_scale);
-				nSERIALIZE(ar, layer.uv_rotate);
-				nSERIALIZE(ar, layer_diffuse);
-				ar.object_end();
-				ar.array_next();
-
-				if( layer.alpha_map )
+				if (ld.normal_tex)
 				{
-					wostringstream os;
-					os << path << m_name
-						<< _T("_alpha_")<<i<<_T(".raw");
-					save_height_map_as_raw(*m_layers[i].alpha_map, pkg_name, os.str());
+					std::ostringstream oss_marco;
+					oss_marco << "N" << ld.index;
+					s_shader_modifier.add_macro(shader_define(oss_marco.str(),"1"));
 				}
-			}// end of for
-			ar.array_end();
-		}// end of else
+
+				m_layers.push_back(ld);
+				j++;
+			}// end of if
+			else
+			{
+				if( trn_mtl->calulate_alpha_relative(i, chunk_rc) )
+				{
+					mtl_layer_data ld;
+					const layer_data& layer = trn_mtl->get_layer_data(i);
+					ld = layer;
+					ld.set_index(j);
+
+					std::ostringstream oss_marco;
+					oss_marco << "LAY" <<  ld.index;
+					s_shader_modifier.add_macro(shader_define(oss_marco.str(),"1"));
+
+					if (ld.normal_tex)
+					{
+						std::ostringstream oss_marco;
+						oss_marco << "N" << ld.index;
+						s_shader_modifier.add_macro(shader_define(oss_marco.str(),"1"));
+					}
+
+					m_layers.push_back(ld);
+
+					//-- 更新Alpha贴图
+					nalpha_map::ptr amap = trn_mtl->get_layer_alpha(i);
+					size_t channel = j-1;
+					m_alpha_tex->copy_alpha( channel, chunk_rc.left, chunk_rc.top, amap.get() );
+					j++;
+				}
+			}// end of else
+
+			//-- 如果已经达到最大图层数，则忽略其他
+			if( j>= MAX_LAYERS )
+				break;
+
+		}// end of for()	
+	}
+
+	void ntexture_splatting::clear_layers()
+	{
+		for(size_t i=0; i<m_layers.size(); i++)
+		{
+			mtl_layer_data& ld = m_layers[i];
+
+			mat_set_identity(ld.uv_mat);
+			ld.diffuse_tex.reset();			
+		}
+
+		if( m_alpha_tex )
+		{
+			for (int i=0; i<MAX_ALPHA_LAYER; i++)
+			{
+				m_alpha_tex->set_alpha(i, 0);
+			}
+		}// end of if()
+
+		m_layers.clear();
+		s_shader_modifier.clear();
+	}
+
+	int ntexture_splatting::get_layer_index(const nstring& layer_name)
+	{
+		for(int i=0; i<m_layers.size(); i++)
+		{
+			const mtl_layer_data& ld = m_layers[i];
+			if( ld.diffuse_tex
+				&& layer_name == ld.diffuse_tex->get_location().to_string() )
+				return i;
+		}
+		return -1;
 	}
 }//namespace nexus

@@ -8,12 +8,12 @@ namespace NexusEditor.EditorMain
     /// <summary>
     /// 编辑器主窗口的viewport
     /// </summary>
-    class NEMainViewport : NEViewport
+    public class NEMainViewport : NEViewport
     {
         public NEMainViewport()
-        {            
-            NLevelEditorEngine.Instance.LevelChanged += new EventHandler(Engine_LevelChanged);            
-            
+        {
+            NLevelEditorEngine.Instance.LevelChanged += new EventHandler(Engine_LevelChanged);
+
             m_focusLevel = NLevelEditorEngine.Instance.MainLevelName;
 
             this.AllowDrop = true;
@@ -24,11 +24,49 @@ namespace NexusEditor.EditorMain
             m_view.CreateHitHash();
         }
 
+        #region RayCheck
+
+        /// <summary>
+        /// 鼠标射线检测
+        /// </summary>
+        /// <param name="hit">检测的结果</param>
+        /// <param name="mousePosition">鼠标位置的屏幕坐标</param>
+        /// <param name="dist">射线检测的长度</param>
+        /// <param name="checkType">检测碰撞类型</param>
+        /// <returns>如何发生碰撞则返回true</returns>
+        public void MouseRayCheck(out NCheckResult hit, Point mousePosition, float dist, LineCheckType checkType)
+        {
+            //Point clientPt = this.PointToClient(mousePosition);
+			Point clientPt = mousePosition;
+            Ray ray = m_view.Camera.GetMouseRay(clientPt.X, clientPt.Y);
+            if(!RayCheck(out hit, ray, dist, checkType))
+            {
+                hit.dist = 500;
+                hit.location = ray.Position + ray.Direction * hit.dist;
+            }
+        }
+
+        /// <summary>
+        /// 射线检测
+        /// </summary>
+        /// <param name="hit">检测的结果</param>
+        /// <param name="ray">射线</param>
+        /// <param name="dist">距离</param>
+        /// <param name="checkType">类型</param>
+        /// <returns>是否发生碰撞</returns>
+        public bool RayCheck(out NCheckResult hit, Ray ray, float dist, LineCheckType checkType)
+        {
+            NLevel mainLv = NLevelEditorEngine.Instance.MainLevel;
+            Vector3 lineEnd = ray.Position + ray.Direction * dist;
+            return mainLv.LineCheck(out hit, ray.Position, lineEnd, checkType);
+        }
+        #endregion
+
         /// <summary>
         /// 响应拖放
         /// </summary>        
         void NEMainViewport_DragEnter(object sender, DragEventArgs e)
-        {            
+        {
             if (!e.Data.GetDataPresent(typeof(NexusEngine.NFileEntity)))
             {
                 return;
@@ -49,19 +87,23 @@ namespace NexusEditor.EditorMain
                 {
                     NLevel mainLv = NLevelEditorEngine.Instance.MainLevel;
                     NActor newActor = ResourceEditor.ResourceActorCreator.CreateActor(resLoc);
-
+                    if (newActor == null)
+                    {
+                        MessageBox.Show("添加对象失败，可能的原因是读取对象数据失败，或者当前作业层被锁定,等等", "错误");
+                        return;
+                    }
                     Point scrPt = new Point(e.X, e.Y);
                     Point clientPt = this.PointToClient(scrPt);
-                    Ray mRay = m_view.Camera.GetMouseRay(clientPt.X, clientPt.Y);
-                    Vector3 lineEnd = mRay.Position + mRay.Direction * 512 * 1024;
+                    Ray ray = m_view.Camera.GetMouseRay(clientPt.X, clientPt.Y);
                     NCheckResult chk;
-                    if (mainLv.LineCheck(out chk, mRay.Position, lineEnd))
+                    if (RayCheck(out chk, ray, 512 * 1024, LineCheckType.Terrain))
                     {
                         newActor.Location = chk.location;
                     }
-                    else 
+                    else
                     {
-                        Vector3 pt = mRay.Position + mRay.Direction * 500;
+
+                        Vector3 pt = ray.Position + ray.Direction * 500;
                         newActor.Location = pt;
                     }
                 }
@@ -87,7 +129,7 @@ namespace NexusEditor.EditorMain
         {
             m_focusLevel = NLevelEditorEngine.Instance.MainLevelName;
         }
-        
+
         /// <summary>
         /// 重载消息处理函数
         /// </summary>
@@ -101,13 +143,13 @@ namespace NexusEditor.EditorMain
             //-- 先由Editor处理，根据返回值，看是否还交由CameraCtrl处理
             int ret = NLevelEditorEngine.Instance.HandleViewportMessage(ref m, this.m_view);
             switch (ret)
-            {                 
+            {
                 case 1:
                     this.Refresh();
                     break;
                 case 2:
-                    if(m_cameraCtrl.InputMessgaeProc(ref m))
-                        this.Refresh();                    
+                    if (m_cameraCtrl.InputMessgaeProc(ref m))
+                        this.Refresh();
                     break;
             }//end of switch
         }

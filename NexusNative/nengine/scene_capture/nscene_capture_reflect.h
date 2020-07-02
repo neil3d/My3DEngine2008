@@ -39,13 +39,16 @@ namespace nexus
 
 		const matrix44& get_uv_project_matrix() const	{	return m_uv_project; }
 
+		virtual void _on_device_lost(int param);
+		virtual bool _on_device_reset(int param);
+
 	protected:
 		plane		m_plane;		
 		nviewport	m_view;
 		
 		matrix44	m_uv_tranfo;
 		matrix44	m_uv_project;
-
+		
 		render_res_ptr<nrender_target>	m_rt;
 	};
 }//namespace nexus

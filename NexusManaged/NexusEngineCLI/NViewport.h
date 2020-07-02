@@ -98,6 +98,12 @@ namespace NexusEngine
 			void set(float val)	{	m_obj->lod_bias=val;}
 		}
 
+		property bool EnableDynamicShadow
+		{
+			bool get() {	return m_obj->enable_dynamic_shadow; }
+			void set(bool val)	{	m_obj->enable_dynamic_shadow=val;}
+		}
+
 		// todo : show_flags
 
 		//!	更新视锥体等内部对象状态

@@ -19,8 +19,11 @@ namespace NexusEngine
 
 		virtual void Init() override;
 		virtual HBITMAP CreateThumbnail(NResourceLoc loc, int w, int h) override;
+		HBITMAP LoadTextureAsBitmap(NResourceLoc loc);
 		virtual void Close() override;
 
+	private:
+		void LoadImage(NResourceLoc loc);
 	private:
 		HDC	m_hdc;
 		System::Collections::ArrayList^	m_fileExtList;		

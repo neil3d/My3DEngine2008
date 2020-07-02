@@ -10,6 +10,7 @@ namespace nexus
 
 	nspeed_tree_component::nspeed_tree_component(const nstring& name_str):nprimitive_component(name_str)
 	{
+		m_spt.owner = this;
 	}
 
 	nspeed_tree_component::~nspeed_tree_component(void)
@@ -20,19 +21,15 @@ namespace nexus
 	{
 		m_spt.base_spt = nresource_manager::instance()->load_speed_tree(spt_file);
 
-		m_spt.m_hit_id = get_owner()->get_name().name_crc;
 		m_bounds = m_spt.base_spt->get_bounds();
 		m_spt_file_loc = spt_file;
 	}
 
-	void nspeed_tree_component::render(const nviewport& view)
+	void nspeed_tree_component::render(render_package_base* rpb)
 	{
-		(void)view;
-		
 		if( m_spt.base_spt )
 		{
-			nrenderer_base* rnd = nengine::instance()->get_renderer();
-			rnd->frame_tree(&m_spt);
+			rpb->add_spt_tree(this);
 		}
 	}
 
@@ -43,13 +40,15 @@ namespace nexus
 
 	void nspeed_tree_component::update(float delta_time, const nviewport& view)
 	{
-		(void)delta_time;
+		nprimitive_component::update(delta_time,view);
 
 		//-- update lod
 		float lod = view.get_lod(m_spt.pos);
 		lod = 1;// temp
 		if( m_spt.base_spt )
+		{
 			m_spt.update_lod( lod );
+		}
 	}
 
 	void nspeed_tree_component::_update_transform(const object_space& parent_space)
@@ -60,15 +59,16 @@ namespace nexus
 
 		m_bounds = m_spt.base_spt->get_bounds();
 
-		float scale = parent_space.scale.x;
 		float rotation = parent_space.rotation.y;
 
 		matrix44 mat;
-		mat_set_scaling(mat, scale, scale, scale);
+		mat_set_scaling(mat, parent_space.scale.x, parent_space.scale.x, parent_space.scale.x);
 		mat_rotate_Y(mat, rotation);
 		mat_translate(mat, m_spt.pos);		
 
-		m_bounds.transform_by(mat);
+		m_bounds.transform_by( mat );
+		m_spt.bounds = m_bounds;
+		m_spt.mat_world = mat;
 	}
 
 	void nspeed_tree_component::serialize(narchive& ar)

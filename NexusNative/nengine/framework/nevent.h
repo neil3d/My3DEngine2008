@@ -20,7 +20,6 @@ namespace nexus
 
 		nDECLARE_VIRTUAL_CLASS(nevent_target)
 	};
-
 }
 
 #endif // end of _NEXUS_EVENT_H_

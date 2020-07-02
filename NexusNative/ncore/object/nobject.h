@@ -83,6 +83,5 @@ public:\
 	nclass* ClassName::reflection_get_class() const		{	return &m_class_##ClassName;}\
 	nobject* ClassName::reflection_alloc_named_object(const nstring& obj_name)		{	return nNew ClassName(obj_name); }\
 	nclass*	ClassName::reflection_get_static_class()	{	return &m_class_##ClassName;}
-
 }//namespace nexus
 #endif //_NOBJECT_H_

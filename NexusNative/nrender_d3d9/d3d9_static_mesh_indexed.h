@@ -32,6 +32,9 @@ namespace nexus
 			const nmesh_vertex_data* vert_data, const index_buffer16* index_data, int mtl_id);
 		virtual size_t append_section(enum EPrimitiveType prim_type, const index_buffer16* index_data, int mtl_id);
 
+		// 静态mesh也提供update内部buffer的接口，但是只适合更新频率极低的情况，否则会有较大的性能损失
+		virtual void update_vertex_buffer(const nmesh_vertex_data* vert_data);
+
 	private:		
 		d3d9_vertex_factory_common::ptr		m_vert;		
 		vector<d3d9_mesh_section::ptr>		m_section_array;		

@@ -1,9 +1,11 @@
 #include "StdAfx.h"
+#include <boost/bind.hpp>
 #include "scene_render_targets.h"
 #include "d3d_device_manager.h"
 #include "d3d_exception.h"
 #include "util.h"
 #include "d3d9_render_target.h"
+#include "nrenderer_d3d9.h"
 
 namespace nexus
 {
@@ -14,29 +16,20 @@ namespace nexus
 
 	scene_render_targets::scene_render_targets(void)
 	{
+		d3d_device_manager::instance()->register_device_handler(
+			boost::bind(&scene_render_targets::on_device_lost, this, _1),
+			boost::bind(&scene_render_targets::on_device_reset, this, _1) );
 	}
 
 	scene_render_targets::~scene_render_targets(void)
 	{
 	}
 
-	void scene_render_targets::create_instance(enum ERenderType type, const render_config& cfg)
+	void scene_render_targets::create_instance(const render_config& cfg)
 	{
 		nASSERT(s_inst == NULL);
-		switch(type)
-		{
-		case HDR:
-			s_inst = nNew scene_render_targets_HDR;
-			break;
-		case LDR:
-			s_inst = nNew scene_render_targets_LDR;
-			break;
-		default:
-			nASSERT(0 && "unknown render targets type");
-		}
-
-		if(s_inst)
-			s_inst->create(cfg);
+		s_inst = nNew scene_render_targets;
+		s_inst->create(cfg);
 	}
 
 	void scene_render_targets::destroy_instance()
@@ -173,7 +166,7 @@ namespace nexus
 
 		//-- load debug draw effect
 		std::string effect_code;
-		load_shder_source(_T("shader_d3d9/post_process/pass_through.fx"), effect_code);
+		load_shader_source(_T("shader_d3d9/post_process/pass_through.fx"), effect_code);
 		
 		ID3DXEffect* debug_effect = NULL;
 		hr = D3DXCreateEffect(device,
@@ -189,6 +182,63 @@ namespace nexus
 		//--
 		m_vert_decl.reset(d3d_decl);
 		m_default_quad_vb = smart_vb_ptr;
+
+		//--
+		D3DFORMAT scene_color_fmt = m_back_desc.Format;
+		if (cfg.bEnableHDR)
+		{
+			scene_color_fmt = D3DFMT_A16B16G16R16F;
+		}
+
+		m_items[ERT_SceneColor] = create_item(cfg.width, cfg.height, scene_color_fmt);
+		m_items[ERT_SceneColorCopy] = create_item(cfg.width, cfg.height, scene_color_fmt);
+		m_items[ERT_Fliter] = create_item(cfg.width/4, cfg.height/4, m_back_desc.Format);
+		m_items[ERT_Light] = create_item(cfg.width/4, cfg.height/4, m_back_desc.Format);
+
+		D3DFORMAT scene_depth_fmt = D3DFMT_D24S8;
+		m_items[ERT_SceneDepth] = create_item(cfg.width, cfg.height, scene_depth_fmt, D3DUSAGE_DEPTHSTENCIL);
+
+		m_items[ERT_SceneNormalDepth] = create_item(m_back_desc.Width, m_back_desc.Height, 
+			D3DFMT_A16B16G16R16F);			
+		
+		m_items[ERT_ShadowColor] = create_item((UINT)shadow_buffer_size.x, (UINT)shadow_buffer_size.y,D3DFMT_R16F);
+		m_items[ERT_ShadowDepth] = create_item((UINT)shadow_buffer_size.x, (UINT)shadow_buffer_size.y,D3DFMT_D24S8, D3DUSAGE_DEPTHSTENCIL );
+
+		IDirect3DCubeTexture9 * cube_tex;
+		IDirect3DSurface9 * cube_depth;
+		hr = device->CreateCubeTexture((UINT)shadow_buffer_size.x/4,0,D3DUSAGE_RENDERTARGET,D3DFMT_R16F,D3DPOOL_DEFAULT,&cube_tex,NULL);
+		hr = device->CreateDepthStencilSurface((UINT)shadow_buffer_size.x/4,(UINT)shadow_buffer_size.y/4,D3DFMT_D24S8,D3DMULTISAMPLE_NONE ,0,false,&cube_depth,NULL);
+		
+		m_cube_texture.reset(cube_tex);
+		m_cube_depth.reset(cube_depth);
+
+		//--
+		if (cfg.bEnableHDR)
+		{
+			m_hdr_final_pass.create_resources();
+		}
+	}
+
+	vector4	scene_render_targets::calc_screen_scale_bias()
+	{
+		IDirect3DDevice9* pDev = d3d_device_manager::instance()->get_device();
+		HRESULT hr;
+
+		D3DSURFACE_DESC         desc;
+		LPDIRECT3DSURFACE9      pSurfRT;
+		D3DVIEWPORT9 vp;
+
+		pDev->GetViewport(&vp);
+		pDev->GetRenderTarget(0, &pSurfRT);
+		pSurfRT->GetDesc(&desc);
+		pSurfRT->Release();
+		
+		return vector4(
+					0.5f* (float)vp.Width / (float)desc.Width,
+					-0.5f* (float)vp.Height / (float)desc.Height,
+					((float)vp.Width*0.5f + pixel_offset + (float)vp.X) / (float)desc.Width,
+					((float)vp.Height*0.5f + pixel_offset + (float)vp.Y) / (float)desc.Height
+		);
 	}
 
 	void scene_render_targets::draw_screen_quad(ID3DXEffect* eft)
@@ -223,42 +273,57 @@ namespace nexus
 			D3DXVECTOR2 t;
 		};
 
-		static const DWORD FVF_TLVERTEX = D3DFVF_XYZRHW | D3DFVF_TEX1;
-
 		IDirect3DDevice9* pDev = d3d_device_manager::instance()->get_device();
 		HRESULT hr;
 
 		D3DSURFACE_DESC         desc;
 		LPDIRECT3DSURFACE9      pSurfRT;
+		D3DVIEWPORT9 view_port;
+		
 
 		pDev->GetRenderTarget(0, &pSurfRT);
 		pSurfRT->GetDesc(&desc);
 		pSurfRT->Release();
 
+		view_port.Height = desc.Height;
+		view_port.Width = desc.Width;
+		view_port.X = 0;
+		view_port.Y = 0;
+		view_port.MinZ= 0;
+		view_port.MaxZ = 1;
+		pDev->SetViewport(&view_port);
 		// To correctly map from texels->pixels we offset the coordinates
 		// by -0.5f:
-		float fWidth = static_cast< float >( desc.Width ) - 0.5f;
-		float fHeight = static_cast< float >( desc.Height ) - 0.5f;
+		float x_offset = -2.0f * pixel_offset/static_cast< float >( desc.Width );
+		float y_offset =  2.0f * pixel_offset/static_cast< float >( desc.Height );
 
 		// Now we can actually assemble the screen-space geometry
 		TLVertex v[4];
 
-		v[0].p = D3DXVECTOR4( -0.5f, -0.5f, 0.0f, 1.0f );
+		v[0].p = D3DXVECTOR4( -1 + x_offset, 1 + y_offset, 0.0f, 1.0f );
 		v[0].t = D3DXVECTOR2( 0.0f, 0.0f );
 
-		v[1].p = D3DXVECTOR4( fWidth, -0.5f, 0.0f, 1.0f );
+		v[1].p = D3DXVECTOR4( 1 + x_offset, 1 + y_offset, 0.0f, 1.0f );
 		v[1].t = D3DXVECTOR2( 1.0f, 0.0f );
 
-		v[2].p = D3DXVECTOR4( -0.5f, fHeight, 0.0f, 1.0f );
+		v[2].p = D3DXVECTOR4( -1 + x_offset, -1 + y_offset, 0.0f, 1.0f );
 		v[2].t = D3DXVECTOR2( 0.0f, 1.0f );
 
-		v[3].p = D3DXVECTOR4( fWidth, fHeight, 0.0f, 1.0f );
+		v[3].p = D3DXVECTOR4( 1 + x_offset, -1 + y_offset, 0.0f, 1.0f );
 		v[3].t = D3DXVECTOR2( 1.0f, 1.0f );
 
 		// Configure the device and render..
-		pDev->SetVertexShader( NULL );
-		pDev->SetFVF( FVF_TLVERTEX );
+		D3DVERTEXELEMENT9 d3d_def_pos[]	= {
+										   {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+										   {0, sizeof(vector4), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+										    D3DDECL_END()
+										   };
 
+		IDirect3DVertexDeclaration9 *d3d_decl = NULL;
+		pDev->CreateVertexDeclaration(d3d_def_pos,&d3d_decl);
+
+		pDev->SetVertexDeclaration(d3d_decl);
+		d3d_decl->Release();
 
 		UINT num_pass = 0;
 		hr = eft->Begin(&num_pass, 0);
@@ -279,33 +344,6 @@ namespace nexus
 #endif
 	}
 
-	//void scene_render_targets::draw_screen_quad(ID3DXEffect* eft, int src_w, int src_h)
-	//{
-	//	adjust_screen_quad_uv(src_w, src_h, m_quad_vert_adjust);
-
-	//	IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-	//	HRESULT hr;
-
-	//	hr = device->SetVertexDeclaration(m_vert_decl.get());
-	//	
-	//	UINT num_pass = 0;
-	//	hr = eft->Begin(&num_pass, 0);
-
-	//	if( FAILED(hr) )
-	//		return;
-
-	//	for(UINT i=0; i<num_pass; i++)
-	//	{
-	//		eft->BeginPass(0);
-
-	//		hr = device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, &m_quad_vert_adjust[0], sizeof(vertex));
-	//		
-	//		eft->EndPass();
-	//	}
-
-	//	eft->End();
-	//}
-
 	void scene_render_targets::begin_back_buffer()
 	{
 		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
@@ -316,6 +354,44 @@ namespace nexus
 
 	void scene_render_targets::end_back_buffer()
 	{
+	}
+
+	void scene_render_targets::draw_final_scene(bool enable_tonemap)
+	{
+		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+		HRESULT hr;
+
+		if( enable_tonemap )
+		{
+			m_hdr_final_pass.draw_process(m_items[ERT_SceneColor]);			
+			hr = d3d_device_manager::instance()->set_view_render_target(0, m_back_surface.get());
+			hr = m_pass_through_effect->SetTexture("g_texSource", m_hdr_final_pass.get_result().tex.get());			
+			m_pass_through_effect->SetTechnique("techDefault");
+			draw_screen_quad(m_pass_through_effect.get());
+		}
+		else
+		{
+			hr = d3d_device_manager::instance()->set_view_render_target(0, m_back_surface.get());
+			hr = m_pass_through_effect->SetTexture("g_texSource", m_items[ERT_SceneColor].tex.get());
+			m_pass_through_effect->SetTechnique("techDefault");
+			draw_screen_quad(m_pass_through_effect.get());
+		}
+
+		//-- for debug
+		//debug_draw_target(m_items[EItem_SceneColor], 0);
+	}
+
+	void scene_render_targets::copy_render_target(nrender_target* out_tg)
+	{
+		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+		HRESULT hr;
+
+		d3d9_render_target* d3d_rt = dynamic_cast<d3d9_render_target*>(out_tg);
+
+		hr = device->SetRenderTarget(0, d3d_rt->get_surface());			
+		hr = m_pass_through_effect->SetTexture("g_texSource",  m_items[ERT_SceneColor].tex.get());
+		m_pass_through_effect->SetTechnique("techDefault");
+		draw_screen_quad(m_pass_through_effect.get());
 	}
 
 	void scene_render_targets::debug_draw_target(const rt_item& rt, int index, const char* tech)
@@ -376,181 +452,81 @@ namespace nexus
 		m_pass_through_effect->End();
 	}
 
-	///////////////////////////////////////////////////////////////////////////////////////
-	//	class scene_render_targets_HDR
-	///////////////////////////////////////////////////////////////////////////////////////
-	scene_render_targets_HDR::scene_render_targets_HDR(void)
-	{
-	}
-
-	scene_render_targets_HDR::~scene_render_targets_HDR(void)
-	{
-	}
-
-	void scene_render_targets_HDR::create(const render_config& cfg)
-	{
-		scene_render_targets::create(cfg);
-
-		//--
-		D3DFORMAT scene_color_fmt = D3DFMT_A16B16G16R16F;
-		m_items[ERT_SceneColor] = create_item(cfg.width, cfg.height, scene_color_fmt);
-
-		D3DFORMAT scene_depth_fmt = D3DFMT_D24S8;
-		m_items[ERT_SceneDepth] = create_item(cfg.width, cfg.height, scene_depth_fmt, D3DUSAGE_DEPTHSTENCIL);
-
-		//--
-		m_hdr_final_pass.create_resources();
-	}
-
-	void scene_render_targets_HDR::begin_pre_pass()
+	void scene_render_targets::begin_pre_pass()
 	{
 		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
 
-		HRESULT hr;
+		HRESULT hr;	
+		hr = d3d_device_manager::instance()->set_view_render_target(0, m_items[ERT_SceneNormalDepth].surf.get());
 		hr = device->SetDepthStencilSurface(m_items[ERT_SceneDepth].surf.get());
-		hr = device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0, 1, 0);
+		hr = device->Clear(0, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_TARGET, 0, 1, 0);
+		device->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
 	}
 	
-	void scene_render_targets_HDR::end_pre_pass()
-	{}
-	
-	void scene_render_targets_HDR::begin_scene_color(bool clear)
+	void scene_render_targets::begin_scene_color(bool clear,bool output_normal_depth)
 	{
-		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+		d3d_device_manager* dev_mgr =  d3d_device_manager::instance();
+		IDirect3DDevice9* device = dev_mgr->get_device();
 
-		HRESULT hr;		
-		hr = d3d_device_manager::instance()->set_view_render_target(0, m_items[ERT_SceneColor].surf.get());
 		if( clear )
-			hr = device->Clear(0, NULL, D3DCLEAR_TARGET, _clear_color, 1, 0);		
+		{	
+			dev_mgr->set_view_render_target(0, m_items[ERT_SceneNormalDepth].surf.get());
+			m_pass_through_effect->SetTechnique("techFillDepth");
+			draw_screen_quad(m_pass_through_effect.get());
+		}
+
+		dev_mgr->set_view_render_target(0, m_items[ERT_SceneColorCopy].surf.get());
+		device->SetDepthStencilSurface(m_items[ERT_SceneDepth].surf.get());
+
+		if (clear)
+		{
+			device->Clear(0, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_TARGET, _clear_color, 1, 0);	
+		}
+
+		if (output_normal_depth)
+		{
+			dev_mgr->set_view_render_target(1, m_items[ERT_SceneNormalDepth].surf.get());
+		}
 	}
 
-	void scene_render_targets_HDR::end_scene_color()
+	void scene_render_targets::end_scene_color(bool bcommit)
 	{
+		d3d_device_manager::instance()->set_view_render_target(1,NULL);
+		if (bcommit)
+		{
+			IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
+			device->SetRenderTarget(0,  m_items[ERT_SceneColor].surf.get());			
+			m_pass_through_effect->SetTexture("g_texSource",  m_items[ERT_SceneColorCopy].tex.get());
+			m_pass_through_effect->SetTechnique("techDefault");
+			draw_screen_quad(m_pass_through_effect.get());
+		}
 #if 0
 		//HRESULT hr = D3DXSaveSurfaceToFile(_T("RT_SceneColor.dds"), D3DXIFF_DDS, 
 		//	m_items[EItem_SceneColor].surf.get(), NULL, NULL);
 #endif
 	}
 
-	void scene_render_targets_HDR::begin_transparency_buffer()
-	{}
-	void scene_render_targets_HDR::end_transparency_buffer()
-	{}
-
-	void scene_render_targets_HDR::draw_final_scene(bool enable_tonemap)
+	void scene_render_targets::on_device_lost(int param)
 	{
-		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-		HRESULT hr;
-		hr = device->SetDepthStencilSurface(NULL);		
-
-		if( enable_tonemap )
-		{
-			m_hdr_final_pass.draw_process(m_items[ERT_SceneColor]);			
-			hr = d3d_device_manager::instance()->set_view_render_target(0, m_back_surface.get());
-			hr = m_pass_through_effect->SetTexture("g_texSource", m_hdr_final_pass.get_result().tex.get());			
-			m_pass_through_effect->SetTechnique("techDefault");
-			draw_screen_quad(m_pass_through_effect.get());
-		}
-		else
-		{
-			hr = d3d_device_manager::instance()->set_view_render_target(0, m_back_surface.get());
-			hr = m_pass_through_effect->SetTexture("g_texSource", m_items[ERT_SceneColor].tex.get());
-			m_pass_through_effect->SetTechnique("techDefault");
-			draw_screen_quad(m_pass_through_effect.get());
-		}
-
-		//-- for debug
-		//debug_draw_target(m_items[EItem_SceneColor], 0);
-	}
-
-	void scene_render_targets_HDR::copy_render_target(nrender_target* out_tg)
-	{
-		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-		HRESULT hr;
-		hr = device->SetDepthStencilSurface(NULL);		
-
-		d3d9_render_target* d3d_rt = dynamic_cast<d3d9_render_target*>(out_tg);
-
-		hr = device->SetRenderTarget(0, d3d_rt->get_surface());			
-		hr = m_pass_through_effect->SetTexture("g_texSource",  m_items[ERT_SceneColor].tex.get());
-		m_pass_through_effect->SetTechnique("techDefault");
-		draw_screen_quad(m_pass_through_effect.get());
-	}
-
-	void scene_render_targets_LDR::begin_transparency_buffer()
-	{
-		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-
-		HRESULT hr;		
-		hr = d3d_device_manager::instance()->set_view_render_target(0, m_trans_buffer.surf.get());
-		hr = device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
-	}
-
-	void scene_render_targets_LDR::end_transparency_buffer()
-	{
-		// blend trans buffer to back buffer
-		begin_back_buffer();
-		
-		HRESULT hr;
-		hr = m_pass_through_effect->SetTexture("g_texSource", m_trans_buffer.tex.get());
-		m_pass_through_effect->SetTechnique("techAlphaBlend");
-		draw_screen_quad(m_pass_through_effect.get());
-
-		end_back_buffer();
-	}
-
-	
-	void scene_render_targets_LDR::create(const render_config& cfg)
-	{
-		scene_render_targets::create(cfg);
-
-		m_scene_color = create_item(m_back_desc.Width, m_back_desc.Height, m_back_desc.Format);
-		
-		
-		rt_item scene_depth = create_item(m_back_desc.Width, m_back_desc.Height, 
-				D3DFMT_D24S8, D3DUSAGE_DEPTHSTENCIL);			
-		m_scene_depth = scene_depth;
-
-
-		scene_depth = create_item(m_back_desc.Width, m_back_desc.Height, 
-			D3DFMT_R32F);			
-		m_scene_depth_linear = scene_depth;
-
-		m_trans_buffer = create_item(m_back_desc.Width, m_back_desc.Height, D3DFMT_A8R8G8B8);
-	}
-
-	void scene_render_targets_LDR::draw_final_scene(bool enable_tonemap)	
-	{
-		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-		HRESULT hr;
-		hr = device->SetDepthStencilSurface(NULL);		
-		
-		hr = d3d_device_manager::instance()->set_view_render_target(0, m_back_surface.get());
-		hr = m_pass_through_effect->SetTexture("g_texSource", m_scene_color.tex.get());
-		m_pass_through_effect->SetTechnique("techDefault");
-		draw_screen_quad(m_pass_through_effect.get());
-
+		int r = 0;
+		//-- 释放基类的资源
+		r = m_back_surface.reset();
+		r = m_back_depth.reset();
+		r = m_pass_through_effect.reset();
+		r = m_default_quad_vb.reset();
+		r = m_vert_decl.reset();
+	    m_cube_texture.reset();
+		m_cube_depth.reset();
 		//--
-		//debug_draw_target(m_scene_depth_linear, 0, "techRed");
-
-		//-- 恢复depht buffer
-		hr = device->SetDepthStencilSurface(m_scene_depth.surf.get());
+		for (int i = 0; i <ERT_Num; i ++)
+		{
+			m_items[i].release();
+		}
 	}
 
-	void scene_render_targets_LDR::copy_render_target(nrender_target* out_tg)
+	bool scene_render_targets::on_device_reset(int param)
 	{
-		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
-		HRESULT hr;
-		hr = device->SetDepthStencilSurface(NULL);		
-
-		d3d9_render_target* d3d_rt = dynamic_cast<d3d9_render_target*>(out_tg);
-
-		hr = device->SetRenderTarget(0, d3d_rt->get_surface());			
-		hr = m_pass_through_effect->SetTexture("g_texSource",  m_scene_color.tex.get());
-		m_pass_through_effect->SetTechnique("techDefault");
-		draw_screen_quad(m_pass_through_effect.get());
-
-		//-- 恢复depht buffer
-		hr = device->SetDepthStencilSurface(m_scene_depth.surf.get());
+		create(d3d_device_manager::instance()->get_render_cfg());
+		return true;
 	}
 }//namespace nexus

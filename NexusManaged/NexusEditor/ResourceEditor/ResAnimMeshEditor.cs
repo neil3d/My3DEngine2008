@@ -15,25 +15,37 @@ namespace NexusEditor.ResourceEditor
     /// </summary>
     public partial class ResAnimMeshEditor : Form
     {
-        private ResourcePreview m_preview;  // 预览窗口控件
+        private ResAnimMeshResourcePreview m_preview;  // 预览窗口控件
         private NResourceAnimMesh m_resAnimMesh;
         private ResAnimMeshProperty m_prop;
         private bool m_animPlaying;
         private bool m_finalClose;
+        // update timer
+        private Timer updateTimer = new Timer();
 
         public ResAnimMeshEditor()
         {
             InitializeComponent();
             m_finalClose = false;
 
-            m_preview = new ResourcePreview("ResAnimMeshPreview_LV");
+            this.Load += new EventHandler(ResAnimMeshEditor_Load);
+
+            m_preview = new ResAnimMeshResourcePreview("ResAnimMeshPreview_LV");
             this.splitContainerLeft.Panel1.Controls.Add(m_preview);
 
-            m_animPlaying = false;
+            m_animPlaying = true;
         }
 
         public new void Close()
         {
+            if (updateTimer != null)
+            {
+                // close refresh timer
+                updateTimer.Stop();
+                updateTimer.Dispose();
+                updateTimer = null;
+            }
+
             if (m_resAnimMesh != null)
                 m_resAnimMesh.Dispose();
             m_preview.Dispose();
@@ -41,6 +53,15 @@ namespace NexusEditor.ResourceEditor
             m_finalClose = true;
             base.Close();
         }
+
+        /// <summary>
+        /// When the timer fires, refresh control
+        /// </summary>
+        private void updateTimer_Tick(object sender, EventArgs e)
+        {
+            m_preview.Invalidate();
+        }
+
 
         private void ResAnimMeshEditor_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -97,7 +118,7 @@ namespace NexusEditor.ResourceEditor
 
         private void toolStripButtonRest_Click(object sender, EventArgs e)
         {
-            this.ResetResource("Are You Sure RESET?");
+            this.ResetResource(NexusEditor.Properties.Resources.ResetChecking);
         }
 
         private void toolStripButtonNew_Click(object sender, EventArgs e)
@@ -105,7 +126,7 @@ namespace NexusEditor.ResourceEditor
             if (m_resAnimMesh != null)
             {
                 if (DialogResult.OK !=
-                    MessageBox.Show(this, "Are You Sure Create a NEW Anim Mesh?", "Please Confirm", MessageBoxButtons.OKCancel))
+                    MessageBox.Show(this, NexusEditor.Properties.Resources.CreateAnimMeshChecking, NexusEditor.Properties.Resources.Ok, MessageBoxButtons.OKCancel))
                     return;
             }
             this.CreateResource();
@@ -141,7 +162,7 @@ namespace NexusEditor.ResourceEditor
                 if (MessageBox.Show(this, confirmTxt, "Save Anim Mesh", MessageBoxButtons.OKCancel)
                     == DialogResult.OK)
                 {
-                    using(NWaitCursor wc = new NWaitCursor(this))
+                    using (NexusEngineExtension.NWaitCursor wc = new NexusEngineExtension.NWaitCursor(this))
                         m_resAnimMesh.SaveToFile(loc, this.toolBtnXML.Checked);                    
                 }
             }// end of if
@@ -181,9 +202,11 @@ namespace NexusEditor.ResourceEditor
                         m_prop.Name = fileName.FileNameNoExtension;
                     }
 
-                    using (NWaitCursor wc = new NWaitCursor(this))
+                    using (NexusEngineExtension.NWaitCursor wc = new NexusEngineExtension.NWaitCursor(this))
                     {
                         m_resAnimMesh.ImportLOD(dlg.SelectedLOD, dlg.SelectedFile);
+                        m_resAnimMesh.PostEditChange(true);
+
                         RefreshLOD();
                     }
                 }
@@ -217,7 +240,7 @@ namespace NexusEditor.ResourceEditor
         private void RefreshLOD()
         {
             this.propertyGridRes.SelectedObject = m_prop;
-            ShowCurrentAnim(); // 必须重置Preview
+            m_preview.ResetAnimMeshResource(m_resAnimMesh); // 必须重置Preview
 
             this.comboBoxLOD.Items.Clear();            
             if (m_resAnimMesh != null
@@ -229,6 +252,7 @@ namespace NexusEditor.ResourceEditor
                 this.comboBoxLOD.SelectedIndex = 0;
 
                 //-- Sequence list
+                this.listBoxAnim.BeginUpdate();
                 this.listBoxAnim.Items.Clear();
                 int numSeq = m_resAnimMesh.GetNumSequence();
                 float seqLen;
@@ -239,7 +263,7 @@ namespace NexusEditor.ResourceEditor
                     this.listBoxAnim.Items.Add(seqName);
                 }
                 this.listBoxAnim.SelectedIndex = 0;
-                
+                this.listBoxAnim.EndUpdate();
             }// end of if
         }
 
@@ -261,56 +285,17 @@ namespace NexusEditor.ResourceEditor
             int lod = this.comboBoxLOD.SelectedIndex;
             int sec = this.comboBoxSection.SelectedIndex;
 
-            NMaterial mtl = m_resAnimMesh.GetMaterial(lod, sec) as NMaterial;
+			AnimedMeshMaterialProperty mtlProp = new AnimedMeshMaterialProperty(m_resAnimMesh, lod, sec);
 
-            MaterialProperty mtlProp = new MaterialProperty(mtl);
-
-            //-- apply default material setting
-            if (mtl == null)
-            {
-                mtlProp.Name = string.Format("Mtl_L{0}S{1}", lod, sec);
-                //mtlProp.TemplateLoc = m_importDefault.MaterialTemplateRes;
-            }
-
-            this.propertyGridMtl.SelectedObject = mtlProp;
-        }
-
-        private void btnCreateMtl_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                MaterialProperty mtlProp = this.propertyGridMtl.SelectedObject as MaterialProperty;
-                if (mtlProp != null)
-                {
-                    NResourceLoc tempLoc = mtlProp.TemplateLoc;
-                    NMaterial mtl = new NMaterial(mtlProp.Name);
-                    mtl.Create(tempLoc);
-
-                    int lod = this.comboBoxLOD.SelectedIndex;
-                    int sec = this.comboBoxSection.SelectedIndex;
-                    m_resAnimMesh.ImportSetMaterial(lod, sec, mtl);
-
-                    mtlProp.BindMaterial(mtl);
-                    this.propertyGridMtl.SelectedObject = mtlProp;
-                }
-            }
-            catch (System.Exception ex)
-            {
-                NexusEditor.Program.ShowException(ex, "Create Material FAILED");
-            }   
-        }
-
-        private void buttonApplyMtlProperty_Click(object sender, EventArgs e)
-        {
-            MaterialProperty mtlProp = this.propertyGridMtl.SelectedObject as MaterialProperty;
-            if (mtlProp != null)
-            {
-                mtlProp.ApplyChange();
-            }
+			this.propertyGridMtl.SelectedObject = mtlProp;
         }
 
         private void ResAnimMeshEditor_Load(object sender, EventArgs e)
         {
+            updateTimer.Interval = 10;
+            updateTimer.Tick += new EventHandler(updateTimer_Tick);
+            updateTimer.Start();
+
             NLevelEditorEngine.Instance.CurrentFolderChanged
                 += new EventHandler(SaveLocationChanged);
             SaveLocationChanged(this, null);
@@ -326,7 +311,7 @@ namespace NexusEditor.ResourceEditor
         {
             try
             {
-                using (NWaitCursor wc = new NWaitCursor(this))
+                using (NexusEngineExtension.NWaitCursor wc = new NexusEngineExtension.NWaitCursor(this))
                 {
                     NResourceLoc resLoc = new NResourceLoc(pkg, file);
                     m_resAnimMesh = NResourceManager.Instance.LoadAnimMesh(
@@ -337,8 +322,6 @@ namespace NexusEditor.ResourceEditor
                     m_prop = new ResAnimMeshProperty(m_resAnimMesh);
 
                     this.propertyGridRes.SelectedObject = m_prop;
-                    ShowCurrentAnim();
-
                     RefreshLOD();
                 }
             }
@@ -356,9 +339,19 @@ namespace NexusEditor.ResourceEditor
                 float len;
                 string name = m_resAnimMesh.GetSequenceInfo(
                     this.listBoxAnim.SelectedIndex, out len);
+                if (len <= 0)
+                    return;
+
                 this.propertyGridSeq.SelectedObject = new AnimSequenceInfo(name, len);
 
-                ShowCurrentAnim();
+                this.m_preview.SetAnim(name);
+
+                // 设置trackBar的值
+                this.trackBarTime.Minimum = 0;
+                this.trackBarTime.Maximum = (int)(this.m_preview.CurrentAnimLength * 1000);
+                this.trackBarTime.Enabled = true;
+
+                PlayAnimByCurrentPosition();
             }
         }
 
@@ -374,11 +367,17 @@ namespace NexusEditor.ResourceEditor
             this.timerTick.Enabled = m_animPlaying;
 
             if (m_animPlaying)
-                this.btnPlay.ImageKey = "play";
-            else
+            {
                 this.btnPlay.ImageKey = "stop";
 
-            ShowCurrentAnim();
+                // 设置起始时间
+                PlayAnimByCurrentPosition();
+            }
+            else
+            {
+                this.btnPlay.ImageKey = "play";
+                this.m_preview.StopAnim();
+            }
         }
 
         private void splitContainerLeft_Panel2_Resize(object sender, EventArgs e)
@@ -388,19 +387,6 @@ namespace NexusEditor.ResourceEditor
 
             oldSize.Width = panelSize.Width - 26 * 2 - 16;
             this.trackBarTime.Size = oldSize;
-        }
-
-        private void ShowCurrentAnim()
-        {
-            string seqName = "";
-            bool loop = this.checkBoxLoop.Checked;
-
-            if (this.listBoxAnim.SelectedItem != null)
-            {
-                seqName = this.listBoxAnim.SelectedItem as string;
-            }
-
-            this.m_preview.ShowAnimMesh(m_resAnimMesh, seqName, loop);
         }
 
         private void checkBoxLoop_CheckedChanged(object sender, EventArgs e)
@@ -413,6 +399,22 @@ namespace NexusEditor.ResourceEditor
             {
                 this.checkBoxLoop.ImageKey = "no_loop";
             }
+
+            PlayAnimByCurrentPosition();
+        }
+
+        private void PlayAnimByCurrentPosition()
+        {
+            // 设置起始时间
+            float rate = 1.0f;
+            try
+            {
+                rate = (float)(this.trackBarTime.Value - this.trackBarTime.Minimum) / (float)(this.trackBarTime.Maximum - this.trackBarTime.Minimum);
+            }
+            finally
+            {
+            }
+            this.m_preview.PlayAnim(this.checkBoxLoop.Checked, 1.0f, rate * this.m_preview.CurrentAnimLength);
         }
 
         private void btnTrnRemoveSeq_Click(object sender, EventArgs e)
@@ -421,7 +423,7 @@ namespace NexusEditor.ResourceEditor
                 return;
 
             string seqName = this.listBoxAnim.SelectedItem as string;
-            string text = string.Format("Remve Animation Sequence [{0}]?", seqName);
+            string text = string.Format("Remove Animation Sequence [{0}]?", seqName);
             if (MessageBox.Show(this, text, "Please Confirm", MessageBoxButtons.OKCancel)
                 == DialogResult.OK)
             {
@@ -438,5 +440,21 @@ namespace NexusEditor.ResourceEditor
         {
             m_preview.Refresh();
         }
+
+        private void trackBarTime_Scroll(object sender, EventArgs e)
+        {
+            float rate = 1.0f;
+            try
+            {
+                rate = (float)(this.trackBarTime.Value - this.trackBarTime.Minimum) / (float)(this.trackBarTime.Maximum - this.trackBarTime.Minimum);
+            }
+            finally
+            {
+                //rate *= 2.0f;
+            }
+            this.m_preview.SetPosition(rate * this.m_preview.CurrentAnimLength, false);
+        }
+
+
     }
 }

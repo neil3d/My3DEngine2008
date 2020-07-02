@@ -28,6 +28,7 @@ namespace nexus
 		d3d_vb_ptr	m_vb_pos_a;
 		d3d_vb_ptr	m_vb_pos_b;
 		UINT		m_pos_stream_stride;
+		bool		prepared;
 	};
 }//namespace nexus
 

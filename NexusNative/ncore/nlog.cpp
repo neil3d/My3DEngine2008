@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "util/string_util.h"
 #include <stdarg.h>
-#include <fstream>
+#include <iostream>
 using namespace std;
 
 #include "nlog.h"
@@ -15,79 +15,78 @@ using namespace std;
 
 namespace nexus
 {
-	//-- class nlog_file ----------------------------------------------------------------
-	nDEFINE_VIRTUAL_CLASS(nlog_output, nobject);
-	class nlog_file : public nlog_output
+
+	nCoreAPI void format_log_message( std::wostream& out, enum ELogType type, const TCHAR* msg )
 	{
-		std::wofstream m_file;
-	public:
-		nlog_file(void)	{}
-		virtual ~nlog_file(void)	{}
-		
-		virtual void open(const nstring& param)
+		out << "[";
+		if (type >= ELog_MAX)
 		{
-			m_file.open(param.c_str(), ios_base::out);
+			out << "(";
+			out << boost::lexical_cast<std::wstring>(type);
+			out << ")";
 		}
-
-		virtual void write_string(const TCHAR* txt)
+		else
 		{
-			m_file << txt;
-		}
-
-		virtual void write_string(enum ELogType t, const TCHAR* txt)
-		{
-			switch(t)
+			static TCHAR* severity_names[ELog_MAX] =
 			{
-			case ELog_Info:
-				m_file << _T("Info : ") << txt;
-				break;
-			case ELog_Warning:
-				m_file << _T("Warning : ") << txt;
-				break;
-			case ELog_Error:
-				m_file << _T("Error : ") << txt;
-				break;
-			case ELog_Exception:
-				m_file << std::endl << _T("Exception : ") << txt << std::endl;
-				break;
-			default:
-				m_file << t << txt;
-				break;
-			}
-			m_file.flush();
+				_T("Info"),
+				_T("Warning"),
+				_T("Error"),
+				_T("Exception"),
+				_T("Debug"),
+			};
+
+			out << severity_names[type];
 		}
+		out << "]";
 
-		virtual void close()
-		{
-			m_file.close();
-		}
-
-		nDECLARE_CLASS(nlog_file)
-	};	
-	nDEFINE_CLASS(nlog_file, nlog_output)
-
-	//-- class nlog ----------------------------------------------------------------
-	nlog::nlog(void)
-	{
+		out << msg << std::endl;
 	}
 
+	nlog_output::~nlog_output( void )
+	{
+		//nlog::instance()->remove_log_output(this);
+	}
+
+	//-- class nlog ----------------------------------------------------------------
 	nlog::~nlog(void)
 	{		
 	}
 
-	void nlog::init(const nstring& out_class_name, const nstring& param)
+	void nlog::add_log_output( log_output_ptr new_output )
 	{
-		boost::shared_ptr<nlog_output> out_ptr
-			( nconstruct<nlog_output>(out_class_name) );
-		out_ptr->open( param);
+		if(!new_output.get())
+		{
+			return;
+		}
 
-		m_out_device = out_ptr;
-		m_default_out = out_ptr;
+		m_target_outputs.push_back(new_output);
+	}
+
+	void nlog::remove_log_output( log_output_ptr output )
+	{
+		if(!output.get())
+			return;
+
+		if(m_target_outputs.empty())
+			return;
+		m_target_outputs.erase(std::find(m_target_outputs.begin(),m_target_outputs.end(),output));
+	}
+
+
+	void nlog::clear_log_output()
+	{
+		m_target_outputs.clear();
+	}
+
+	void nlog::enable_log_type( const ELogType t, const bool enable )
+	{
+		m_enabled_log_types[t] = enable;
 	}
 
 	static TCHAR _static_format_buf[4096] = {0};
 	
-	nstring	format_string(const TCHAR* fmt, ...)
+	nCoreAPI nstring	format_string(const TCHAR* fmt, ...)
 	{
 		va_list argptr;
 
@@ -98,91 +97,189 @@ namespace nexus
 		return nstring(_static_format_buf);
 	}
 
-	void nlog::write(const TCHAR* fmt,...)
+	void nlog::write( enum ELogType t, const TCHAR* txt)
 	{
-		va_list argptr;
+		if(txt == NULL)
+			return;
 
-		va_start(argptr, fmt);
-		_vstprintf(_static_format_buf, fmt, argptr);
-		va_end(argptr);
+		EnableLogTypeMap::const_iterator itEnabled = m_enabled_log_types.find( t );
+		if (itEnabled != m_enabled_log_types.end() && !itEnabled->second)
+			return;
 
-		m_out_device->write_string(_static_format_buf);		
-	}
-
-	void nlog::write_info(const TCHAR* fmt,...)
-	{
-		va_list argptr;
-
-		va_start(argptr, fmt);
-		_vstprintf(_static_format_buf, fmt, argptr);
-		va_end(argptr);
-
-		m_out_device->write_string(ELog_Info, _static_format_buf);		
-	}
-
-	void nlog::write_warning(const TCHAR* fmt,...)
-	{
-		va_list argptr;
-
-		va_start(argptr, fmt);
-		_vstprintf(_static_format_buf, fmt, argptr);
-		va_end(argptr);
-
-		m_out_device->write_string(ELog_Warning, _static_format_buf);		
-	}
-
-	void nlog::write_error(const TCHAR* fmt,...)
-	{
-		va_list argptr;
-
-		va_start(argptr, fmt);
-		_vstprintf(_static_format_buf, fmt, argptr);
-		va_end(argptr);
-
-		m_out_device->write_string(ELog_Error, _static_format_buf);		
-	}
-
-	void nlog::write_exception(const TCHAR* fmt,...)
-	{
-		va_list argptr;
-
-		va_start(argptr, fmt);
-		_vstprintf(_static_format_buf, fmt, argptr);
-		va_end(argptr);
-
-		m_last_exception = nstring(_static_format_buf);
-		m_out_device->write_string(ELog_Exception, _static_format_buf);		
-	}
-
-	void nlog::write_exception(const char* std_exp)
-	{		
-		m_last_exception = conv_string(std::string(std_exp));
-		m_out_device->write_string(ELog_Exception, m_last_exception.c_str());		
-	}
-
-	void nlog::trace(const TCHAR* fmt,...)
-	{
-		va_list argptr;
-
-		va_start(argptr, fmt);
-		_vstprintf(_static_format_buf, fmt, argptr);
-		va_end(argptr);
-
-		::OutputDebugString(_static_format_buf);
-	}
-
-	nstring nlog::get_last_exception()
-	{
-		return m_last_exception;
-	}
-
-	void nlog::redirect(boost::shared_ptr<nlog_output> new_output)
-	{
-		if(new_output)
-			m_out_device = new_output;
-		else
+		log_output_list::const_iterator itEnd = m_target_outputs.end();
+		for (log_output_list::const_iterator it = m_target_outputs.begin(); it != itEnd; ++it)
 		{
-			m_out_device = m_default_out;
+			(*it)->write_string(t, txt);
 		}
 	}
+
+	void nlog::write_warning( const TCHAR* fmt,... )
+	{
+		va_list argptr;
+
+		va_start(argptr, fmt);
+		_vstprintf(_static_format_buf, fmt, argptr);
+		va_end(argptr);
+
+		write(ELog_Warning, _static_format_buf);
+	}
+
+	void nlog::write_info( const TCHAR* fmt,... )
+	{
+		va_list argptr;
+
+		va_start(argptr, fmt);
+		_vstprintf(_static_format_buf, fmt, argptr);
+		va_end(argptr);
+
+		write(ELog_Info, _static_format_buf);
+	}
+
+	void nlog::write_error( const TCHAR* fmt,... )
+	{
+		va_list argptr;
+
+		va_start(argptr, fmt);
+		_vstprintf(_static_format_buf, fmt, argptr);
+		va_end(argptr);
+
+		write(ELog_Error, _static_format_buf);
+	}
+
+	void nlog::write_exception( const TCHAR* fmt,... )
+	{
+		va_list argptr;
+
+		va_start(argptr, fmt);
+		_vstprintf(_static_format_buf, fmt, argptr);
+		va_end(argptr);
+
+		write(ELog_Exception, _static_format_buf);
+	}
+
+	void nlog::write_exception( const char* std_exp )
+	{
+		write(ELog_Exception, conv_string(std_exp).c_str());
+	}
+
+	void nlog::write_debug( const TCHAR* fmt,... )
+	{
+		va_list argptr;
+
+		va_start(argptr, fmt);
+		_vstprintf(_static_format_buf, fmt, argptr);
+		va_end(argptr);
+
+		write(ELog_Debug, _static_format_buf);
+	}
+
+	nfile_listener::nfile_listener( const nstring& fileName )
+	{
+		m_file.open(fileName.c_str(), ios_base::out);
+		m_file << "// format: [logLevel] message \r\n";
+		m_file.flush();
+	}
+
+	nfile_listener::~nfile_listener()
+	{
+		if( m_file.is_open() )
+		{
+			m_file.flush();
+			m_file.close();
+		}
+	}
+
+	void nfile_listener::write_string( enum ELogType t, const TCHAR* txt )
+	{
+		format_log_message(m_file, t, txt);
+		m_file.flush();
+	}
+
+	log_output_ptr nfile_listener::add( const nstring& fileName )
+	{
+		log_output_ptr l( new nfile_listener(fileName) );
+		nlog::instance()->add_log_output(l);
+		return l;
+
+	}
+
+
+	nstderr_listener::nstderr_listener()
+	{
+
+	}
+
+	nstderr_listener::~nstderr_listener()
+	{
+
+	}
+
+	void nstderr_listener::write_string( enum ELogType t, const TCHAR* txt )
+	{
+		std::wostringstream ss;
+		format_log_message(ss, t, txt);
+
+		std::wcerr << ss.str();
+	}
+
+	nexus::log_output_ptr nstderr_listener::add()
+	{
+		log_output_ptr l( new nstderr_listener() );
+		nlog::instance()->add_log_output( l );
+		return l;
+	}
+
+	nconsole_listener::nconsole_listener()
+	{
+
+	}
+
+	nconsole_listener::~nconsole_listener()
+	{
+
+	}
+
+	void nconsole_listener::write_string( enum ELogType t, const TCHAR* txt )
+	{
+		AllocConsole(); // this would actually open a console window...
+
+		if(txt == NULL)
+			return;
+
+		// save settings
+		HANDLE outHandle = GetStdHandle( STD_ERROR_HANDLE );
+		if (!outHandle)
+			return;
+		CONSOLE_SCREEN_BUFFER_INFO csbiInfo; 
+		::GetConsoleScreenBufferInfo( outHandle, &csbiInfo );
+
+		// print
+		WORD wAttributes = FOREGROUND_INTENSITY;
+		if (t == ELog_Error || t == ELog_Exception)
+			wAttributes |= FOREGROUND_RED; // red
+		else if (t == ELog_Warning)
+			wAttributes |= FOREGROUND_GREEN | FOREGROUND_RED; // yellow
+		else if (t == ELog_Debug)
+			wAttributes |= FOREGROUND_GREEN; // green
+		else
+			wAttributes = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE;
+		::SetConsoleTextAttribute( outHandle, wAttributes );
+		DWORD dwWritten = 0;
+
+		::BOOL bSuccess = WriteConsoleW( outHandle, txt, wcslen(txt), &dwWritten, 0 );
+		assert( bSuccess );
+
+		// restore settings
+		::SetConsoleTextAttribute( outHandle, csbiInfo.wAttributes );
+	}
+
+	nexus::log_output_ptr nconsole_listener::add()
+	{
+		log_output_ptr l( new nconsole_listener() );
+		nlog::instance()->add_log_output( l );
+		return l;
+	}
+
+
+
 }//namespace nexus

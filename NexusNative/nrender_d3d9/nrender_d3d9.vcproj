@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\ncore"
+				AdditionalIncludeDirectories="..\ncore;..\..\External\NexusExternal\boost_1_40_0;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\DXSDK_Aug2009\Include;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NRENDER_D3D9_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,9 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).nex"
+				AdditionalDependencies="FFT.lib"
+				OutputFile="..\..\debug\$(ProjectName).nex"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\FFT;..\..\External\NexusExternal\DXSDK_Aug2009\Lib\x86;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -118,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\ncore"
+				AdditionalIncludeDirectories="..\ncore;..\..\External\NexusExternal\boost_1_40_0;../../NexusGame/nexus_shared/ndef_game;..\..\External\NexusExternal\DXSDK_Aug2009\Include;..\..\External\NexusExternal\DevIL\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Physics\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Foundation\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\PhysXLoader\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\Cooking\include;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\NxCharacter\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NRENDER_D3D9_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -137,9 +138,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="FFT.lib"
 				OutputFile="$(OutDir)\$(ProjectName).nex"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\external\boost\lib;..\..\..\external\DirectX\Lib\x86"
+				AdditionalLibraryDirectories="..\..\External\NexusExternal\boost_1_40_0\stage\lib;..\..\External\FFT;..\..\External\NexusExternal\DXSDK_Aug2009\Lib\x86;..\..\External\NexusExternal\DevIL\lib;..\..\External\NexusExternal\PhysXSdk2.8.3\SDKs\lib\Win32"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -194,6 +196,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\d3d9_dynamic_mesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\d3d9_dynamic_mesh.h"
+				>
+			</File>
+			<File
 				RelativePath=".\d3d9_dynamic_mesh_indexed.cpp"
 				>
 			</File>
@@ -223,6 +233,14 @@
 			</File>
 			<File
 				RelativePath=".\d3d9_PDI.h"
+				>
+			</File>
+			<File
+				RelativePath=".\d3d9_render_font.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\d3d9_render_font.h"
 				>
 			</File>
 			<File
@@ -274,6 +292,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\d3d9_ui_canvas.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\d3d9_ui_canvas.h"
+				>
+			</File>
+			<File
 				RelativePath=".\d3d9_vertex_factory.cpp"
 				>
 			</File>
@@ -290,6 +316,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\render_package.h"
+				>
+			</File>
+			<File
 				RelativePath=".\shading_effect.cpp"
 				>
 			</File>
@@ -301,6 +331,14 @@
 		<Filter
 			Name="lighting"
 			>
+			<File
+				RelativePath=".\ambent_light_policy.h"
+				>
+			</File>
+			<File
+				RelativePath=".\base_pass_policy_type.h"
+				>
+			</File>
 			<File
 				RelativePath=".\directional_light_policy.cpp"
 				>
@@ -322,22 +360,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\drawing_lit_trans_obj.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\drawing_lit_trans_obj.h"
-				>
-			</File>
-			<File
-				RelativePath=".\drawing_unlit_trans.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\drawing_unlit_trans.h"
-				>
-			</File>
-			<File
 				RelativePath=".\light_drawing_policy_type.h"
 				>
 			</File>
@@ -346,11 +368,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\nrender_light.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\nrender_light.h"
+				>
+			</File>
+			<File
 				RelativePath=".\point_light_policy.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\point_light_policy.h"
+				>
+			</File>
+			<File
+				RelativePath=".\spot_light_policy.h"
 				>
 			</File>
 		</Filter>
@@ -391,6 +425,14 @@
 			</File>
 			<File
 				RelativePath=".\scene_render_targets.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ssao.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ssao.h"
 				>
 			</File>
 		</Filter>
@@ -434,6 +476,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mesh_render.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mesh_render.h"
+				>
+			</File>
+			<File
 				RelativePath=".\mesh_util.cpp"
 				>
 			</File>
@@ -453,18 +503,6 @@
 		<Filter
 			Name="shadow"
 			>
-			<File
-				RelativePath=".\shadow_buffer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\shadow_buffer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\shadow_policy_base.h"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\d3d_device_manager.cpp"
@@ -492,6 +530,18 @@
 		</File>
 		<File
 			RelativePath=".\draw_hit_proxy.h"
+			>
+		</File>
+		<File
+			RelativePath=".\drawing_atom.h"
+			>
+		</File>
+		<File
+			RelativePath=".\drawing_extend.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\drawing_extend.h"
 			>
 		</File>
 		<File
@@ -535,11 +585,35 @@
 			>
 		</File>
 		<File
+			RelativePath=".\FFTWave.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\FFTWave.h"
+			>
+		</File>
+		<File
 			RelativePath=".\global_shader_lib.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\global_shader_lib.h"
+			>
+		</File>
+		<File
+			RelativePath=".\nrender_fog.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\nrender_fog.h"
+			>
+		</File>
+		<File
+			RelativePath=".\nrender_water.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\nrender_water.h"
 			>
 		</File>
 		<File
@@ -563,11 +637,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\render_group_world.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\render_group_world.h"
+			RelativePath=".\render_proxy.h"
 			>
 		</File>
 		<File

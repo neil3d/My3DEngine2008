@@ -27,6 +27,8 @@ namespace nexus
 		virtual nresource* find_resource(const nname& res_name);
 		virtual size_t get_num_resource();
 
+		virtual void accept_visitor(nresource_cache_visitor* v, int param);
+
 	private:
 		typedef std::map<nname, nresource*>	resource_map;
 

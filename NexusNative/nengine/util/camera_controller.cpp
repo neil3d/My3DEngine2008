@@ -4,7 +4,7 @@
 namespace nexus
 {
 	//-- class camera_controller --------------------------------------------------------------------------------------
-	camera_controller::camera_controller(void) : m_left_down(0), m_right_down(0),
+	camera_controller::camera_controller(void) : m_left_down(0), m_right_down(0),m_middle_down(0),
 		m_move_factor(4), m_rotate_factor(0.005f), m_wheel_factor(0.5f)
 	{}
 
@@ -30,9 +30,26 @@ namespace nexus
 		m_right_down = false;
 	}
 
+	void camera_controller::on_mouse_middle_down( const npoint& pt )
+	{
+		m_middle_down = true;
+		m_middle_drag_pt = pt;
+	}
+
+	void camera_controller::on_mouse_middle_up()
+	{
+		m_middle_down = false;
+	}
+
+	bool camera_controller::on_key_down( unsigned int key )
+	{
+		(void)(key);
+		return false;
+	}
 	//-- class camera_YPR --------------------------------------------------------------------------------------
 	camera_YPR::camera_YPR(void):m_eye_pos(0,500,-500),
 		m_look_at(0,0,0),
+		m_last_look_at(0,0,0),
 		m_forward(0,0,-1),
 		m_up(0,1,0),
 		m_side(1,0,0)
@@ -74,7 +91,7 @@ namespace nexus
 		// ¸üÐÂÉãÏñ»ú¾ØÕó
 		cam->set_lookat(m_eye_pos, m_look_at, m_up);
 
-		vector3 test = cam->get_eye_pos();
+		//vector3 test = cam->get_eye_pos();
 	}
 
 	void camera_YPR::zoom_extents(const AABBox& box, const ncamera* cam)
@@ -88,5 +105,10 @@ namespace nexus
 
 		m_look_at = center;
 		m_dist = e/tanf(cam->get_fov()*0.5f);
+	}
+
+	vector3 camera_YPR::get_direction() const
+	{
+		return vec_normalize(m_look_at - m_eye_pos);
 	}
 }//namespace nexus

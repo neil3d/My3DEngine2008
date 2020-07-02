@@ -1,23 +1,12 @@
 #include "StdAfx.h"
 #include <ostream>
 #include "nterrain_editor.h"
-#include "neditor_cmd_mgr.h"
+#include "neditor_engine.h"
 #include "../renderer/nrender_element.h"
-#include "../util/perlin.h"
 #include "terrain_brush.h"
-
 
 namespace nexus
 {
-	const float TRN_BRUSH_CURSOR_ZBIAS = 0.04f;
-	//-----------------------------------------------------------------------------------------------
-	// 一个全局的noise对象，只在某些时刻重新生成；用于brush operator对象
-	boost::shared_ptr<Perlin> g_brush_noise;
-	static void _reset_brush_noise(float freq, int brush_strength)
-	{
-		g_brush_noise.reset( new Perlin(8, freq, brush_strength*0.5f, rand())
-			);
-	}
 
 	//-----------------------------------------------------------------------------------------------
 	// 笔刷编辑命令
@@ -30,15 +19,13 @@ namespace nexus
 		{}
 		virtual ~ntrn_brush_cmd(void)	{}
 
-		bool init(nterrain_actor::ptr trn, nheight_map<T>* target, const nterrain_brush& brush, npoint cursor_pos)
+		bool _init(nterrain_actor::ptr trn, const nstring& target_map_name, const nterrain_brush& brush, npoint cursor_pos)
 		{
-			if( !trn )
-				return false;
-			if( !target )
+			if( !trn || !trn->is_valid())
 				return false;
 
 			m_trn = trn;
-			m_target = target;
+			m_target_map_name = target_map_name;
 			m_brush = brush;
 			m_cursor_pos = cursor_pos;
 
@@ -48,7 +35,23 @@ namespace nexus
 		virtual bool execute(void)
 		{
 			nterrain_actor::ptr trn(m_trn);
-			//-- backup old heightmap
+			if( !trn || !trn->is_valid())
+				return false;
+			
+			nheight_map<T>* target = get_target();
+			if( !target )
+				return false;
+			
+			//-- backup old heightmap			
+			m_backup_region.left	= m_cursor_pos.x-m_brush.outer_radius;
+			m_backup_region.right	= m_cursor_pos.x+m_brush.outer_radius;
+			m_backup_region.top		= m_cursor_pos.y-m_brush.outer_radius;
+			m_backup_region.bottom	= m_cursor_pos.y+m_brush.outer_radius;
+			clip_rect(m_backup_region, target->get_width(), target->get_height());
+
+			m_backup_map = target->create_sub_map(m_backup_region.left, m_backup_region.top,
+				m_backup_region.get_width(), m_backup_region.get_height());
+
 
 			//-- change heightmap
 			switch(m_brush.op)
@@ -56,7 +59,7 @@ namespace nexus
 			case EOP_Paint:
 				{
 					trn_brush_add<T> brush_op;
-					m_dirty_region = do_terrain_brush(m_target,
+					m_dirty_region = do_terrain_brush(target,
 						m_cursor_pos,
 						m_brush,
 						brush_op);
@@ -66,7 +69,7 @@ namespace nexus
 				{
 					trn_brush_average<T> avg;
 					
-					do_terrain_brush(m_target,
+					do_terrain_brush(target,
 						m_cursor_pos,
 						m_brush,
 						avg);
@@ -74,7 +77,7 @@ namespace nexus
 					{
 						trn_brush_apply_val<T> apply(avg.get_result());
 
-						m_dirty_region = do_terrain_brush(m_target,
+						m_dirty_region = do_terrain_brush(target,
 							m_cursor_pos,
 							m_brush,
 							apply);						
@@ -84,17 +87,17 @@ namespace nexus
 			case EOP_Smooth:
 				{
 					trn_brush_smooth<T> brush_op(5);
-					m_dirty_region = do_terrain_brush(m_target,
+					m_dirty_region = do_terrain_brush(target,
 						m_cursor_pos,
 						m_brush,
-						brush_op);
-					brush_op.apply(m_target);
+						brush_op);				
+					brush_op.apply(target);
 				}
 				break;
 			case EOP_Apply:
 				{
 					trn_brush_apply_val<T> brush_op(m_brush.strength);
-					m_dirty_region = do_terrain_brush(m_target,
+					m_dirty_region = do_terrain_brush(target,
 						m_cursor_pos,
 						m_brush,
 						brush_op);					
@@ -107,13 +110,13 @@ namespace nexus
 					brush_rect.top = m_cursor_pos.y-m_brush.outer_radius;
 					brush_rect.right = m_cursor_pos.x+m_brush.outer_radius;
 					brush_rect.bottom = m_cursor_pos.y+m_brush.outer_radius;					
-					_clip_rect(brush_rect, trn->get_map_width(), trn->get_map_height());
+					clip_rect(brush_rect, trn->get_map_width(), trn->get_map_height());
 
 					trn_brush_noise<T> brush_op(brush_rect.get_width(), 
 						brush_rect.get_height(),
 						npoint(brush_rect.left, brush_rect.top)
 						);
-					m_dirty_region = do_terrain_brush(m_target,
+					m_dirty_region = do_terrain_brush(target,
 						m_cursor_pos,
 						m_brush,
 						brush_op);					
@@ -128,24 +131,38 @@ namespace nexus
 		{
 			nterrain_actor::ptr trn( m_trn );
 
-			// terrain对象已经被释放？
-			if( !trn )
+			// 检测terrain对象已经被释放
+			if( !trn || !trn->is_valid())
+				return false;
+
+			nheight_map<T>* target = get_target();
+			if( !target )
 				return false;
 
 			// write data
+			target->blit(m_backup_map.get(), m_backup_region.left, m_backup_region.top);			
 
 			return true;
 		}
 
+
+		virtual bool redo(void)
+		{
+			return execute();
+		}
+
 		const nrect& get_dirty_region() const	{	return m_dirty_region; }
+		virtual nheight_map<T>* get_target() const {	return NULL;}
 	
 	protected:
 		boost::weak_ptr<nterrain_actor>	m_trn;
-		nheight_map<T>*	m_target;
+		nstring			m_target_map_name;
 		nterrain_brush	m_brush;
 		npoint			m_cursor_pos;
 
-		nrect	m_dirty_region;
+		shared_ptr<nheight_map<T> >	m_backup_map;
+		nrect			m_backup_region;
+		nrect			m_dirty_region;
 	};
 
 	//-----------------------------------------------------------------------------------------------
@@ -156,12 +173,23 @@ namespace nexus
 		ntrn_brush_cmd_hmap()	{}
 		virtual ~ntrn_brush_cmd_hmap()	{}
 
+		bool init(nterrain_actor::ptr trn, const nterrain_brush& brush, npoint cursor_pos)
+		{
+			return _init(trn, _T("heightmap"), brush, cursor_pos);
+		}
+
+		virtual nheight_map<unsigned short>* get_target() const 
+		{	
+			nterrain_actor::ptr trn( m_trn );
+			if( !trn || !trn->is_valid())
+				return NULL;
+
+			return trn->get_height_map();
+		}
+
 		virtual bool execute(void)
 		{
 			nterrain_actor::ptr trn( m_trn );
-			if( !trn )
-				return false;
-
 			if( ntrn_brush_cmd::execute() )
 			{
 				trn->post_heightmap_change(m_dirty_region);
@@ -169,6 +197,36 @@ namespace nexus
 			}
 
 			return false;
+		}
+
+		virtual bool undo(void)
+		{			
+			nterrain_actor::ptr trn( m_trn );
+			if(ntrn_brush_cmd::undo())
+			{
+				trn->post_heightmap_change(m_backup_region);
+				return true;
+			}
+
+			return true;
+		}
+
+		virtual nstring get_name(void)
+		{
+			return _T("terrain heightmap brush");
+		}
+
+		virtual nstring get_desc(void)
+		{
+			wostringstream oss;
+			oss << get_name()
+				<< _T("(")
+				<< m_dirty_region.left << _T(",")
+				<< m_dirty_region.top << _T(",")
+				<< m_dirty_region.right << _T(",")
+				<< m_dirty_region.bottom << _T(",")
+				<< _T(")");
+			return oss.str();
 		}
 	};
 
@@ -182,24 +240,228 @@ namespace nexus
 
 		bool init(nterrain_actor::ptr trn, const nterrain_brush& brush, npoint cursor_pos)
 		{
-			//-- 记录材质指针
-			nmaterial_base* mtl_base_ptr = trn->get_material();
-			ntexture_splatting* splat = ndynamic_cast<ntexture_splatting>(mtl_base_ptr);
-			if( splat == NULL )
+			if( !trn || !trn->is_valid())
+				return false;
+			
+			nterrain_mtl_setup* mtl = trn->get_material();
+			if( !mtl )
+				return false;
+			if( (size_t)brush.target_index >= mtl->get_num_layers() )
 				return false;
 
-			m_mtl = splat;
+			nstring layer_name = mtl->get_layer_name(brush.target_index);
+			if( layer_name.empty() )
+				return false;			
 
 			//-- 调用基类功能
-			return ntrn_brush_cmd::init(trn, splat->get_alpha_map(brush.target_index), brush, cursor_pos);			
+			return _init(trn, layer_name, brush, cursor_pos);			
+		}
+
+		virtual nheight_map<unsigned char>* get_target() const 
+		{	
+			nterrain_actor::ptr trn( m_trn );
+			if( !trn || !trn->is_valid())
+				return false;
+
+			nterrain_mtl_setup* mtl = trn->get_material();
+			nalpha_map::ptr amap = mtl->get_layer_alpha(m_target_map_name);
+			
+			return amap.get();
 		}
 
 		virtual bool execute(void)
 		{
+			nterrain_actor::ptr trn( m_trn );
 			if( ntrn_brush_cmd::execute() )
 			{
-				m_mtl->post_alphamap_change(m_brush.target_index, m_dirty_region);
+				nterrain_mtl_setup* mtl = trn->get_material();
+				mtl->post_layer_alpha_change(m_target_map_name, m_dirty_region);
 				return true;
+			}
+
+			return false;
+		}	
+
+		bool is_alphamap_valid() const
+		{
+			nterrain_actor::ptr trn( m_trn );
+			if( !trn || !trn->is_valid())
+				return false;
+
+			nterrain_mtl_setup* mtl = trn->get_material();
+			if( !mtl )
+				return false;
+
+			if( mtl->get_layer_index(m_target_map_name) == -1)
+				return false;
+
+			return true;
+		}
+
+		virtual bool undo(void)
+		{
+			if( !is_alphamap_valid() )
+				return false;
+
+			if(ntrn_brush_cmd::undo())
+			{
+				nterrain_actor::ptr trn( m_trn );
+				nterrain_mtl_setup* mtl = trn->get_material();
+
+				mtl->post_layer_alpha_change(m_target_map_name, m_backup_region);					
+				return true;
+			}
+
+			return false;
+		}
+
+		virtual bool redo(void)
+		{
+			if( is_alphamap_valid() )				
+				return execute();
+			return false;
+		}
+
+		virtual nstring get_name(void)
+		{
+			return _T("terrain alphamap brush");
+		}
+
+		virtual nstring get_desc(void)
+		{
+			wostringstream oss;
+			oss << get_name()
+				<< _T(" layer ") << m_target_map_name
+				<< _T(",(")
+				<< m_dirty_region.left << _T(",")
+				<< m_dirty_region.top << _T(",")
+				<< m_dirty_region.right << _T(",")
+				<< m_dirty_region.bottom << _T(",")
+				<< _T(")");
+			return oss.str();
+		}
+	};
+
+	//-----------------------------------------------------------------------------------------------
+	/** 编辑修改当前被选中的地形装饰层*/
+	class ntrn_brush_cmd_deco : public neditor_cmd
+	{
+	protected:
+		nterrain_deco_layer*	m_target_map;
+		boost::weak_ptr<nterrain_actor>	m_trn;
+		nstring			m_target_map_name;
+		nterrain_brush	m_brush;
+		npoint			m_cursor_pos;
+
+		shared_ptr<nalpha_map>	m_backup_map;
+		nrect			m_backup_region;
+		nrect			m_dirty_region;
+	public:
+		ntrn_brush_cmd_deco()	{}
+		virtual ~ntrn_brush_cmd_deco()	{}
+
+		bool init(nterrain_actor::ptr trn, const nterrain_brush& brush, npoint _cursor_pos)
+		{
+			if( !trn || !trn->is_valid())
+				return false;
+
+			nterrain_deco_setup* mtl = trn->get_deco();
+			if( !mtl )
+				return false;
+			if( brush.target_index >= (int)mtl->get_deco_layer_count() )
+				return false;
+
+			nstring layer_name = mtl->get_deco_layer(brush.target_index)->get_name();
+			if( layer_name.empty() )
+				layer_name=mtl->get_deco_layer(brush.target_index)->get_resource_loc().to_string();
+
+			m_target_map=mtl->get_deco_layer(brush.target_index).get();
+
+			//将笔刷的中心点从terrain坐标转换为分布图坐标
+			uint32 m_terrain_width=trn->get_map_width();
+			uint32 m_terrain_height=trn->get_map_height();
+			uint32 m_terrain_max_size=__max(m_terrain_width,m_terrain_height);
+			npoint cursor_pos;
+			cursor_pos.x=(int)((_cursor_pos.x/(float)m_terrain_width)*m_target_map->get_grid_size());
+			cursor_pos.y=(int)((_cursor_pos.y/(float)m_terrain_height)*m_target_map->get_grid_size());
+			nterrain_brush new_brush=brush;
+			//笔刷的半径也要从terrain空间转换到分布图空间
+			new_brush.inner_radius=(int)((brush.inner_radius/(float)m_terrain_max_size)*m_target_map->get_grid_size());
+			new_brush.outer_radius=(int)((brush.outer_radius/(float)m_terrain_max_size)*m_target_map->get_grid_size());
+			
+			m_trn = trn;
+			m_target_map_name = layer_name;
+			m_brush = brush;
+			m_cursor_pos = cursor_pos;
+
+			return true;
+		}
+
+		virtual nalpha_map* get_target() const 
+		{	
+			nterrain_actor::ptr trn( m_trn );
+			if( !trn || !trn->is_valid())
+				return 0;
+
+			if(!is_alphamap_valid())
+			{
+				return 0;
+			}
+
+			nalpha_map::ptr amap = m_target_map->get_density_map();
+
+			return amap.get();
+		}
+
+		virtual bool execute(void)
+		{
+			nterrain_actor::ptr trn(m_trn);
+			if( !trn || !trn->is_valid())
+				return false;
+
+			nalpha_map* target = get_target();
+			if( !target )
+				return false;
+
+			//-- backup old heightmap			
+			m_backup_region.left	= m_cursor_pos.x-m_brush.outer_radius;
+			m_backup_region.right	= m_cursor_pos.x+m_brush.outer_radius;
+			m_backup_region.top		= m_cursor_pos.y-m_brush.outer_radius;
+			m_backup_region.bottom	= m_cursor_pos.y+m_brush.outer_radius;
+			clip_rect(m_backup_region, (long)target->get_width(), (long)target->get_height());
+
+			m_backup_map = target->create_sub_map(m_backup_region.left, m_backup_region.top,
+				m_backup_region.get_width(), m_backup_region.get_height());
+
+			srand(m_target_map->get_random_seed());
+			trn_brush_deco_rand brush_op(trn->get_map_width(),trn->get_map_height());
+			m_dirty_region = do_brush(target,
+						m_cursor_pos,
+						m_brush,
+						brush_op);
+
+			nterrain_deco_setup* mtl = trn->get_deco();
+			mtl->post_deco_map_changed(m_target_map, m_dirty_region);
+
+			return true;
+		}	
+
+		bool is_alphamap_valid() const
+		{
+			nterrain_actor::ptr trn( m_trn );
+			if( !trn || !trn->is_valid())
+				return false;
+
+			nterrain_deco_setup* mtl = trn->get_deco();
+			if( !mtl )
+				return false;
+
+			for (size_t i=0;i<mtl->get_deco_layer_count();++i)
+			{
+				if(mtl->get_deco_layer(i).get()==m_target_map)
+				{
+					return true;
+				}
 			}
 
 			return false;
@@ -207,34 +469,59 @@ namespace nexus
 
 		virtual bool undo(void)
 		{
+			if( !is_alphamap_valid() )
+				return false;
+
 			nterrain_actor::ptr trn( m_trn );
 
-			// terrain对象已经被释放？
-			if( !trn )
+			// 检测terrain对象已经被释放
+			if( !trn || !trn->is_valid())
 				return false;
 
-			// terrain对象的材质是否已经重建？
-			if( trn->get_material() != m_mtl )
+			nalpha_map* target = get_target();
+			if( !target )
 				return false;
 
-			// 材质的alpha map是否已经重建？
-			if( m_target != m_mtl->get_alpha_map(m_brush.target_index) )
-				return false;
-
-			// write back
-
+			// write data
+			target->blit(m_backup_map.get(), m_backup_region.left, m_backup_region.top);
+			
+			nterrain_deco_setup* mtl = trn->get_deco();
+			mtl->post_deco_map_changed(m_target_map, m_backup_region);					
 			return true;
 		}
 
-	private:
-		ntexture_splatting*	m_mtl;
+		virtual bool redo(void)
+		{
+			if( is_alphamap_valid() )				
+				return execute();
+			return false;
+		}
 
+		virtual nstring get_name(void)
+		{
+			return _T("terrain alphamap brush");
+		}
+
+		virtual nstring get_desc(void)
+		{
+			wostringstream oss;
+			oss << get_name()
+				<< _T(" layer ") << m_target_map_name
+				<< _T(",(")
+				<< m_dirty_region.left << _T(",")
+				<< m_dirty_region.top << _T(",")
+				<< m_dirty_region.right << _T(",")
+				<< m_dirty_region.bottom << _T(",")
+				<< _T(")");
+			return oss.str();
+		}
 	};
 
 	//-----------------------------------------------------------------------------------------------
 	// class nterrain_editor
 
-	nterrain_editor::nterrain_editor(void):m_cursor_pos(0,0)
+	nterrain_editor::nterrain_editor(void):m_cursor_pos(0,0),
+		m_show_chunk_edge(true)
 	{
 	}
 
@@ -245,7 +532,7 @@ namespace nexus
 	void nterrain_editor::bind_terrain(const nterrain_actor::ptr& trn_ptr)	
 	{	
 		m_trn_actor = trn_ptr; 
-		_reset_brush_noise(m_brush.noise_freq, m_brush.strength);
+		nbrush_noise::instance()->reset_brush_noise(m_brush.noise_freq, m_brush.strength);
 	}
 
 	void nterrain_editor::draw_widgets(nrender_primitive_draw_interface* PDI)
@@ -260,6 +547,26 @@ namespace nexus
 		{
 			//-- 显示笔刷区域
 			draw_brush_cursor(PDI);
+
+			//-- 显示Chunk边缘
+			if( m_show_chunk_edge )
+			{
+				int chunk_step = trn->get_chunk_size()-1;
+
+				int yc = (trn->get_map_width()-1)/chunk_step;
+				int xc = (trn->get_map_height()-1)/chunk_step;
+				for(int y=0; y<yc; y++)
+				{
+					for(int x=0; x<xc; x++)
+					{
+						int px = x*chunk_step;
+						int py = y*chunk_step;
+
+						draw_terrain_quad(px, px+chunk_step+1, py, py+chunk_step+1, PDI);
+					}
+				}//end of for()
+			}//end of if
+
 
 			//-- 显示光标信息
 			vector3 wp = trn->tile2world(m_cursor_pos.x, m_cursor_pos.y);
@@ -278,8 +585,9 @@ namespace nexus
 
 	void nterrain_editor::on_mouse_left_down(const npoint& pt)
 	{
+		(void)pt;
 		m_left_drag.begin_drag();
-		_reset_brush_noise(m_brush.noise_freq, m_brush.strength);
+		nbrush_noise::instance()->reset_brush_noise(m_brush.noise_freq, m_brush.strength);
 
 		// 执行笔刷操作
 		brush_paint(false);
@@ -294,7 +602,7 @@ namespace nexus
 	{
 		m_right_drag.begin_drag();
 
-		_reset_brush_noise(m_brush.noise_freq, m_brush.strength);
+		nbrush_noise::instance()->reset_brush_noise(m_brush.noise_freq, m_brush.strength);
 
 		brush_paint(true);
 	}
@@ -305,7 +613,9 @@ namespace nexus
 	}
 
 	void nterrain_editor::on_mouse_wheel(int delta)
-	{}
+	{
+		(void)delta;
+	}
 
 	void nterrain_editor::brush_paint(bool neg)
 	{
@@ -327,7 +637,7 @@ namespace nexus
 		case EBT_Heightmap:
 			{
 				boost::shared_ptr<ntrn_brush_cmd_hmap> cmd(new ntrn_brush_cmd_hmap);
-				if( cmd->init(trn, trn->get_height_map(), my_brush, m_cursor_pos) )
+				if( cmd->init(trn, my_brush, m_cursor_pos) )
 				{
 					if( cmd->execute() )
 						new_cmd = boost::dynamic_pointer_cast<neditor_cmd>(cmd);
@@ -345,14 +655,28 @@ namespace nexus
 			}
 			break;
 		case EBT_Decomap:
+			{
+				boost::shared_ptr<ntrn_brush_cmd_deco> cmd(new ntrn_brush_cmd_deco);
+				if( cmd->init(trn, my_brush, m_cursor_pos) )
+				{
+					if( cmd->execute() )
+						new_cmd = boost::dynamic_pointer_cast<neditor_cmd>(cmd);
+				}
+			}
 			break;
+
 		}// end of switch
 
+		//-- 把command交给enditor engine管理
+		if( new_cmd )
+			neditor_engine::instance()->push_command(new_cmd);
 		
 	}
 
 	void nterrain_editor::on_mouse_move(const npoint& pt, bool ctrl_down, const ncamera* cam)
 	{
+		(void)ctrl_down;
+
 		if( m_trn_actor.expired() )
 			return;
 		nterrain_actor::ptr trn(m_trn_actor);
@@ -370,7 +694,7 @@ namespace nexus
 		vector3 end = mouse_ray.origin+mouse_ray.dir*len;
 
 		ncheck_result chk;
-		if( trn->line_check(chk, mouse_ray.origin, end) )
+		if( trn->line_check(chk, mouse_ray.origin, end, ELCT_Terrain) )
 		{
 			m_cursor_pos = trn->world2tile(chk.location.x, chk.location.z);
 		}
@@ -417,7 +741,7 @@ namespace nexus
 		if( !trn )
 			return;
 
-		_clip_rect(left, top, right, bottom, 
+		clip_rect(left, top, right, bottom, 
 			trn->get_map_width(), trn->get_map_height());
 
 		std::vector<vector3> line_vb;
@@ -514,87 +838,18 @@ namespace nexus
 		trn->import_heightmap(img_file_name);
 	}
 
-	void nterrain_editor::create_material_basic(const resource_location& texture_loc)
-	{
-		if( m_trn_actor.expired() )
-			return;
-		nterrain_actor::ptr trn(m_trn_actor);
-		if( !trn )
-			return;
-
-		trn->create_material_basic(texture_loc);
-	}
-
-	void nterrain_editor::splat_set_layer(size_t layer_index, const resource_location& texture_loc, const vector2& uv_scale, float uv_rotate)
-	{
-		if( m_trn_actor.expired() )
-			return;
-		nterrain_actor::ptr trn(m_trn_actor);
-		if( !trn )
-			return;
-
-		nmaterial_base* mtl_base_ptr = trn->get_material();
-		ntexture_splatting* splat = ndynamic_cast<ntexture_splatting>(mtl_base_ptr);
-
-		if( splat )
-		{
-			splat->set_layer_texture(layer_index, texture_loc);
-			splat->set_layer_uv_param(layer_index, uv_scale, uv_rotate);
-		}
-	}
-
-	void nterrain_editor::create_texture_splatting(size_t alpha_w, size_t alpha_h)
-	{
-		if( m_trn_actor.expired() )
-			return;
-		nterrain_actor::ptr trn(m_trn_actor);
-		if( !trn )
-			return;
-
-		if( alpha_w == 0
-			|| alpha_w == -1)
-			alpha_w = trn->get_map_width()-1;
-		if( alpha_h == 0
-			|| alpha_h == -1)
-			alpha_h = trn->get_map_height()-1;
-
-		trn->create_texture_splatting(alpha_w, alpha_h);
-	}
-
-	void nterrain_editor::splat_layer_noise(size_t layer_index, nrect rc, int numOctaves, float amplitude, float frequency)
-	{
-		if( m_trn_actor.expired() )
-			return;
-		nterrain_actor::ptr trn(m_trn_actor);
-		if( !trn )
-			return;
-
-		nmaterial_base* mtl_base_ptr = trn->get_material();
-		ntexture_splatting* splat = ndynamic_cast<ntexture_splatting>(mtl_base_ptr);
-
-		if( splat )
-		{
-			splat->generate_noise(layer_index, rc, numOctaves, amplitude, frequency);
-		}
-	}
-
-	void nterrain_editor::get_layer_param(size_t layer_index, resource_location& out_tex, vector2& out_scale, float& out_rotate)
-	{
-		if( m_trn_actor.expired() )
-			return;
-		nterrain_actor::ptr trn(m_trn_actor);
-		if( !trn )
-			return;
-
-		nmaterial_base* mtl_base_ptr = trn->get_material();
-		ntexture_splatting* splat = ndynamic_cast<ntexture_splatting>(mtl_base_ptr);
-
-		if( splat )
-			splat->get_layer_param(layer_index, out_tex, out_scale, out_rotate);
-	}
-
 	bool nterrain_editor::empty() const
 	{
 		return m_trn_actor.expired();
+	}
+
+	nterrain_mtl_setup* nterrain_editor::get_material()
+	{
+		if( m_trn_actor.expired() )
+			return NULL;
+		nterrain_actor::ptr trn(m_trn_actor);
+		if( !trn )
+			return NULL;
+		return trn->get_material();
 	}
 }//namespace nexus

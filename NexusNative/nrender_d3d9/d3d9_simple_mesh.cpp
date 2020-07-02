@@ -58,7 +58,7 @@ namespace nexus
 		m_index_buffer.reset(ib_ptr);
 	}
 
-	void d3d9_simple_mesh::draw(const d3d_view_info* view, const color4f& color) const
+	void d3d9_simple_mesh::draw(const nview_info* view, const color4f& color) const
 	{
 		d3d_effect_ptr effect = global_shader_lib::instance()->find_shader(
 			_T("draw_simple_mesh.fx"));
@@ -67,6 +67,7 @@ namespace nexus
 			return;
 
 		HRESULT hr;
+		effect->SetTechnique("techDefault");
 		hr = effect->SetMatrix("g_matWorldViewPrj", (const D3DXMATRIX*)(&view->mat_view_project));
 
 		UINT num_pass = 0;
@@ -88,5 +89,19 @@ namespace nexus
 		}
 
 		hr = effect->End();
+	}
+
+	void d3d9_simple_mesh::draw_index_primitive(d3d_effect_ptr effect) const
+	{
+		 IDirect3DDevice9* d3d_device = d3d_device_manager::instance()->get_device();
+		 d3d_device->SetFVF(D3DFVF_XYZ);	
+		 d3d_device->SetStreamSource(0, m_vert_buffer.get(), 0, sizeof(vector3));
+		 d3d_device->SetIndices(m_index_buffer.get());		
+		 UINT num_pass = 0;
+		 HRESULT hr = effect->Begin(&num_pass, 0);
+		 hr = effect->BeginPass(0);
+		 hr = d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_num_vert, 0, m_num_tri);
+		 hr = effect->EndPass();
+		 hr = effect->End();
 	}
 }//namespace nexus

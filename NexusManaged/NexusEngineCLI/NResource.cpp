@@ -62,6 +62,13 @@ namespace NexusEngine
 	//-- class NResrouceLoc ------------------------------------------------------
 	NResourceLoc::NResourceLoc(System::String^ loc)
 	{
+		if(String::IsNullOrEmpty(loc))
+		{
+			pkgName = String::Empty;
+			fileName = String::Empty;
+			return;
+		}
+
 		int pos = loc->IndexOf(':');
 		if (pos != -1)
 		{
@@ -70,14 +77,20 @@ namespace NexusEngine
 		}
 		else
 		{
-			throw gcnew System::ArgumentException("Bad Resource Location");
+			//throw gcnew System::ArgumentException("Bad Resource Location");
 		}
 	}
 
-	void NResourceLoc::FromNative(const nexus::resource_location& nativeLoc)
+	NResourceLoc::NResourceLoc( const nexus::resource_location& nativeLoc )
 	{
 		pkgName = gcnew System::String( nativeLoc.pkg_name.c_str() );
-		fileName =  gcnew System::String( nativeLoc.file_name.c_str() );
+		fileName = gcnew System::String( nativeLoc.file_name.c_str() );
+	}
+
+	void NResourceLoc::FromNative( const nexus::resource_location& nativeLoc )
+	{
+		pkgName = gcnew System::String( nativeLoc.pkg_name.c_str() );
+		fileName = gcnew System::String( nativeLoc.file_name.c_str() );
 	}
 
 	void NResourceLoc::ToNative(nexus::resource_location& nativeLoc)
@@ -85,8 +98,8 @@ namespace NexusEngine
 		pin_ptr<const wchar_t> szPkgName = PtrToStringChars(pkgName);
 		pin_ptr<const wchar_t> szFileName = PtrToStringChars(fileName);
 
-		nativeLoc.pkg_name = szPkgName;
-		nativeLoc.file_name = szFileName;
+		nativeLoc.pkg_name = String::IsNullOrEmpty(pkgName)?L"":szPkgName;
+		nativeLoc.file_name = String::IsNullOrEmpty(fileName)?L"":szFileName;;
 	}
 
 	System::String^ NResourceLoc::ToString()
@@ -123,6 +136,44 @@ namespace NexusEngine
 		return ret;
 	}
 
+	bool NResourceLoc::operator == ( NResourceLoc left, NResourceLoc right )
+	{
+		return NResourceLoc::Equals( left, right );
+	}
+
+	bool NResourceLoc::operator != ( NResourceLoc left, NResourceLoc right )
+	{
+		return !NResourceLoc::Equals( left, right );
+	}
+
+	int NResourceLoc::GetHashCode()
+	{
+		return (pkgName==nullptr ? 0 : pkgName->GetHashCode())
+			+ (fileName==nullptr ? 0 : fileName->GetHashCode());
+	}
+
+	bool NResourceLoc::Equals( Object^ value )
+	{
+		if( value == nullptr )
+			return false;
+
+		if( value->GetType() != GetType() )
+			return false;
+
+		return Equals( safe_cast<NResourceLoc>( value ) );
+	}
+
+	bool NResourceLoc::Equals( NResourceLoc value )
+	{
+		return ( pkgName == value.pkgName && fileName == value.fileName );
+	}
+
+	bool NResourceLoc::Equals( NResourceLoc% value1, NResourceLoc% value2 )
+	{
+		return ( value1.pkgName == value2.pkgName && value1.fileName == value2.fileName );
+	}
+
+
 	//-- class NResource ------------------------------------------------------
 	NResource::NResource(nresource::ptr nativeResPtr)
 	{
@@ -142,9 +193,7 @@ namespace NexusEngine
 
 	NResourceLoc NResource::Location::get()
 	{
-		NResourceLoc mLoc;
-		mLoc.FromNative( NativePtr->get_location() );
-		return mLoc;
+		return NResourceLoc( NativePtr->get_location() );
 	}
 
 	System::String^ NResource::Name::get()
@@ -172,5 +221,10 @@ namespace NexusEngine
 		NativePtr->save_to_file( nativeLoc, xml );
 
 		END_NATIVE_GUARD
+	}
+
+	void NResource::PostEditChange(bool ready)
+	{
+		NativePtr->post_edit_change(true);
 	}
 }//namespace NexusEngine

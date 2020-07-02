@@ -28,6 +28,9 @@ namespace nexus
 		
 		virtual size_t append_section(enum EPrimitiveType prim_type, const index_buffer16* index_data, int mtl_id) = 0;
 
+		// 静态mesh也提供update内部buffer的接口，但是只适合更新频率极低的情况，否则会有较大的性能损失
+		virtual void update_vertex_buffer(const nmesh_vertex_data* vert_data) = 0;
+
 		nDECLARE_VIRTUAL_CLASS(nrender_static_mesh_indexed)
 	};
 }//namespace nexus

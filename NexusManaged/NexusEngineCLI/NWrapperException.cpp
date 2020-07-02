@@ -10,4 +10,8 @@ namespace NexusEngine
 	NexusNativeException::NexusNativeException(const TCHAR* szInfo)
 		: NexusException(gcnew System::String(szInfo))
 	{}
+
+	NexusNativeException::NexusNativeException(const char* szInfo)
+		: NexusException(gcnew System::String(szInfo))
+	{}
 }//namespace NexusEngine

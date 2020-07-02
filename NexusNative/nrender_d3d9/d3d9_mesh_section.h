@@ -8,9 +8,16 @@
 #ifndef _NEXUS_D3D9_INDEX_BUFFER_H_
 #define _NEXUS_D3D9_INDEX_BUFFER_H_
 #include "d3d_ptr.h"
+#include "shading_effect.h"
 
 namespace nexus
 {
+	struct effect_cache
+	{
+		d3d9_shading_effect*	effect;
+		nmtl_base*					mtl;
+	};
+
 	/** material id + d3d9 index buffer
 	*/
 	class d3d9_mesh_section 
@@ -31,6 +38,7 @@ namespace nexus
 
 		void update_index(const index_buffer16* index_data, size_t valid_count);
 
+		effect_cache cache_effect[EDP_Num];
 	private:
 		d3d_index_ptr		m_index_buffer;
 		D3DPRIMITIVETYPE	m_d3d_pm_type;

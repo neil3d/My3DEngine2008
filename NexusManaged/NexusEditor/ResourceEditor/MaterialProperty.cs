@@ -12,26 +12,23 @@ namespace NexusEditor.ResourceEditor
     [TypeConverter(typeof(MaterialBasePropertyConverter))]
     public class MaterialBaseProperty
     {
-        protected string m_createName;
-        protected NResourceLoc m_createTemplateLoc; 
-        protected NMaterialBase m_mtl;
+        protected string m_createName;        
+        protected NMtlBase m_mtl;
 
-        public MaterialBaseProperty(NMaterialBase mtl)
+        public MaterialBaseProperty(NMtlBase mtl)
         {
             BindMaterial(mtl);
         }
 
-        public virtual void BindMaterial(NMaterialBase mtl)
+        public virtual void BindMaterial(NMtlBase mtl)
         {
             if (mtl != null)
             {
-                m_createName = mtl.GetName();
-                m_createTemplateLoc = mtl.GetTemplateLoc();
+                m_createName = mtl.Name;                
             }
             else
             {
-                m_createName = "InputCreateName";
-                m_createTemplateLoc = new NResourceLoc("Input:TemplateLoc");
+                m_createName = "Null Material";                
             }
 
             m_mtl = mtl;
@@ -41,14 +38,7 @@ namespace NexusEditor.ResourceEditor
         public string Name
         {
             get { return m_createName; }
-            set { m_createName = value; }
-        }
-
-        [Category("Material")]
-        public NResourceLoc TemplateLoc
-        {
-            get { return m_createTemplateLoc; }
-            set { m_createTemplateLoc = value; }
+            //set { m_createName = value; }
         }
     }// end of class MaterialBaseProperty
 
@@ -58,22 +48,23 @@ namespace NexusEditor.ResourceEditor
     public class MaterialProperty : MaterialBaseProperty
     {
         MaterialParamCollection m_params;
+        NResourceLoc m_ShaderLoc;
 
-        public MaterialProperty(NMaterial mtl)
+		public MaterialProperty(NMtlBase mtl)
             : base(mtl)
         {
             BindMaterial(mtl);
         }
         
-        public override void  BindMaterial(NMaterialBase _mtl)
+        public override void  BindMaterial(NMtlBase _mtl)
         {
             base.BindMaterial(_mtl);
 
-            NMaterial mtl = _mtl as NMaterial;
-
+            NMtlStatic mtl = _mtl as NMtlStatic;
             m_params = new MaterialParamCollection();
             if (mtl != null)
             {
+				m_ShaderLoc = _mtl.ShaderLoc;
                 int num = mtl.GetNumParameter();
                 for (int i = 0; i < num; i++)
                 {
@@ -106,6 +97,16 @@ namespace NexusEditor.ResourceEditor
         }
 
         [Category("Material")]
+        public NResourceLoc ShaderLoc
+        {
+            get { return m_ShaderLoc; }
+			set 
+			{
+				m_ShaderLoc = value;
+			}
+        }
+
+        [Category("Material")]
         public MaterialParamCollection MaterialParams
         {
             get
@@ -114,12 +115,43 @@ namespace NexusEditor.ResourceEditor
             }
         }
 
+		[Category("Material")]
+		public bool TwoSide
+		{
+			get 
+			{
+				if (m_mtl == null) return true;
+				return m_mtl.TwoSide; 
+			}
+			set 
+			{
+				if (m_mtl != null) m_mtl.TwoSide = value; 
+			}
+		}
+
+		[Category("Material")]
+		public ETransparentType TransType
+		{
+			get
+			{
+				if (m_mtl == null) return ETransparentType.Opaque;
+				return  m_mtl.TransType;
+			}
+			set
+			{
+				if (m_mtl != null) m_mtl.TransType = value;
+			}
+		}
+
         public void ApplyChange()
         {
             try
             {
-                NMaterial mtl = m_mtl as NMaterial;
-
+                NMtlStatic mtl = m_mtl as NMtlStatic;
+				if (m_mtl!=null)
+				{
+					m_ShaderLoc = m_mtl.ShaderLoc;
+				}
                 foreach (MaterialParamEdit param in m_params)
                 {
                     if( param.IsValid() )

@@ -8,7 +8,7 @@
 #ifndef _NEXUS_RENDER_TEXTURE_H_
 #define _NEXUS_RENDER_TEXTURE_H_
 #include "nrender_resource.h"
-#include "../terrain/nheight_map.h"
+#include "../ncore/height_map/nheight_map.h"
 #include "math/rect.h"
 
 namespace nexus
@@ -39,6 +39,7 @@ namespace nexus
 		virtual ~nrender_texture2D(void)		{	}
 
 		virtual void load_from_file(nfile_system* fs, const nstring& pkg_name, const nstring& file_name) = 0;
+		virtual const fsize& get_original_size() const = 0;
 
 		nDECLARE_VIRTUAL_CLASS(nrender_texture2D)
 	};
@@ -84,7 +85,8 @@ namespace nexus
 		virtual ~nrender_alphamap(void)	{}
 
 		virtual void create(size_t w, size_t h) = 0;
-		virtual void copy_alpha(size_t channel, const nrect& rc, nalpha_map* src) = 0;
+		virtual void copy_alpha(size_t channel, int src_x, int src_y, nalpha_map* src) = 0;
+		virtual void set_alpha(size_t channel, unsigned char val) = 0;
 
 		nDECLARE_VIRTUAL_CLASS(nrender_alphamap)
 	};

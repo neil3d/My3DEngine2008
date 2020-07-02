@@ -190,4 +190,19 @@ namespace nexus
 			nthrow(il_error);			
 		}
 	}
+
+	void nimage::blit(const nimage& source, int dest_x, int dest_y, int src_x, int src_y, size_t src_w, size_t src_h)
+	{
+		ilDisable(IL_BLIT_BLEND);
+		ilBindImage(m_impl->image_name);
+		ilBlit(source._get_image_id(),
+			dest_x, dest_y, 0,
+			src_x, src_y, 0,
+			src_w, src_h, 1);
+	}
+
+	size_t nimage::_get_image_id() const
+	{
+		return m_impl->image_name;
+	}
 }//namespace nexus

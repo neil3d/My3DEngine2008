@@ -48,6 +48,11 @@ namespace NexusEngine
 		return RawPtr;
 	}
 
+	boost::shared_ptr<nexus::nobject>* NativeObjectOwnedBySharedPtr::SharedPtr::get()
+	{
+		return m_smart_ptr;
+	}
+
 	//-- class NativeObjectOwnedRaw -------------------------------------------------------
 	NativeObjectOwnedRaw::NativeObjectOwnedRaw(nexus::nobject* obj):m_obj(obj)
 	{}

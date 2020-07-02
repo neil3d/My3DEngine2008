@@ -20,7 +20,7 @@ namespace nexus
 
 		static dynamic_vb_pool* instance();
 
-		void init(size_t max_item_size=256*1024)
+		void init(size_t max_item_size=512*1024)
 		{
 			m_max_item_size = max_item_size;
 		}

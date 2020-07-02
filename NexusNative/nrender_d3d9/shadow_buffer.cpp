@@ -1,7 +1,9 @@
 #include "StdAfx.h"
+#include <boost/bind.hpp>
 #include "shadow_buffer.h"
 #include "d3d_device_manager.h"
 #include "d3d_exception.h"
+#include "..\nengine\actor\nlight_component.h"
 #include "util.h"
 
 namespace nexus
@@ -10,6 +12,11 @@ namespace nexus
 	shadow_buffer::shadow_buffer(void)
 	{
 		mat_set_identity(m_uv_tranfo);
+		m_rt_size = -1;
+
+		d3d_device_manager::instance()->register_device_handler(
+			boost::bind(&shadow_buffer::on_device_lost, this, _1),
+			boost::bind(&shadow_buffer::on_device_reset, this, _1) );
 	}
 
 	shadow_buffer::~shadow_buffer(void)
@@ -83,7 +90,7 @@ namespace nexus
 		const float dist = 5000;
 
 		vector3 pos = view->look_at;
-		pos -= lgt->m_direction*dist;
+		pos -= lgt->get_owner()->m_direction*dist;
 
 		m_camera.set_lookat(pos, view->look_at, vector3(0,1,0));
 
@@ -145,5 +152,22 @@ namespace nexus
 	void noshadow::modify_drawing_policy_type(light_drawing_policy_type* dp_type)
 	{
 		dp_type->m_shadow_policy = _T("shader_d3d9/shadow/no_shadow.hlsl");			
+	}
+
+	void shadow_buffer::on_device_lost(int param)
+	{
+		m_shadow_tex.reset();
+		m_surface.reset();
+		m_color_tex.reset();
+		m_color_surface.reset();
+		m_old_target.reset();
+		m_old_zbuffer.reset();
+	}
+
+	bool shadow_buffer::on_device_reset(int param)
+	{
+		if( m_rt_size!=-1 )
+			create(m_rt_size);
+		return true;
 	}
 }//namespace nexus

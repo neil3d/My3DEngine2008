@@ -30,9 +30,19 @@ namespace nexus
 
 		// called by actor
 		virtual void _init(nactor* owner);
-		virtual void _update_transform(const object_space& parent_space)	{	(void)parent_space; }
+		virtual void  update_transform( const object_space& parent_space)	{	(void)parent_space; }
+		virtual void _update_transform( const object_space& parent_space)	{	(void)parent_space; }
 		virtual void _remove_from_level() {}
-		virtual void _destroy()	{}
+		virtual void _destroy()	
+		{
+			m_owner = NULL;
+		}
+
+		// physics interfaces
+		// init actor physics,应当在begin play时才调用该接口 
+		virtual void _init_cmp_phys(){};
+		virtual void _simulate_cmp_phys(float /*delta_time*/){};
+		virtual void _release_cmp_phys(){};
 
 		virtual void update(float delta_time, const nviewport& view)	
 		{
@@ -43,7 +53,7 @@ namespace nexus
 		virtual void render(const nviewport& view)	{	(void)view;	}
 		nactor* get_owner()				{	return m_owner;}
 		const nname& get_name() const	{	return m_name;}
-
+		
 		virtual void on_event(nevent_base& evt)	{ (void)evt;}
 
 		virtual void serialize(narchive& ar);
@@ -54,9 +64,16 @@ namespace nexus
 			(void)PDI;
 			(void)color;
 		}
+
+		//-- 单独管理了渲染资源的类需要重写
+		virtual void _on_device_lost(int param)		{	(void)param; }
+		virtual bool _on_device_reset(int param)	{	(void)param; return true; }
+
+		bool get_editable() const	{	return m_editable; }
 	protected:
 		nactor*	m_owner;
 		nname	m_name;
+		bool	m_editable;	// 是否可编辑，类似terrain chunk之类的程序生成的Components，不可编辑
 
 		nDECLARE_VIRTUAL_CLASS(nactor_component)
 	};

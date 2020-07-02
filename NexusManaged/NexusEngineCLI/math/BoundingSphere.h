@@ -7,6 +7,8 @@
 
 namespace NexusEngine
 {
+	using namespace NexusEngineExtension;
+
 	value class BoundingBox;
 	value class Plane;
 	value class Ray;
@@ -18,17 +20,20 @@ namespace NexusEngine
 	[System::Serializable]
 	[System::Runtime::InteropServices::StructLayout( System::Runtime::InteropServices::LayoutKind::Sequential )]
 	[System::ComponentModel::TypeConverter( NexusEngine::Design::BoundingSphereConverter::typeid )]
+	[XmlClassSerializable("BoundingSphere",false)]
 	public value class BoundingSphere : System::IEquatable<BoundingSphere>
 	{
 	public:
 		/// <summary>
 		/// Specifies the center point of the sphere.
 		/// </summary>
+		[XmlFieldSerializable("Center")]
 		Vector3 Center;
 
 		/// <summary>
 		/// The radius of the sphere.
 		/// </summary>
+		[XmlFieldSerializable("Radius")]
 		float Radius;
 
 		/// <summary>

@@ -117,6 +117,7 @@ namespace nexus
 		{
 			ret = ret.substr(0, f);
 		}
+		ret += _T("/nexus_game");
 		return ret;
 	}
 
@@ -180,9 +181,9 @@ namespace nexus
 		wostringstream ostr;
 		ostr << m_base_path
 			<< _T('/')
-			<< pkg_name
-			<< _T('/')
-			<< file_name;
+			<< pkg_name;
+			if(file_name[0]!=_T('/') && file_name[0]!=_T('\\')) ostr << _T('/');
+			ostr<< file_name;
 
 		return ostr.str();
 	}
@@ -241,8 +242,8 @@ namespace nexus
 			<< pkg_name;
 		if( path != _T("/") ) // pkg root
 		{
-			oss << _T('/')
-			<< path;
+			if(path[0]!=_T('/') && path[0]!=_T('\\')) oss << _T('/');
+			oss<< path;
 		}
 
 		nstring path_str = oss.str();
@@ -287,4 +288,40 @@ namespace nexus
 			}
 		}// end of for	
 	}
+
+	void nstd_file_system::create_directory( const nstring& pkg_name,const nstring& dir )
+	{
+		nstring full_path_str = get_full_path(pkg_name, dir);
+		boost::filesystem::wpath fpath( full_path_str );
+		if(!boost::filesystem::exists(fpath))
+		{
+			boost::filesystem::create_directory(fpath);
+		}		
+	}
+
+	void nstd_file_system::remove_directory( const nstring& pkg_name,const nstring& dir )
+	{
+		nstring full_path_str = get_full_path(pkg_name, dir);
+		full_path_str+=L'/';
+		boost::filesystem::wpath fpath( full_path_str );
+		if(boost::filesystem::exists(fpath))
+		{
+			boost::filesystem::remove_all(fpath);
+		}
+	}
+
+	bool nstd_file_system::rename_directory( const nstring& pkg_name,const nstring& old_name,const nstring& new_name )
+	{
+		nstring old_path_str = get_full_path(pkg_name, old_name);
+		nstring new_path_str = get_full_path(pkg_name, new_name);
+		boost::filesystem::wpath old_fpath( old_path_str );
+		boost::filesystem::wpath new_fpath( new_path_str );
+		if(boost::filesystem::exists(old_fpath) && !boost::filesystem::exists(new_fpath))
+		{
+			boost::filesystem::rename(old_fpath,new_fpath);
+			return true;
+		}
+		return false;
+	}
+
 }//namespace nexus

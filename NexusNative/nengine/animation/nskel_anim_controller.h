@@ -15,7 +15,6 @@ namespace nexus
 		nskel_anim_controller(void);
 		virtual ~nskel_anim_controller(void);
 
-		virtual void advance_anim(float delta_time) = 0;
 		virtual const nskeleton_define* get_skeleton() const = 0;
 
 		const matrix_palette& get_matrix_palette() const	{	return m_mat_palette;}

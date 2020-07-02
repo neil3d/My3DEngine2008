@@ -27,15 +27,23 @@ namespace nexus
 		virtual vertex_stream* get_stream(size_t i)
 		{
 			nASSERT(i < 2);
-			vertex_stream* ptr_array[2] = 
+			vertex_stream* ptr_array[3] = 
 			{	&m_pos_stream,
-				&m_second_stream,					
+				&m_second_stream,	
+				0,
 			};
 
 			return ptr_array[i];
 		}
 
 		bool has_tangent() const	{	return m_tangent; }
+
+		virtual void serialize(narchive& ar)
+		{
+			nmesh_vertex_data::serialize(ar);
+			nSERIALIZE(ar, m_tangent);
+			nSERIALIZE(ar, m_second_stream);
+		}
 	protected:
 		bool	m_tangent;
 
@@ -50,6 +58,8 @@ namespace nexus
 			};
 		*/
 		vertex_stream	m_second_stream;
+
+		nDECLARE_CLASS(nmesh_vertex_data_skin)
 	};
 }//namespace nexus
 #endif //_NEXUS_MESH_VERTEX_DATA_SKIN_H_

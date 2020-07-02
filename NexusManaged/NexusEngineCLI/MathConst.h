@@ -13,5 +13,12 @@ namespace NexusEngine
 		literal float DoubleEPS	=	float(10e-6) * 2;
 		literal float BigEPS		=	float(10e-2);
 		literal float SmallEPS		=	float(10e-6);
+
+		// Maximum size of the world
+		literal float WorldMax		=	524288.0f;
+		// Half the maximum size of the world
+		literal float HalfWorldMax	=	262144.0f;
+		// Half the maximum size of the world - 1
+		literal float HalfWorldMax1	=	262143.0f;
 	};
 }//namespace NexusCore

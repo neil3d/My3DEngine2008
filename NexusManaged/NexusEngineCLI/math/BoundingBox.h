@@ -9,6 +9,8 @@ using System::Runtime::InteropServices::OutAttribute;
 
 namespace NexusEngine
 {
+	using namespace NexusEngineExtension;
+
 	value class BoundingSphere;
 	value class Plane;
 	value class Ray;
@@ -22,17 +24,20 @@ namespace NexusEngine
 	[System::Serializable]
 	[System::Runtime::InteropServices::StructLayout( System::Runtime::InteropServices::LayoutKind::Sequential )]
 	[System::ComponentModel::TypeConverter( NexusEngine::Design::BoundingBoxConverter::typeid )]
+	[XmlClassSerializable("BoundingBox",false)]
 	public value class BoundingBox : System::IEquatable<BoundingBox>
 	{
 	public:
 		/// <summary>
 		/// The highest corner of the box.
 		/// </summary>
+		[XmlFieldSerializable("Maximum")]
 		Vector3 Maximum;
 
 		/// <summary>
 		/// The lowest corner of the box.
 		/// </summary>
+		[XmlFieldSerializable("Minimum")]
 		Vector3 Minimum;
 
 		/// <summary>
@@ -47,6 +52,17 @@ namespace NexusEngine
 		/// </summary>
 		/// <returns>An array of points representing the eight corners of the bounding box.</returns>
 		array<Vector3>^ GetCorners();
+
+		// 合并一个顶点
+		void MergeVector(const Vector3& vec)
+		{
+			if (vec.x < Minimum.x) Minimum.x = vec.x;
+			if (vec.x > Maximum.x) Maximum.x = vec.x;
+			if (vec.y < Minimum.y) Minimum.y = vec.y;
+			if (vec.y > Maximum.y) Maximum.y = vec.y;
+			if (vec.z < Minimum.z) Minimum.z = vec.z;
+			if (vec.z > Maximum.z) Maximum.z = vec.z;
+		}
 
 		/// <summary>
 		/// Determines whether the box contains the specified box.

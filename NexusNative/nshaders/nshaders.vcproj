@@ -143,110 +143,154 @@
 			Name="material"
 			>
 			<File
-				RelativePath="..\..\engine_data\material\diffuse_alpha.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\BanksAnisotropic.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\diffuse_basic.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\BlinnAnisotropic.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\diffuse_masked.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\CookTorrance.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\ENG_Default.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\diffuse_alpha.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\ENG_DefaultTwoSided.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\diffuse_basic.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\mtl_const.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\diffuse_masked.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\normal_maped.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\ENG_ConstColor.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\SKY_cube.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\ENG_Default.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\SKY_dome.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\ENG_ZFail.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\SPT_Branch.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\environment_map.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\SPT_Frond.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\KajiyaKayAnisotropic.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\SPT_leaf.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\mtl_common.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\test_param.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\mtl_const.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\TRN_mtl_basic.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\mtl_leaf.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\TRN_tex_splatting.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\mtl_water.hlsl"
 				>
 			</File>
 			<File
-				RelativePath="..\..\engine_data\material\TRN_water_natural.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\material\nav_map.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\normal_maped.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\OrenNayar.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\schlick.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\SFX_Default.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\SKY_cube.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\SKY_dome.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\specular_basic.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\SPT_Branch.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\SPT_Frond.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\SPT_leaf.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\standard.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\standard_mask.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\test_param.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\TRN_mtl_basic.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\TRN_tex_splatting.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\material\water.hlsl"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="shader_d3d9"
 			>
-			<File
-				RelativePath="..\..\engine_data\shader_d3d9\draw_hit_proxy.fx"
-				>
-			</File>
-			<File
-				RelativePath="..\..\engine_data\shader_d3d9\drawing_base_pass.fx"
-				>
-			</File>
-			<File
-				RelativePath="..\..\engine_data\shader_d3d9\drawing_light.fx"
-				>
-			</File>
-			<File
-				RelativePath="..\..\engine_data\shader_d3d9\drawing_pre_pass.fx"
-				>
-			</File>
-			<File
-				RelativePath="..\..\engine_data\shader_d3d9\drawing_unlit.fx"
-				>
-			</File>
-			<File
-				RelativePath="..\..\engine_data\shader_d3d9\drawing_unlit_trans.fx"
-				>
-			</File>
-			<File
-				RelativePath="..\..\engine_data\shader_d3d9\drawing_wireframe.fx"
-				>
-			</File>
 			<Filter
 				Name="lighting"
 				>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\lighting\directional_light.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\lighting\directional_light.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\lighting\point_light.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\lighting\hemisphere_light.hlsl"
+					>
+				</File>
+				<File
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\lighting\point_light.hlsl"
+					>
+				</File>
+				<File
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\lighting\spot_light.hlsl"
 					>
 				</File>
 			</Filter>
@@ -254,19 +298,23 @@
 				Name="post_process"
 				>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\post_process\bloom.fx"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\post_process\bloom.fx"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\post_process\hdr_final.fx"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\post_process\hdr_final.fx"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\post_process\hdr_luminance.fx"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\post_process\hdr_luminance.fx"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\post_process\pass_through.fx"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\post_process\pass_through.fx"
+					>
+				</File>
+				<File
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\global\ssao.fx"
 					>
 				</File>
 			</Filter>
@@ -274,51 +322,51 @@
 				Name="vertex_factory"
 				>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_morph_common.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_grass.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_skin.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_morph_common.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_sky_cube.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_nav_map.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_sky_dome.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_sfx.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_spt_branch.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_skin.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_spt_frond.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_spt_branch.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_spt_leafcard.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_spt_frond.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_spt_leafmesh.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_spt_leafcard.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_static_common.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_spt_leafmesh.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_static_PN.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_static_common.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_terrain.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_static_PN.hlsl"
 					>
 				</File>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\vertex_factory\vfactory_terrain_water.hlsl"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\vertex_factory\vfactory_terrain.hlsl"
 					>
 				</File>
 			</Filter>
@@ -326,7 +374,7 @@
 				Name="misc"
 				>
 				<File
-					RelativePath="..\..\engine_data\shader_d3d9\misc\line_batch.fx"
+					RelativePath="..\..\nexus_game\engine_data\shader_d3d9\misc\line_batch.fx"
 					>
 				</File>
 			</Filter>
@@ -337,20 +385,76 @@
 					RelativePath="..\..\engine_data\shader_d3d9\shadow\no_shadow.hlsl"
 					>
 				</File>
-				<File
-					RelativePath="..\..\engine_data\shader_d3d9\shadow\shadow_map.hlsl"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="common"
 			>
 			<File
-				RelativePath="..\..\engine_data\common\speed_tree_wind.hlsl"
+				RelativePath="..\..\nexus_game\engine_data\common\common.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\common\shade_lib.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\common\shadow.hlsl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\common\speed_tree_wind.hlsl"
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="global"
+			>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\shader_d3d9\global\draw_simple_mesh.fx"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\shader_d3d9\global\fog_volume.fx"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nexus_game\engine_data\shader_d3d9\global\water_surface.fx"
+				>
+			</File>
+		</Filter>
+		<File
+			RelativePath="..\..\nexus_game\engine_data\shader_d3d9\draw_hit_proxy.fx"
+			>
+		</File>
+		<File
+			RelativePath="..\..\nexus_game\engine_data\shader_d3d9\drawing_base_pass.fx"
+			>
+		</File>
+		<File
+			RelativePath="..\..\nexus_game\engine_data\shader_d3d9\drawing_extend.fx"
+			>
+		</File>
+		<File
+			RelativePath="..\..\nexus_game\engine_data\shader_d3d9\drawing_light.fx"
+			>
+		</File>
+		<File
+			RelativePath="..\..\nexus_game\engine_data\shader_d3d9\drawing_pre_pass.fx"
+			>
+		</File>
+		<File
+			RelativePath="..\..\nexus_game\engine_data\shader_d3d9\drawing_unlit.fx"
+			>
+		</File>
+		<File
+			RelativePath="..\..\nexus_game\engine_data\shader_d3d9\drawing_wireframe.fx"
+			>
+		</File>
+		<File
+			RelativePath=".\VTune\nshaders.vpj"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

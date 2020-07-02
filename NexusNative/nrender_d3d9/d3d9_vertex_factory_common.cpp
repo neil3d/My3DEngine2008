@@ -30,6 +30,10 @@ namespace nexus
 		vertex_factory_type_lib::instance()->conditional_create_for_static(mesh_vb);
 		vertex_factory_type* vf_type = vertex_factory_type_lib::instance()->get_type(mesh_vb->get_vertex_type_name());
 
+		vertex_factory_type_lib::instance()->conditional_create_for_instance(mesh_vb);
+		m_inst_type = vertex_factory_type_lib::instance()->get_instance_type(mesh_vb->get_vertex_type_name());
+		nASSERT(m_inst_type);
+
 		if( !vf_type )
 			THROW_D3D_EXCEPTION(_T("vertex factory type not find."));
 

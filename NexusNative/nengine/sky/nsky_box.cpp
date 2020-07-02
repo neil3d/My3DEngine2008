@@ -96,45 +96,6 @@ namespace nexus
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	//	class nsky_cube_material
-	////////////////////////////////////////////////////////////////////////////
-	nsky_cube_material::nsky_cube_material(const nstring& name_str):nmaterial_base(name_str)
-	{}
-
-	nsky_cube_material::~nsky_cube_material(void)
-	{}
-
-	void nsky_cube_material::create(const resource_location& texture_loc)
-	{
-		m_template = nresource_manager::instance()->load_material_template_script(
-			resource_location(_T("engine_data:material/SKY_cube.hlsl"))
-			);
-
-		//-- load texture
-		nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
-		m_texture.reset( rres_mgr->alloc_cube_map() );
-		m_texture->load_from_file( nengine::instance()->get_file_sys(),
-			texture_loc.pkg_name, texture_loc.file_name );
-
-		m_texture_loc = texture_loc;
-	}
-
-	void nsky_cube_material::draw_effect_param(nshading_effect* effect_ptr) const
-	{
-		effect_ptr->set_texture("MTL_DiffuseMap", m_texture.get());
-	}
-
-	void nsky_cube_material::serialize(narchive& ar)
-	{
-		nmaterial_base::serialize(ar);
-
-		nSERIALIZE(ar, m_texture_loc);
-
-		if( ar.is_loading() )
-			create( m_texture_loc );
-	}
-
-	////////////////////////////////////////////////////////////////////////////
 	//	class nsky_box
 	////////////////////////////////////////////////////////////////////////////
 	nsky_box::nsky_box(const nstring& name_str):nsky_component(name_str),
@@ -162,16 +123,22 @@ namespace nexus
 		create_render_mesh();
 
 		//-- material
-		m_mtl.create(texture_loc);
+		m_mtl.create_from_hlsl(_T("basic_pass"),
+			resource_location(_T("engine_data:material/SKY_cube.hlsl"))
+			);
+		m_mtl.set_cube_map_parameter("MTL_DiffuseMap", texture_loc);		
 	}
 
-	nmaterial_base* nsky_box::get_material(int lod, int mtl_id)
+	nmtl_base* nsky_box::get_material(int lod, int mtl_id)
 	{
+		(void)lod;
+		(void)mtl_id;
 		return &m_mtl;
 	}
 
 	nrender_mesh* nsky_box::get_render_mesh(int lod)
 	{
+		(void)lod;
 		return m_mesh.get();
 	}
 
@@ -191,6 +158,20 @@ namespace nexus
 
 	void nsky_box::_destroy()
 	{
-		m_mesh.get();
+		m_mesh.reset();
+		m_mtl._destroy();
+	}
+
+	void nsky_box::_on_device_lost(int param)
+	{
+		(void)param;
+		m_mesh.reset();
+	}
+
+	bool nsky_box::_on_device_reset(int param)
+	{
+		(void)param;
+		create_render_mesh();
+		return true;
 	}
 }//namespace nexus

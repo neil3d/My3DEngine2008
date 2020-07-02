@@ -57,17 +57,15 @@
             this.tabPageProperty = new System.Windows.Forms.TabPage();
             this.propertyGridRes = new System.Windows.Forms.PropertyGrid();
             this.tabPageMtl = new System.Windows.Forms.TabPage();
-            this.buttonApplyMtlProperty = new System.Windows.Forms.Button();
             this.propertyGridMtl = new System.Windows.Forms.PropertyGrid();
-            this.btnCreateMtl = new System.Windows.Forms.Button();
             this.comboBoxSection = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.comboBoxLOD = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.tabPageAnim = new System.Windows.Forms.TabPage();
-            this.groupSeqInfo = new NControl.CollapsibleGroupBox();
+            this.groupSeqInfo = new NexusEditor.NControl.CollapsibleGroupBox();
             this.propertyGridSeq = new System.Windows.Forms.PropertyGrid();
-            this.groupSeqList = new NControl.CollapsibleGroupBox();
+            this.groupSeqList = new NexusEditor.NControl.CollapsibleGroupBox();
             this.btnTrnRemoveSeq = new System.Windows.Forms.Button();
             this.listBoxAnim = new System.Windows.Forms.ListBox();
             this.imageListTab = new System.Windows.Forms.ImageList(this.components);
@@ -95,14 +93,14 @@
             this.fileToolStripMenuItem});
             this.menuStripMain.Location = new System.Drawing.Point(0, 0);
             this.menuStripMain.Name = "menuStripMain";
-            this.menuStripMain.Size = new System.Drawing.Size(915, 24);
+            this.menuStripMain.Size = new System.Drawing.Size(915, 25);
             this.menuStripMain.TabIndex = 0;
             this.menuStripMain.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(39, 21);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // toolStripMain
@@ -120,9 +118,9 @@
             this.toolBtnZoomExtents,
             this.toolStripSeparator3,
             this.toolBtnXML});
-            this.toolStripMain.Location = new System.Drawing.Point(0, 24);
+            this.toolStripMain.Location = new System.Drawing.Point(0, 25);
             this.toolStripMain.Name = "toolStripMain";
-            this.toolStripMain.Size = new System.Drawing.Size(915, 36);
+            this.toolStripMain.Size = new System.Drawing.Size(915, 40);
             this.toolStripMain.TabIndex = 1;
             this.toolStripMain.Text = "Resource Tool Bar";
             // 
@@ -131,7 +129,7 @@
             this.toolStripButtonRest.Image = global::NexusEditor.Properties.Resources.Reset;
             this.toolStripButtonRest.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonRest.Name = "toolStripButtonRest";
-            this.toolStripButtonRest.Size = new System.Drawing.Size(57, 33);
+            this.toolStripButtonRest.Size = new System.Drawing.Size(68, 37);
             this.toolStripButtonRest.Text = "   Reset   ";
             this.toolStripButtonRest.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolStripButtonRest.Click += new System.EventHandler(this.toolStripButtonRest_Click);
@@ -141,7 +139,7 @@
             this.toolStripButtonNew.Image = global::NexusEditor.Properties.Resources.white_picture;
             this.toolStripButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonNew.Name = "toolStripButtonNew";
-            this.toolStripButtonNew.Size = new System.Drawing.Size(83, 33);
+            this.toolStripButtonNew.Size = new System.Drawing.Size(103, 37);
             this.toolStripButtonNew.Text = "New AnimMesh";
             this.toolStripButtonNew.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolStripButtonNew.Click += new System.EventHandler(this.toolStripButtonNew_Click);
@@ -151,7 +149,7 @@
             this.toolStripButtonSave.Image = global::NexusEditor.Properties.Resources.Save;
             this.toolStripButtonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonSave.Name = "toolStripButtonSave";
-            this.toolStripButtonSave.Size = new System.Drawing.Size(67, 33);
+            this.toolStripButtonSave.Size = new System.Drawing.Size(78, 37);
             this.toolStripButtonSave.Text = "Save to File";
             this.toolStripButtonSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolStripButtonSave.Click += new System.EventHandler(this.toolStripButtonSave_Click);
@@ -161,7 +159,7 @@
             this.toolStripButtonImport.Image = global::NexusEditor.Properties.Resources.connect;
             this.toolStripButtonImport.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonImport.Name = "toolStripButtonImport";
-            this.toolStripButtonImport.Size = new System.Drawing.Size(66, 33);
+            this.toolStripButtonImport.Size = new System.Drawing.Size(81, 37);
             this.toolStripButtonImport.Text = "Import LOD";
             this.toolStripButtonImport.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolStripButtonImport.Click += new System.EventHandler(this.toolStripButtonImport_Click);
@@ -169,14 +167,14 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 36);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 40);
             // 
             // toolBtnLit
             // 
             this.toolBtnLit.Image = global::NexusEditor.Properties.Resources.Light;
             this.toolBtnLit.ImageTransparentColor = System.Drawing.Color.Silver;
             this.toolBtnLit.Name = "toolBtnLit";
-            this.toolBtnLit.Size = new System.Drawing.Size(46, 33);
+            this.toolBtnLit.Size = new System.Drawing.Size(57, 37);
             this.toolBtnLit.Text = "    Lit    ";
             this.toolBtnLit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolBtnLit.Click += new System.EventHandler(this.toolBtnLit_Click);
@@ -186,7 +184,7 @@
             this.toolBtnUnlit.Image = global::NexusEditor.Properties.Resources.UnLight;
             this.toolBtnUnlit.ImageTransparentColor = System.Drawing.Color.Silver;
             this.toolBtnUnlit.Name = "toolBtnUnlit";
-            this.toolBtnUnlit.Size = new System.Drawing.Size(44, 33);
+            this.toolBtnUnlit.Size = new System.Drawing.Size(54, 37);
             this.toolBtnUnlit.Text = "  Unlit  ";
             this.toolBtnUnlit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolBtnUnlit.Click += new System.EventHandler(this.toolBtnUnlit_Click);
@@ -196,7 +194,7 @@
             this.toolBtnWireframe.Image = global::NexusEditor.Properties.Resources.Wireframe;
             this.toolBtnWireframe.ImageTransparentColor = System.Drawing.Color.White;
             this.toolBtnWireframe.Name = "toolBtnWireframe";
-            this.toolBtnWireframe.Size = new System.Drawing.Size(61, 33);
+            this.toolBtnWireframe.Size = new System.Drawing.Size(73, 37);
             this.toolBtnWireframe.Text = "Wireframe";
             this.toolBtnWireframe.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolBtnWireframe.Click += new System.EventHandler(this.toolBtnWireframe_Click);
@@ -204,14 +202,14 @@
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 36);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 40);
             // 
             // toolBtnZoomExtents
             // 
             this.toolBtnZoomExtents.Image = global::NexusEditor.Properties.Resources.ZoomExtents;
             this.toolBtnZoomExtents.ImageTransparentColor = System.Drawing.Color.White;
             this.toolBtnZoomExtents.Name = "toolBtnZoomExtents";
-            this.toolBtnZoomExtents.Size = new System.Drawing.Size(74, 33);
+            this.toolBtnZoomExtents.Size = new System.Drawing.Size(87, 37);
             this.toolBtnZoomExtents.Text = "ZoomExtents";
             this.toolBtnZoomExtents.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolBtnZoomExtents.Click += new System.EventHandler(this.toolBtnZoomExtents_Click);
@@ -219,7 +217,7 @@
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 36);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 40);
             // 
             // toolBtnXML
             // 
@@ -228,7 +226,7 @@
             this.toolBtnXML.Image = global::NexusEditor.Properties.Resources.page_white_code;
             this.toolBtnXML.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolBtnXML.Name = "toolBtnXML";
-            this.toolBtnXML.Size = new System.Drawing.Size(72, 33);
+            this.toolBtnXML.Size = new System.Drawing.Size(87, 37);
             this.toolBtnXML.Text = "Save As XML";
             this.toolBtnXML.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolBtnXML.Click += new System.EventHandler(this.toolBtnXML_Click);
@@ -248,7 +246,7 @@
             this.statusSaveLoc.Image = global::NexusEditor.Properties.Resources.Save;
             this.statusSaveLoc.IsLink = true;
             this.statusSaveLoc.Name = "statusSaveLoc";
-            this.statusSaveLoc.Size = new System.Drawing.Size(90, 17);
+            this.statusSaveLoc.Size = new System.Drawing.Size(104, 17);
             this.statusSaveLoc.Text = "Save Location";
             this.statusSaveLoc.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.statusSaveLoc.ToolTipText = "Save Location";
@@ -257,7 +255,7 @@
             // 
             this.splitContainerMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainerMain.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainerMain.Location = new System.Drawing.Point(0, 60);
+            this.splitContainerMain.Location = new System.Drawing.Point(0, 65);
             this.splitContainerMain.Name = "splitContainerMain";
             // 
             // splitContainerMain.Panel1
@@ -267,8 +265,8 @@
             // splitContainerMain.Panel2
             // 
             this.splitContainerMain.Panel2.Controls.Add(this.tabControlRight);
-            this.splitContainerMain.Size = new System.Drawing.Size(915, 556);
-            this.splitContainerMain.SplitterDistance = 640;
+            this.splitContainerMain.Size = new System.Drawing.Size(915, 551);
+            this.splitContainerMain.SplitterDistance = 639;
             this.splitContainerMain.TabIndex = 3;
             // 
             // splitContainerLeft
@@ -286,8 +284,8 @@
             this.splitContainerLeft.Panel2.Controls.Add(this.trackBarTime);
             this.splitContainerLeft.Panel2.Controls.Add(this.btnPlay);
             this.splitContainerLeft.Panel2.Resize += new System.EventHandler(this.splitContainerLeft_Panel2_Resize);
-            this.splitContainerLeft.Size = new System.Drawing.Size(640, 556);
-            this.splitContainerLeft.SplitterDistance = 520;
+            this.splitContainerLeft.Size = new System.Drawing.Size(639, 551);
+            this.splitContainerLeft.SplitterDistance = 514;
             this.splitContainerLeft.TabIndex = 0;
             // 
             // checkBoxLoop
@@ -317,16 +315,17 @@
             // trackBarTime
             // 
             this.trackBarTime.AutoSize = false;
-            this.trackBarTime.Location = new System.Drawing.Point(65, 3);
+            this.trackBarTime.LargeChange = 2;
+            this.trackBarTime.Location = new System.Drawing.Point(65, 6);
             this.trackBarTime.Maximum = 100;
             this.trackBarTime.Name = "trackBarTime";
-            this.trackBarTime.Size = new System.Drawing.Size(572, 26);
+            this.trackBarTime.Size = new System.Drawing.Size(569, 26);
             this.trackBarTime.TabIndex = 1;
-            this.trackBarTime.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.trackBarTime.Scroll += new System.EventHandler(this.trackBarTime_Scroll);
             // 
             // btnPlay
             // 
-            this.btnPlay.ImageKey = "play";
+            this.btnPlay.ImageKey = "stop";
             this.btnPlay.ImageList = this.imageListBtn;
             this.btnPlay.Location = new System.Drawing.Point(37, 6);
             this.btnPlay.Name = "btnPlay";
@@ -347,7 +346,7 @@
             this.tabControlRight.Location = new System.Drawing.Point(0, 0);
             this.tabControlRight.Name = "tabControlRight";
             this.tabControlRight.SelectedIndex = 0;
-            this.tabControlRight.Size = new System.Drawing.Size(271, 556);
+            this.tabControlRight.Size = new System.Drawing.Size(272, 551);
             this.tabControlRight.TabIndex = 0;
             // 
             // tabPageProperty
@@ -357,7 +356,7 @@
             this.tabPageProperty.Location = new System.Drawing.Point(4, 23);
             this.tabPageProperty.Name = "tabPageProperty";
             this.tabPageProperty.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageProperty.Size = new System.Drawing.Size(263, 529);
+            this.tabPageProperty.Size = new System.Drawing.Size(264, 524);
             this.tabPageProperty.TabIndex = 0;
             this.tabPageProperty.Text = "Resource";
             this.tabPageProperty.UseVisualStyleBackColor = true;
@@ -368,14 +367,12 @@
             this.propertyGridRes.Location = new System.Drawing.Point(3, 3);
             this.propertyGridRes.Name = "propertyGridRes";
             this.propertyGridRes.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGridRes.Size = new System.Drawing.Size(257, 523);
+            this.propertyGridRes.Size = new System.Drawing.Size(258, 518);
             this.propertyGridRes.TabIndex = 1;
             // 
             // tabPageMtl
             // 
-            this.tabPageMtl.Controls.Add(this.buttonApplyMtlProperty);
             this.tabPageMtl.Controls.Add(this.propertyGridMtl);
-            this.tabPageMtl.Controls.Add(this.btnCreateMtl);
             this.tabPageMtl.Controls.Add(this.comboBoxSection);
             this.tabPageMtl.Controls.Add(this.label2);
             this.tabPageMtl.Controls.Add(this.comboBoxLOD);
@@ -384,21 +381,10 @@
             this.tabPageMtl.Location = new System.Drawing.Point(4, 23);
             this.tabPageMtl.Name = "tabPageMtl";
             this.tabPageMtl.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageMtl.Size = new System.Drawing.Size(263, 529);
+            this.tabPageMtl.Size = new System.Drawing.Size(264, 524);
             this.tabPageMtl.TabIndex = 1;
             this.tabPageMtl.Text = "Material";
             this.tabPageMtl.UseVisualStyleBackColor = true;
-            // 
-            // buttonApplyMtlProperty
-            // 
-            this.buttonApplyMtlProperty.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.buttonApplyMtlProperty.Location = new System.Drawing.Point(3, 480);
-            this.buttonApplyMtlProperty.Name = "buttonApplyMtlProperty";
-            this.buttonApplyMtlProperty.Size = new System.Drawing.Size(257, 23);
-            this.buttonApplyMtlProperty.TabIndex = 12;
-            this.buttonApplyMtlProperty.Text = "Apply";
-            this.buttonApplyMtlProperty.UseVisualStyleBackColor = true;
-            this.buttonApplyMtlProperty.Click += new System.EventHandler(this.buttonApplyMtlProperty_Click);
             // 
             // propertyGridMtl
             // 
@@ -406,21 +392,9 @@
             this.propertyGridMtl.Location = new System.Drawing.Point(3, 75);
             this.propertyGridMtl.Name = "propertyGridMtl";
             this.propertyGridMtl.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGridMtl.Size = new System.Drawing.Size(257, 428);
+            this.propertyGridMtl.Size = new System.Drawing.Size(258, 446);
             this.propertyGridMtl.TabIndex = 11;
             this.propertyGridMtl.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGridMtl_PropertyValueChanged);
-            // 
-            // btnCreateMtl
-            // 
-            this.btnCreateMtl.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnCreateMtl.Location = new System.Drawing.Point(3, 503);
-            this.btnCreateMtl.Margin = new System.Windows.Forms.Padding(16, 3, 16, 3);
-            this.btnCreateMtl.Name = "btnCreateMtl";
-            this.btnCreateMtl.Size = new System.Drawing.Size(257, 23);
-            this.btnCreateMtl.TabIndex = 10;
-            this.btnCreateMtl.Text = "Create";
-            this.btnCreateMtl.UseVisualStyleBackColor = true;
-            this.btnCreateMtl.Click += new System.EventHandler(this.btnCreateMtl_Click);
             // 
             // comboBoxSection
             // 
@@ -429,7 +403,7 @@
             this.comboBoxSection.FormattingEnabled = true;
             this.comboBoxSection.Location = new System.Drawing.Point(3, 53);
             this.comboBoxSection.Name = "comboBoxSection";
-            this.comboBoxSection.Size = new System.Drawing.Size(257, 22);
+            this.comboBoxSection.Size = new System.Drawing.Size(258, 22);
             this.comboBoxSection.TabIndex = 9;
             this.comboBoxSection.SelectedIndexChanged += new System.EventHandler(this.comboBoxSection_SelectedIndexChanged);
             // 
@@ -450,7 +424,7 @@
             this.comboBoxLOD.FormattingEnabled = true;
             this.comboBoxLOD.Location = new System.Drawing.Point(3, 17);
             this.comboBoxLOD.Name = "comboBoxLOD";
-            this.comboBoxLOD.Size = new System.Drawing.Size(257, 22);
+            this.comboBoxLOD.Size = new System.Drawing.Size(258, 22);
             this.comboBoxLOD.TabIndex = 8;
             this.comboBoxLOD.SelectedIndexChanged += new System.EventHandler(this.comboBoxLOD_SelectedIndexChanged);
             // 
@@ -472,7 +446,7 @@
             this.tabPageAnim.Location = new System.Drawing.Point(4, 23);
             this.tabPageAnim.Name = "tabPageAnim";
             this.tabPageAnim.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAnim.Size = new System.Drawing.Size(263, 529);
+            this.tabPageAnim.Size = new System.Drawing.Size(264, 524);
             this.tabPageAnim.TabIndex = 2;
             this.tabPageAnim.Text = "Animation";
             this.tabPageAnim.UseVisualStyleBackColor = true;
@@ -483,7 +457,7 @@
             this.groupSeqInfo.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupSeqInfo.Location = new System.Drawing.Point(3, 212);
             this.groupSeqInfo.Name = "groupSeqInfo";
-            this.groupSeqInfo.Size = new System.Drawing.Size(257, 311);
+            this.groupSeqInfo.Size = new System.Drawing.Size(258, 311);
             this.groupSeqInfo.TabIndex = 5;
             this.groupSeqInfo.TabStop = false;
             this.groupSeqInfo.Text = "Anim Sequence Info";
@@ -493,7 +467,7 @@
             this.propertyGridSeq.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGridSeq.Location = new System.Drawing.Point(3, 16);
             this.propertyGridSeq.Name = "propertyGridSeq";
-            this.propertyGridSeq.Size = new System.Drawing.Size(251, 292);
+            this.propertyGridSeq.Size = new System.Drawing.Size(252, 292);
             this.propertyGridSeq.TabIndex = 3;
             // 
             // groupSeqList
@@ -503,7 +477,7 @@
             this.groupSeqList.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupSeqList.Location = new System.Drawing.Point(3, 3);
             this.groupSeqList.Name = "groupSeqList";
-            this.groupSeqList.Size = new System.Drawing.Size(257, 209);
+            this.groupSeqList.Size = new System.Drawing.Size(258, 209);
             this.groupSeqList.TabIndex = 4;
             this.groupSeqList.TabStop = false;
             this.groupSeqList.Text = "Anim Sequence List";
@@ -602,17 +576,14 @@
         private System.Windows.Forms.ToolStripButton toolBtnZoomExtents;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ImageList imageListTab;
-        private System.Windows.Forms.Button buttonApplyMtlProperty;
-        private System.Windows.Forms.PropertyGrid propertyGridMtl;
-        private System.Windows.Forms.Button btnCreateMtl;
+		private System.Windows.Forms.ImageList imageListTab;
+		private System.Windows.Forms.PropertyGrid propertyGridMtl;
         private System.Windows.Forms.ComboBox comboBoxSection;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox comboBoxLOD;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PropertyGrid propertyGridRes;
         private System.Windows.Forms.SplitContainer splitContainerLeft;
-        private System.Windows.Forms.Button btnPlay;
         private System.Windows.Forms.TrackBar trackBarTime;
         private System.Windows.Forms.TabPage tabPageAnim;
         private System.Windows.Forms.ListBox listBoxAnim;
@@ -626,5 +597,6 @@
         private System.Windows.Forms.Button btnTrnRemoveSeq;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton toolBtnXML;
+        private System.Windows.Forms.Button btnPlay;
     }
 }

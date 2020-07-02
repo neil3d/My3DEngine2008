@@ -1,14 +1,21 @@
 #include "StdAfx.h"
-#include "global_shader_lib.h"
+#include <boost/bind.hpp>
 #define BOOST_FILESYSTEM_DYN_LINK 
 #include <boost/filesystem.hpp>
+
+#include "global_shader_lib.h"
 #include "d3d_device_manager.h"
 #include "util.h"
 
 namespace nexus
 {
+	extern nfile_system::ptr g_file_sys;
+
 	global_shader_lib::global_shader_lib(void)
 	{
+		d3d_device_manager::instance()->register_device_handler(
+			boost::bind(&global_shader_lib::on_device_lost, this, _1),
+			boost::bind(&global_shader_lib::on_device_reset, this, _1) );
 	}
 
 	global_shader_lib::~global_shader_lib(void)
@@ -21,21 +28,28 @@ namespace nexus
 		return &g_global_shaders;
 	}
 
-	void global_shader_lib::load(const nstring& folder_name)
+	void global_shader_lib::file_query_callback(const nfile_entity& f)
 	{
-		boost::filesystem::wpath base_path(folder_name);
-
-		boost::filesystem::wdirectory_iterator end_iter;
-		for(boost::filesystem::wdirectory_iterator iter(base_path);
-			iter != end_iter;
-			++iter)
+		if( f.type == EFile_Regular 
+			&& f.file_size > 0)
 		{
-			if(boost::filesystem::is_regular( iter->status() ) )
-			{
-				boost::filesystem::wpath path = *iter;
-				create_effect_from_file(path.leaf(), path.string() );				
-			}
-		}// end of for
+			nstring filename = f.path;
+			// 去掉路径的文件名作为key
+			nstring::size_type ipos = filename.find_last_of(_T('/'));
+
+			if (ipos != nstring::npos)
+				filename = filename.substr(ipos+1, filename.length()-ipos-1);				
+			
+
+			create_effect_from_file(filename, f.path);
+		}
+	}
+
+	void global_shader_lib::load(const nstring& pkg_name, const nstring& folder_name)
+	{
+		g_file_sys->query_package(pkg_name, folder_name, 
+			nfile_query_bind( boost::bind(&global_shader_lib::file_query_callback, this, _1) )
+			);
 	}
 
 	d3d_effect_ptr global_shader_lib::find_shader(const nstring& file_name)
@@ -52,7 +66,7 @@ namespace nexus
 	void global_shader_lib::create_effect_from_file(const nstring& key_name, const nstring& file_name)
 	{
 		std::string shader_code;
-		load_shder_source(file_name, shader_code);
+		load_shader_source(file_name, shader_code);
 
 		HRESULT hr;
 		IDirect3DDevice9* device = d3d_device_manager::instance()->get_device();
@@ -83,5 +97,33 @@ namespace nexus
 		{
 			m_effect_map.insert( std::make_pair(key_name, d3d_effect_ptr(ret)) );
 		}
+	}
+
+	void global_shader_lib::on_device_lost(int param)
+	{
+		HRESULT hr;
+		for (effect_map::iterator iter = m_effect_map.begin();
+			iter != m_effect_map.end();
+			++iter)
+		{
+			d3d_effect_ptr eft = iter->second;
+			hr = eft->OnLostDevice();
+			nASSERT( SUCCEEDED(hr) );
+		}
+	}
+
+	bool global_shader_lib::on_device_reset(int param)
+	{
+		HRESULT hr;
+		for (effect_map::iterator iter = m_effect_map.begin();
+			iter != m_effect_map.end();
+			++iter)
+		{
+			d3d_effect_ptr eft = iter->second;
+			hr = eft->OnResetDevice();
+			if( FAILED(hr) )
+				return false;
+		}
+		return true;
 	}
 }//namespace nexus

@@ -30,7 +30,21 @@ namespace NexusEngine
 	{
 	}
 
+	HBITMAP ImageThumbnailCreator::LoadTextureAsBitmap(NResourceLoc loc)
+	{
+		LoadImage(loc);		
+		return ilutConvertToHBitmap(m_hdc);
+	}
+
 	HBITMAP ImageThumbnailCreator::CreateThumbnail(NResourceLoc loc, int w, int h)
+	{
+		LoadImage(loc);
+
+		iluScale(w, h, 1);
+		return ilutConvertToHBitmap(m_hdc);
+	}
+
+	void ImageThumbnailCreator::LoadImage(NResourceLoc loc)
 	{
 		//-- Load File to memory lump
 		nexus::resource_location nloc;
@@ -50,23 +64,16 @@ namespace NexusEngine
 			);
 		fp->read_buffer(lump.get(), fileSize);
 		
-		//--
+		//-- load image
 		ILuint imageName;
 
 		ilGenImages(1, &imageName);
 		ilBindImage(imageName);
 
-		if( ilLoadL(IL_TYPE_UNKNOWN , lump.get(), fileSize) )
-		{
-			iluScale(w, h, 1);
-			return ilutConvertToHBitmap(m_hdc);
-		}
-		else
+		if( !ilLoadL(IL_TYPE_UNKNOWN , lump.get(), fileSize) )		
 		{
 			throw gcnew NexusNativeException("Image file load failed");
 		}
-
-		return NULL;
 	}
 
 	void ImageThumbnailCreator::Init()

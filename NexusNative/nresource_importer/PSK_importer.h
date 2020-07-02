@@ -39,6 +39,10 @@ namespace nexus
 		virtual nskeletal_mesh::ptr import_from_file(const nstring& full_path);
 
 	private:
+		void generate_normal(nskeletal_mesh::ptr mesh);
+		void generate_tangent(const vector<nmesh_section::ptr>& sec_array);
+
+	private:
 		PSKFile	m_file_data;
 
 		std::vector<skin_vertex>	m_vertices;

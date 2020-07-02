@@ -41,6 +41,8 @@ namespace nexus
 			break;
 		case EVEU_Tangent:			ret = D3DDECLUSAGE_TANGENT;
 			break;
+		case EVEU_Binormal:			ret = D3DDECLUSAGE_BINORMAL;
+			break;
 		case EVEU_TexCoord:			ret = D3DDECLUSAGE_TEXCOORD;
 			break;
 		case EVEU_BlendIndices:		ret = D3DDECLUSAGE_BLENDINDICES;
@@ -75,7 +77,7 @@ namespace nexus
 		oss <<_T("shader_d3d9/vertex_factory/")
 			<< m_vertex_factory_name
 			<< _T(".hlsl");
-		load_shder_source(oss.str(), m_shader_code);
+		load_shader_source(oss.str(), m_shader_code);
 	}
 
 	void vertex_factory_type::create_shared(const nmesh_vertex_data* vb, vector<D3DVERTEXELEMENT9>& d3d_element_array)
@@ -89,6 +91,7 @@ namespace nexus
 
 		m_vert_decl.reset(d3d_decl);
 
+		m_element_array = d3d_element_array;
 		m_vertex_factory_name = vb->get_vertex_factory_name();
 		//-- copy shader macro
 		m_shader_macro_array = vb->get_macro_array();
@@ -265,11 +268,72 @@ namespace nexus
 				THROW_D3D_HRESULT(hr, _T("CreateVertexDeclaration Failed"));
 
 			m_vert_decl_static_pos_only.reset(d3d_decl);
-
 		}
 		
 		//--
 		conditional_create(vb, ECreate_Static);
+	}
+
+	void vertex_factory_type_lib::conditional_create_for_instance(const nmesh_vertex_data* vb)
+	{
+		//--
+		vertex_factory_type::ptr vf_type;
+
+		nstring type_name = vb->get_vertex_type_name() + nstring(_T("_instance"));
+
+		vf_type_map::iterator iter = m_type_map.find(type_name);
+		if( iter != m_type_map.end() )
+		{
+			vf_type = iter->second;
+		}
+		else
+		{
+			vf_type.reset(nNew vertex_factory_type(type_name));
+			m_type_map.insert(make_pair(type_name, vf_type));
+		}
+
+		if( !vf_type->is_created() )
+		{
+			//-- create vertex declaration
+			vector<D3DVERTEXELEMENT9>	d3d_element_array;
+			for(size_t i=0; i<vb->get_num_stream(); i++)
+			{
+				const element_array& defines = vb->get_stream_elements_define(i);
+				for(size_t j=0; j<defines.size(); j++)
+				{
+					const vertex_element_define& def = defines[j];
+
+					D3DVERTEXELEMENT9 d3d_def;
+					d3d_def.Stream	= (WORD)i;
+					d3d_def.Offset	= def.offset;
+					d3d_def.Type	= convert_vertex_element_type( def.type );
+					d3d_def.Method	= D3DDECLMETHOD_DEFAULT;
+					d3d_def.Usage	= convert_vertex_element_usage( def.usage );
+					d3d_def.UsageIndex = def.usage_index;
+
+					d3d_element_array.push_back(d3d_def);
+				}
+			}
+
+			for(size_t j=0; j<4; j++)
+			{
+				D3DVERTEXELEMENT9 d3d_def;
+				d3d_def.Stream	= 8;
+				d3d_def.Offset	= j*sizeof(float)*4;
+				d3d_def.Type = D3DDECLTYPE_FLOAT4;
+				d3d_def.Method = D3DDECLMETHOD_DEFAULT;
+				d3d_def.Usage	= D3DDECLUSAGE_COLOR;
+				d3d_def.UsageIndex = j;
+
+				d3d_element_array.push_back(d3d_def);
+			}
+		
+			D3DVERTEXELEMENT9 endElm = D3DDECL_END();
+			d3d_element_array.push_back(endElm);
+
+			vf_type->create_shared(vb, d3d_element_array);
+			vf_type->add_macro(shader_define("USE_INSTANCE", "1"));
+		}
 	}
 
 	void vertex_factory_type_lib::conditional_create(const nmesh_vertex_data* vb, enum ECreateType ct)
@@ -307,12 +371,19 @@ namespace nexus
 		}
 	}
 
-	vertex_factory_type* vertex_factory_type_lib::get_type(nstring type_name)
+	vertex_factory_type* vertex_factory_type_lib::get_type(const nstring& type_name)
 	{
 		vf_type_map::iterator iter = m_type_map.find(type_name);
 		if( iter != m_type_map.end() )
 			return iter->second.get();
 
 		return NULL;
+	}
+
+	vertex_factory_type* vertex_factory_type_lib::get_instance_type(const nstring& type_name)
+	{
+		vertex_factory_type* type = get_type(type_name + nstring(_T("_instance")) );
+	
+		return type;
 	}
 }//namespace nexus

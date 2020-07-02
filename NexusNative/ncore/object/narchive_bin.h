@@ -30,6 +30,7 @@ namespace nexus
 		virtual void array_begin(const TCHAR* array_name, size_t& array_size);
 		virtual void array_next() {}
 		virtual void object_begin(const TCHAR* object_name, nstring& class_name);
+		virtual void object_description(const TCHAR* desc_name,nstring& description);
 		virtual void serial(const TCHAR* att_name, int& val);
 		virtual void serial(const TCHAR* att_name, unsigned int& val);
 		virtual void serial(const TCHAR* att_name, char& val);
@@ -73,6 +74,7 @@ namespace nexus
 		
 		virtual void array_begin(const TCHAR* array_name, size_t& array_size);
 		virtual void object_begin(const TCHAR* object_name, nstring& class_name);
+		virtual void object_description(const TCHAR* desc_name,nstring& description);
 		virtual void array_next() {}
 		virtual void serial(const TCHAR* att_name, int& val);
 		virtual void serial(const TCHAR* att_name, unsigned int& val);

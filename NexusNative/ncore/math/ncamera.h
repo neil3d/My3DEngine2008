@@ -43,9 +43,11 @@ namespace nexus
 		float get_zfar() const	{	return m_zfar;}
 		float get_znear() const	{	return m_znear;}
 		float get_fov() const	{	return m_fov;}
+		void  set_fov(float value);
 
 		vector3 screen2world(int screen_x, int screen_y) const;
 		npoint world2screen(const vector3& p) const;
+		vector4 world2screen_with_depth(const vector3& p) const;
 		void get_mouse_ray(int cursorX, int cursorY, ray& out) const;
 
 		int get_viewport_width() const	{	return m_viewport_w;}
@@ -55,6 +57,8 @@ namespace nexus
 			return (float)m_viewport_w/m_viewport_h;
 		}
 
+		bool is_ortho() const { return b_ortho; }
+
 	protected:
 		matrix44	m_mat_view;
 		matrix44	m_mat_view_inv;
@@ -63,6 +67,7 @@ namespace nexus
 		float	m_fov;
 		float	m_znear;
 		float	m_zfar;
+		bool b_ortho;
 
 		vector3	m_lookat;
 		int		m_viewport_w,

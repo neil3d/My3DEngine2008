@@ -3,6 +3,8 @@
 
 namespace nexus
 {
+	nDEFINE_CLASS(nmesh_vertex_data_skin, nmesh_vertex_data)
+
 	nmesh_vertex_data_skin::nmesh_vertex_data_skin(void)
 	{
 		m_tangent = false;

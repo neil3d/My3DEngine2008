@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "MD2_anim_importer.h"
 
 namespace nexus

@@ -24,7 +24,7 @@ namespace nexus
 		virtual ~nrender_resource(void)	{}
 
 		void release();
-
+		
 		nDECLARE_VIRTUAL_CLASS(nrender_resource)
 	};
 
@@ -97,6 +97,7 @@ namespace nexus
 
 		void reset( T* obj )
 		{
+			nASSERT( obj!=NULL && obj!=m_res );
 			reset();
 			m_res = obj;
 		}

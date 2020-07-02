@@ -80,6 +80,17 @@ namespace NexusEngine
 		return (x * x) + (y * y) + (z * z);
 	}
 
+	float Vector3::Length2D()
+	{
+		return static_cast<float>( Math::Sqrt( (x * x) + (z * z) ) );
+	}
+
+	float Vector3::LengthSquared2D()
+	{
+		return (x * x) + (z * z);
+	}
+
+
 	void Vector3::Normalize()
 	{
 		float length = Length();
@@ -808,7 +819,33 @@ namespace NexusEngine
 
 	String^ Vector3::ToString()
 	{
-		return String::Format( CultureInfo::CurrentCulture, "X:{0} Y:{1} Z:{2}", x.ToString(CultureInfo::CurrentCulture), y.ToString(CultureInfo::CurrentCulture), z.ToString(CultureInfo::CurrentCulture) );
+		return String::Format("({0},{1},{2})", this->x, this->y, this->z);
+		//return String::Format( CultureInfo::CurrentCulture, "X:{0} Y:{1} Z:{2}", x.ToString(".0000", CultureInfo::CurrentCulture), y.ToString(".0000", CultureInfo::CurrentCulture), z.ToString(".0000", CultureInfo::CurrentCulture) );
+	}
+
+	/// <summary>
+	///		Overrides the Object.ToString() method to provide a text representation of 
+	///		a Vector3.
+	/// </summary>
+	/// <returns>A string representation of a vector3.</returns>
+	String^ Vector3::ToString(bool shortenDecmialPlaces) 
+	{
+		if(shortenDecmialPlaces)
+			return String::Format("({0:0.00}, {1:0.00} ,{2:0.00})", this->x, this->y, this->z);
+		return ToString();
+	}
+
+	Vector3 Vector3::Parse(String^ text) 
+	{
+		array<String^>^ vals = text->TrimStart('(','[','<')->TrimEnd(')',']','>')->Split(',');
+		if(vals->Length != 3)
+			throw gcnew FormatException(String::Format("Cannot parse the text '{0}' because it does not have 3 parts separated by commas in the form (x,y,z) with optional parenthesis.",text));
+		
+		return Vector3(
+			float::Parse(vals[0]->Trim()),
+			float::Parse(vals[1]->Trim()), 
+			float::Parse(vals[2]->Trim())
+			);
 	}
 
 	int Vector3::GetHashCode()
@@ -835,5 +872,25 @@ namespace NexusEngine
 	bool Vector3::Equals( Vector3% value1, Vector3% value2 )
 	{
 		return ( value1.x == value2.x && value1.y == value2.y && value1.z == value2.z );
+	}
+
+	float Vector3::CalcYaw( Vector3 dir )
+	{
+		dir.y=0;
+		dir.Normalize();
+
+		float yaw = Vector3::Dot(-Vector3::UnitZ, dir);
+
+		if(yaw>1.0f)
+			yaw=1.0f;
+		if(yaw<-1.0f)
+			yaw=-1.0f;
+
+		yaw=acosf(yaw);
+		if(dir.x>0.0f)
+		{
+			yaw = nPI * 2-yaw;
+		}
+		return yaw;
 	}
 }

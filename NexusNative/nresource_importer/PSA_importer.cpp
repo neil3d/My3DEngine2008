@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "PSA_importer.h"
 #include <boost/algorithm/string.hpp>
 #include "F3D_util.h"

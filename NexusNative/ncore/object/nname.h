@@ -26,6 +26,17 @@ namespace nexus
 
 		explicit nname(const nstring& szname);
 		void reset(const nstring& szname);
+	
+		// casting
+		inline operator unsigned int () const
+		{
+			return name_crc;
+		}
+		inline operator nstring () const
+		{
+			return name_str;
+		}
+
 	};
 	
 	inline bool operator < (const nname& v1, const nname& v2)

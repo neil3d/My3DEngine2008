@@ -16,8 +16,16 @@ namespace NexusEngine
 	public:
 		NGameEngine(void);
 
-		//!	执行每帧的Update和Render
-		virtual void FrameTick(float deltaTime, NViewport^ vp);
+		//!	执行每帧的Update
+		virtual void Update(float deltaTime, NViewport^ vp);
+		//!	执行每帧的Render
+		virtual void Render(NViewport^ vp);
+
+		//!	鼠标拾取关卡中的Actor
+		NActor^ PickLevelActor(NViewport^ vp, int mouseX, int mouseY);
+
+		virtual void ScreenShot(System::String^ fileName, UINT32 width, UINT32 height);
+		virtual void ViewportShot(System::String^ fileName);
 
 	protected:
 		property ngame_engine* NativePtr

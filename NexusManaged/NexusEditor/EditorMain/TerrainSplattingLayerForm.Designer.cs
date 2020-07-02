@@ -48,7 +48,7 @@
             this.buttonApplyLayerProperty.Name = "buttonApplyLayerProperty";
             this.buttonApplyLayerProperty.Size = new System.Drawing.Size(75, 23);
             this.buttonApplyLayerProperty.TabIndex = 4;
-            this.buttonApplyLayerProperty.Text = "Apply";
+            this.buttonApplyLayerProperty.Text = "确定";
             this.buttonApplyLayerProperty.UseVisualStyleBackColor = true;
             this.buttonApplyLayerProperty.Click += new System.EventHandler(this.buttonApplyLayerProperty_Click);
             // 
@@ -59,7 +59,7 @@
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(75, 23);
             this.buttonClose.TabIndex = 14;
-            this.buttonClose.Text = "Close";
+            this.buttonClose.Text = "取消";
             this.buttonClose.UseVisualStyleBackColor = true;
             this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
             // 
@@ -73,7 +73,8 @@
             this.Controls.Add(this.buttonApplyLayerProperty);
             this.Controls.Add(this.propertyGridLayer);
             this.Name = "TerrainSplattingLayerForm";
-            this.Text = "Terrain Splatting Layer";            
+            this.Text = "Terrain Splatting Layer";
+            this.Load += new System.EventHandler(this.TerrainSplattingLayerForm_Load);
             this.ResumeLayout(false);
 
         }

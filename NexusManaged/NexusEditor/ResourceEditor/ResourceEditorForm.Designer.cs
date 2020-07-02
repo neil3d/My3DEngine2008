@@ -32,14 +32,26 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ResourceEditorForm));
             this.menuBarResource = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.levelupAttToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resourceEditorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showStaticMeshEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showAnimMeshEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showGUIEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showSFXEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.externalToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolBarResource = new System.Windows.Forms.ToolStrip();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonRefresh = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonStaticMeshEd = new System.Windows.Forms.ToolStripButton();
             this.toolBtnAnimMeshEd = new System.Windows.Forms.ToolStripButton();
+            this.toolBtnAnimSetEd = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripAnimSet = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.thumbnialsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,8 +80,11 @@
             this.imageListForList = new System.Windows.Forms.ImageList(this.components);
             this.imageListForListSmall = new System.Windows.Forms.ImageList(this.components);
             this.contextMenuStripTree = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.saveCurrentLevelHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadLevelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshDirectoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.makeTextureAtlasHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuBarResource.SuspendLayout();
             this.toolBarResource.SuspendLayout();
             this.splitContainerResource.Panel1.SuspendLayout();
@@ -85,33 +100,53 @@
             // 
             this.menuBarResource.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.resourceEditorsToolStripMenuItem});
+            this.resourceEditorsToolStripMenuItem,
+            this.toolsToolStripMenuItem});
             this.menuBarResource.Location = new System.Drawing.Point(0, 0);
             this.menuBarResource.Name = "menuBarResource";
-            this.menuBarResource.Size = new System.Drawing.Size(901, 24);
+            this.menuBarResource.Size = new System.Drawing.Size(901, 25);
             this.menuBarResource.TabIndex = 0;
             this.menuBarResource.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(39, 21);
             this.fileToolStripMenuItem.Text = "File";
+            // 
+            // importToolStripMenuItem
+            // 
+            this.importToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.levelupAttToolStripMenuItem});
+            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.importToolStripMenuItem.Text = "&Import Attribute";
+            this.importToolStripMenuItem.ToolTipText = "从Excel表导入策划数值模板数据";
+            this.importToolStripMenuItem.DropDownOpening += new System.EventHandler(this.importToolStripMenuItem_DropDownOpening);
+            // 
+            // levelupAttToolStripMenuItem
+            // 
+            this.levelupAttToolStripMenuItem.Name = "levelupAttToolStripMenuItem";
+            this.levelupAttToolStripMenuItem.Size = new System.Drawing.Size(68, 22);
             // 
             // resourceEditorsToolStripMenuItem
             // 
             this.resourceEditorsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showStaticMeshEditorToolStripMenuItem,
-            this.showAnimMeshEditorToolStripMenuItem});
+            this.showAnimMeshEditorToolStripMenuItem,
+            this.showGUIEditorToolStripMenuItem,
+            this.showSFXEditorToolStripMenuItem});
             this.resourceEditorsToolStripMenuItem.Name = "resourceEditorsToolStripMenuItem";
-            this.resourceEditorsToolStripMenuItem.Size = new System.Drawing.Size(100, 20);
+            this.resourceEditorsToolStripMenuItem.Size = new System.Drawing.Size(119, 21);
             this.resourceEditorsToolStripMenuItem.Text = "Resource Editors";
             // 
             // showStaticMeshEditorToolStripMenuItem
             // 
             this.showStaticMeshEditorToolStripMenuItem.Image = global::NexusEditor.Properties.Resources.Box;
             this.showStaticMeshEditorToolStripMenuItem.Name = "showStaticMeshEditorToolStripMenuItem";
-            this.showStaticMeshEditorToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.showStaticMeshEditorToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
             this.showStaticMeshEditorToolStripMenuItem.Text = "Show Static Mesh Editor";
             this.showStaticMeshEditorToolStripMenuItem.Click += new System.EventHandler(this.showStaticMeshEditorToolStripMenuItem_Click);
             // 
@@ -119,67 +154,168 @@
             // 
             this.showAnimMeshEditorToolStripMenuItem.Image = global::NexusEditor.Properties.Resources.AnimMesh;
             this.showAnimMeshEditorToolStripMenuItem.Name = "showAnimMeshEditorToolStripMenuItem";
-            this.showAnimMeshEditorToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.showAnimMeshEditorToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
             this.showAnimMeshEditorToolStripMenuItem.Text = "Show Anim Mesh Editor";
             this.showAnimMeshEditorToolStripMenuItem.Click += new System.EventHandler(this.showAnimMeshEditorToolStripMenuItem_Click);
+            // 
+            // showGUIEditorToolStripMenuItem
+            // 
+            this.showGUIEditorToolStripMenuItem.Image = global::NexusEditor.Properties.Resources.Window;
+            this.showGUIEditorToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Fuchsia;
+            this.showGUIEditorToolStripMenuItem.Name = "showGUIEditorToolStripMenuItem";
+            this.showGUIEditorToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.showGUIEditorToolStripMenuItem.Text = "Show &GUI Editor";
+            this.showGUIEditorToolStripMenuItem.Click += new System.EventHandler(this.showGUIEditorToolStripMenuItem_Click);
+            // 
+            // showSFXEditorToolStripMenuItem
+            // 
+            this.showSFXEditorToolStripMenuItem.Image = global::NexusEditor.Properties.Resources.chinaz_31A_PNG04;
+            this.showSFXEditorToolStripMenuItem.Name = "showSFXEditorToolStripMenuItem";
+            this.showSFXEditorToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.showSFXEditorToolStripMenuItem.Text = "Show SFX Editor";
+            this.showSFXEditorToolStripMenuItem.Click += new System.EventHandler(this.showSFXEditorToolStripMenuItem_Click);
+            // 
+            // toolsToolStripMenuItem
+            // 
+            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.externalToolsToolStripMenuItem});
+            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(52, 21);
+            this.toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // externalToolsToolStripMenuItem
+            // 
+            this.externalToolsToolStripMenuItem.Name = "externalToolsToolStripMenuItem";
+            this.externalToolsToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.externalToolsToolStripMenuItem.Text = "External Tools...";
+            this.externalToolsToolStripMenuItem.ToolTipText = "根据文件后缀调用外部工具";
+            this.externalToolsToolStripMenuItem.Click += new System.EventHandler(this.externalToolsToolStripMenuItem_Click);
             // 
             // toolBarResource
             // 
             this.toolBarResource.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripButton1,
+            this.toolStripButton3,
             this.toolStripButtonRefresh,
             this.toolStripSeparator1,
+            this.toolStripButton2,
             this.toolStripButtonStaticMeshEd,
             this.toolBtnAnimMeshEd,
+            this.toolBtnAnimSetEd,
+            this.toolStripButton5,
+            this.toolStripAnimSet,
             this.toolStripSeparator2,
             this.toolStripDropDownButton1,
             this.toolStripSplitButton1,
             this.toolStripSeparator3,
             this.toolStripLabel1,
             this.toolTextSearch});
-            this.toolBarResource.Location = new System.Drawing.Point(0, 24);
+            this.toolBarResource.Location = new System.Drawing.Point(0, 25);
             this.toolBarResource.Name = "toolBarResource";
-            this.toolBarResource.Size = new System.Drawing.Size(901, 36);
+            this.toolBarResource.Size = new System.Drawing.Size(901, 40);
             this.toolBarResource.TabIndex = 1;
             this.toolBarResource.Text = "toolStrip1";
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(36, 37);
+            this.toolStripButton1.Text = "后退";
+            this.toolStripButton1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.toolStripButton1.ToolTipText = "返回上一次选择的目录";
+            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            // 
+            // toolStripButton3
+            // 
+            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
+            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton3.Name = "toolStripButton3";
+            this.toolStripButton3.Size = new System.Drawing.Size(36, 37);
+            this.toolStripButton3.Text = "前进";
+            this.toolStripButton3.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
             // toolStripButtonRefresh
             // 
             this.toolStripButtonRefresh.Image = global::NexusEditor.Properties.Resources.Refresh;
             this.toolStripButtonRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonRefresh.Name = "toolStripButtonRefresh";
-            this.toolStripButtonRefresh.Size = new System.Drawing.Size(49, 33);
+            this.toolStripButtonRefresh.Size = new System.Drawing.Size(56, 37);
             this.toolStripButtonRefresh.Text = "Refresh";
             this.toolStripButtonRefresh.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.toolStripButtonRefresh.Click += new System.EventHandler(this.toolStripButtonRefresh_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 36);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 40);
+            // 
+            // toolStripButton2
+            // 
+            this.toolStripButton2.Image = global::NexusEditor.Properties.Resources.Box;
+            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton2.Name = "toolStripButton2";
+            this.toolStripButton2.Size = new System.Drawing.Size(90, 37);
+            this.toolStripButton2.Text = "StaticMeshEd";
+            this.toolStripButton2.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
             // toolStripButtonStaticMeshEd
             // 
-            this.toolStripButtonStaticMeshEd.Image = global::NexusEditor.Properties.Resources.Box;
+            this.toolStripButtonStaticMeshEd.Image = global::NexusEditor.Properties.Resources.png_0803;
             this.toolStripButtonStaticMeshEd.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonStaticMeshEd.Name = "toolStripButtonStaticMeshEd";
-            this.toolStripButtonStaticMeshEd.Size = new System.Drawing.Size(75, 33);
-            this.toolStripButtonStaticMeshEd.Text = "StaticMeshEd";
+            this.toolStripButtonStaticMeshEd.Size = new System.Drawing.Size(75, 37);
+            this.toolStripButtonStaticMeshEd.Text = "MaterialEd";
             this.toolStripButtonStaticMeshEd.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.toolStripButtonStaticMeshEd.Click += new System.EventHandler(this.showStaticMeshEditorToolStripMenuItem_Click);
+            this.toolStripButtonStaticMeshEd.Click += new System.EventHandler(this.toolStripButtonStaticMeshEd_Click);
             // 
             // toolBtnAnimMeshEd
             // 
             this.toolBtnAnimMeshEd.Image = global::NexusEditor.Properties.Resources.AnimMesh;
             this.toolBtnAnimMeshEd.ImageTransparentColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
             this.toolBtnAnimMeshEd.Name = "toolBtnAnimMeshEd";
-            this.toolBtnAnimMeshEd.Size = new System.Drawing.Size(71, 33);
+            this.toolBtnAnimMeshEd.Size = new System.Drawing.Size(88, 37);
             this.toolBtnAnimMeshEd.Text = "AnimMeshEd";
             this.toolBtnAnimMeshEd.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.toolBtnAnimMeshEd.Click += new System.EventHandler(this.showAnimMeshEditorToolStripMenuItem_Click);
             // 
+            // toolBtnAnimSetEd
+            // 
+            this.toolBtnAnimSetEd.Image = global::NexusEditor.Properties.Resources.action_go;
+            this.toolBtnAnimSetEd.ImageTransparentColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.toolBtnAnimSetEd.Name = "toolBtnAnimSetEd";
+            this.toolBtnAnimSetEd.Size = new System.Drawing.Size(59, 37);
+            this.toolBtnAnimSetEd.Text = "AnimSet";
+            this.toolBtnAnimSetEd.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.toolBtnAnimSetEd.Click += new System.EventHandler(this.toolStripAnimSet_Click);
+            // 
+            // toolStripButton5
+            // 
+            this.toolStripButton5.Image = global::NexusEditor.Properties.Resources.chinaz_31A_PNG04;
+            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.toolStripButton5.Name = "toolStripButton5";
+            this.toolStripButton5.Size = new System.Drawing.Size(68, 37);
+            this.toolStripButton5.Text = "SFXEditor";
+            this.toolStripButton5.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.toolStripButton5.Click += new System.EventHandler(this.showSFXEditorToolStripMenuItem_Click);
+            // 
+            // toolStripAnimSet
+            // 
+            this.toolStripAnimSet.Image = global::NexusEditor.Properties.Resources.Window;
+            this.toolStripAnimSet.ImageTransparentColor = System.Drawing.Color.Fuchsia;
+            this.toolStripAnimSet.Name = "toolStripAnimSet";
+            this.toolStripAnimSet.Size = new System.Drawing.Size(69, 37);
+            this.toolStripAnimSet.Text = "GUIEditor";
+            this.toolStripAnimSet.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.toolStripAnimSet.Click += new System.EventHandler(this.showGUIEditorToolStripMenuItem_Click);
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 36);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 40);
             // 
             // toolStripDropDownButton1
             // 
@@ -190,28 +326,28 @@
             this.toolStripDropDownButton1.Image = global::NexusEditor.Properties.Resources.ListMode;
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(61, 33);
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(71, 37);
             this.toolStripDropDownButton1.Text = "List View";
             this.toolStripDropDownButton1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
             // thumbnialsToolStripMenuItem
             // 
             this.thumbnialsToolStripMenuItem.Name = "thumbnialsToolStripMenuItem";
-            this.thumbnialsToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.thumbnialsToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.thumbnialsToolStripMenuItem.Text = "Thumbnials";
             this.thumbnialsToolStripMenuItem.Click += new System.EventHandler(this.thumbnialsToolStripMenuItem_Click);
             // 
             // iconsToolStripMenuItem
             // 
             this.iconsToolStripMenuItem.Name = "iconsToolStripMenuItem";
-            this.iconsToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.iconsToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.iconsToolStripMenuItem.Text = "Icons";
             this.iconsToolStripMenuItem.Click += new System.EventHandler(this.iconsToolStripMenuItem_Click);
             // 
             // detailsToolStripMenuItem
             // 
             this.detailsToolStripMenuItem.Name = "detailsToolStripMenuItem";
-            this.detailsToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.detailsToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.detailsToolStripMenuItem.Text = "Details";
             this.detailsToolStripMenuItem.Click += new System.EventHandler(this.detailsToolStripMenuItem_Click);
             // 
@@ -223,26 +359,26 @@
             this.toolStripSplitButton1.Image = global::NexusEditor.Properties.Resources.Sort;
             this.toolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
             this.toolStripSplitButton1.Name = "toolStripSplitButton1";
-            this.toolStripSplitButton1.Size = new System.Drawing.Size(72, 33);
+            this.toolStripSplitButton1.Size = new System.Drawing.Size(87, 37);
             this.toolStripSplitButton1.Text = "Sort Mode";
             this.toolStripSplitButton1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
             // nameToolStripMenuItem
             // 
             this.nameToolStripMenuItem.Name = "nameToolStripMenuItem";
-            this.nameToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            this.nameToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.nameToolStripMenuItem.Text = "Name";
             // 
             // dateToolStripMenuItem
             // 
             this.dateToolStripMenuItem.Name = "dateToolStripMenuItem";
-            this.dateToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            this.dateToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.dateToolStripMenuItem.Text = "Date";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 36);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 40);
             // 
             // toolStripLabel1
             // 
@@ -258,7 +394,7 @@
             // toolTextSearch
             // 
             this.toolTextSearch.Name = "toolTextSearch";
-            this.toolTextSearch.Size = new System.Drawing.Size(128, 36);
+            this.toolTextSearch.Size = new System.Drawing.Size(128, 23);
             this.toolTextSearch.TextChanged += new System.EventHandler(this.toolTextSearch_TextChanged);
             // 
             // statusBarResource
@@ -273,7 +409,7 @@
             // 
             this.splitContainerResource.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainerResource.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerResource.Location = new System.Drawing.Point(0, 60);
+            this.splitContainerResource.Location = new System.Drawing.Point(0, 65);
             this.splitContainerResource.Name = "splitContainerResource";
             // 
             // splitContainerResource.Panel1
@@ -283,8 +419,9 @@
             // splitContainerResource.Panel2
             // 
             this.splitContainerResource.Panel2.Controls.Add(this.listViewResource);
-            this.splitContainerResource.Size = new System.Drawing.Size(901, 496);
-            this.splitContainerResource.SplitterDistance = 300;
+            this.splitContainerResource.Size = new System.Drawing.Size(901, 491);
+            this.splitContainerResource.SplitterDistance = 298;
+            this.splitContainerResource.SplitterWidth = 5;
             this.splitContainerResource.TabIndex = 3;
             // 
             // tabControlResource
@@ -296,7 +433,7 @@
             this.tabControlResource.Location = new System.Drawing.Point(0, 0);
             this.tabControlResource.Name = "tabControlResource";
             this.tabControlResource.SelectedIndex = 0;
-            this.tabControlResource.Size = new System.Drawing.Size(298, 494);
+            this.tabControlResource.Size = new System.Drawing.Size(296, 489);
             this.tabControlResource.TabIndex = 0;
             // 
             // tabPageFileSys
@@ -305,8 +442,8 @@
             this.tabPageFileSys.ImageIndex = 0;
             this.tabPageFileSys.Location = new System.Drawing.Point(4, 23);
             this.tabPageFileSys.Name = "tabPageFileSys";
-            this.tabPageFileSys.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageFileSys.Size = new System.Drawing.Size(290, 467);
+            this.tabPageFileSys.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPageFileSys.Size = new System.Drawing.Size(288, 462);
             this.tabPageFileSys.TabIndex = 0;
             this.tabPageFileSys.Text = "FileSys";
             this.tabPageFileSys.UseVisualStyleBackColor = true;
@@ -316,11 +453,13 @@
             this.treeViewFileSys.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeViewFileSys.ImageIndex = 0;
             this.treeViewFileSys.ImageList = this.imageListTree;
-            this.treeViewFileSys.Location = new System.Drawing.Point(3, 3);
+            this.treeViewFileSys.LabelEdit = true;
+            this.treeViewFileSys.Location = new System.Drawing.Point(4, 4);
             this.treeViewFileSys.Name = "treeViewFileSys";
             this.treeViewFileSys.SelectedImageIndex = 0;
-            this.treeViewFileSys.Size = new System.Drawing.Size(284, 461);
+            this.treeViewFileSys.Size = new System.Drawing.Size(280, 454);
             this.treeViewFileSys.TabIndex = 0;
+            this.treeViewFileSys.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeViewFileSys_AfterLabelEdit);
             this.treeViewFileSys.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewFileSys_AfterSelect);
             this.treeViewFileSys.Click += new System.EventHandler(this.treeViewFileSys_Click);
             // 
@@ -339,8 +478,8 @@
             this.tabPageResFilter.ImageIndex = 1;
             this.tabPageResFilter.Location = new System.Drawing.Point(4, 23);
             this.tabPageResFilter.Name = "tabPageResFilter";
-            this.tabPageResFilter.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageResFilter.Size = new System.Drawing.Size(290, 467);
+            this.tabPageResFilter.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPageResFilter.Size = new System.Drawing.Size(288, 462);
             this.tabPageResFilter.TabIndex = 1;
             this.tabPageResFilter.Text = "ResFilter";
             this.tabPageResFilter.UseVisualStyleBackColor = true;
@@ -355,10 +494,11 @@
             "Static Mesh",
             "Skeletal Mesh",
             "Morph Anim Mesh",
-            "Texture"});
-            this.listFilter.Location = new System.Drawing.Point(3, 3);
+            "Texture",
+            "Material"});
+            this.listFilter.Location = new System.Drawing.Point(4, 4);
             this.listFilter.Name = "listFilter";
-            this.listFilter.Size = new System.Drawing.Size(284, 452);
+            this.listFilter.Size = new System.Drawing.Size(280, 452);
             this.listFilter.TabIndex = 0;
             this.listFilter.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.listFilter_ItemCheck);
             // 
@@ -382,7 +522,7 @@
             this.listViewResource.LargeImageList = this.imageListForList;
             this.listViewResource.Location = new System.Drawing.Point(0, 0);
             this.listViewResource.Name = "listViewResource";
-            this.listViewResource.Size = new System.Drawing.Size(595, 494);
+            this.listViewResource.Size = new System.Drawing.Size(596, 489);
             this.listViewResource.TabIndex = 0;
             this.listViewResource.UseCompatibleStateImageBehavior = false;
             this.listViewResource.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listViewResource_MouseDoubleClick);
@@ -424,24 +564,48 @@
             // contextMenuStripTree
             // 
             this.contextMenuStripTree.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveCurrentLevelHereToolStripMenuItem,
-            this.loadLevelToolStripMenuItem});
+            this.newToolStripMenuItem,
+            this.deleteToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.refreshDirectoryToolStripMenuItem,
+            this.makeTextureAtlasHereToolStripMenuItem});
             this.contextMenuStripTree.Name = "contextMenuStripTree";
-            this.contextMenuStripTree.Size = new System.Drawing.Size(204, 48);
+            this.contextMenuStripTree.Size = new System.Drawing.Size(219, 114);
             // 
-            // saveCurrentLevelHereToolStripMenuItem
+            // newToolStripMenuItem
             // 
-            this.saveCurrentLevelHereToolStripMenuItem.Name = "saveCurrentLevelHereToolStripMenuItem";
-            this.saveCurrentLevelHereToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.saveCurrentLevelHereToolStripMenuItem.Text = "Save Current Level here...";
-            this.saveCurrentLevelHereToolStripMenuItem.Click += new System.EventHandler(this.saveCurrentLevelHereToolStripMenuItem_Click);
+            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.newToolStripMenuItem.Text = "New";
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
-            // loadLevelToolStripMenuItem
+            // deleteToolStripMenuItem
             // 
-            this.loadLevelToolStripMenuItem.Name = "loadLevelToolStripMenuItem";
-            this.loadLevelToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.loadLevelToolStripMenuItem.Text = "Load Level ...";
-            this.loadLevelToolStripMenuItem.Click += new System.EventHandler(this.loadLevelToolStripMenuItem_Click);
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(218, 22);
+            this.toolStripMenuItem1.Text = "Rename";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            // 
+            // refreshDirectoryToolStripMenuItem
+            // 
+            this.refreshDirectoryToolStripMenuItem.Name = "refreshDirectoryToolStripMenuItem";
+            this.refreshDirectoryToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.refreshDirectoryToolStripMenuItem.Text = "Refresh Directory";
+            this.refreshDirectoryToolStripMenuItem.Click += new System.EventHandler(this.refreshDirectoryToolStripMenuItem_Click);
+            // 
+            // makeTextureAtlasHereToolStripMenuItem
+            // 
+            this.makeTextureAtlasHereToolStripMenuItem.Name = "makeTextureAtlasHereToolStripMenuItem";
+            this.makeTextureAtlasHereToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.makeTextureAtlasHereToolStripMenuItem.Text = "Make Texture Atlas here";
+            this.makeTextureAtlasHereToolStripMenuItem.Click += new System.EventHandler(this.makeTextureAtlasHereToolStripMenuItem_Click);
             // 
             // ResourceEditorForm
             // 
@@ -490,8 +654,6 @@
         private System.Windows.Forms.ToolStripMenuItem resourceEditorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showStaticMeshEditorToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripTree;
-        private System.Windows.Forms.ToolStripMenuItem saveCurrentLevelHereToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem loadLevelToolStripMenuItem;
         private System.Windows.Forms.ImageList imageListTree;
         private System.Windows.Forms.ImageList imageListForList;
         private System.Windows.Forms.ToolStripButton toolStripButtonRefresh;
@@ -516,5 +678,22 @@
         private System.Windows.Forms.ColumnHeader columnFileSize;
         private System.Windows.Forms.ColumnHeader columnResType;
         private System.Windows.Forms.ColumnHeader columnDate;
+        private System.Windows.Forms.ToolStripMenuItem makeTextureAtlasHereToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showGUIEditorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showSFXEditorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem externalToolsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem refreshDirectoryToolStripMenuItem;
+		private System.Windows.Forms.ToolStripButton toolStripButton2;
+		private System.Windows.Forms.ToolStripButton toolStripButton1;
+		private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem levelupAttToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton toolStripAnimSet;
+        private System.Windows.Forms.ToolStripButton toolBtnAnimSetEd;
+        private System.Windows.Forms.ToolStripButton toolStripButton5;
     }
 }

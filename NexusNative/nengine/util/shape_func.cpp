@@ -17,6 +17,8 @@ namespace nexus
 
 	nrender_static_mesh* shape_func::create_box_rich(float width, float height, float depth)
 	{
+		nrender_static_mesh* new_mesh_ptr = NULL;
+
 		//--
 		vector3 box_max(width/2, height/2, depth/2);
 		vector3 box_min(-width/2, -height/2, -depth/2);
@@ -236,18 +238,20 @@ namespace nexus
 		//-- create render mesh
 		nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
 
-		render_res_ptr<nrender_static_mesh> new_mesh_ptr( rres_mgr->alloc_static_mesh() );
+		new_mesh_ptr = ( rres_mgr->alloc_static_mesh() );
 
 		if( !new_mesh_ptr )
 			nthrow(_T("component: create render static mesh object failed."));
 
 		new_mesh_ptr->create(EDraw_TriangleList, &(vertex_data) );		
 
-		return new_mesh_ptr.release();
+		return new_mesh_ptr;
 	}
 
 	nrender_static_mesh* shape_func::create_box(float width, float height, float depth)
 	{
+		nrender_static_mesh* new_mesh_ptr = NULL;
+
 		//--
 		vector3 box_max(width/2, height/2, depth/2);
 		vector3 box_min(-width/2, -height/2, -depth/2);
@@ -390,32 +394,36 @@ namespace nexus
 		//-- create render mesh
 		nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
 
-		render_res_ptr<nrender_static_mesh> new_mesh_ptr( rres_mgr->alloc_static_mesh() );
+		 new_mesh_ptr = ( rres_mgr->alloc_static_mesh() );
 
 		if( !new_mesh_ptr )
 			nthrow(_T("component: create render static mesh object failed."));
 
 		new_mesh_ptr->create(EDraw_TriangleList, &(vertex_data) );		
 
-		return new_mesh_ptr.release();
+		return new_mesh_ptr;
 	}
 
 	// TODO: bug - bottom cap error
 	nrender_static_mesh_indexed* shape_func::create_sphere(vector3& vCenter, float fRadius, unsigned short wNumRings, unsigned short wNumSections)
 	{
+		nrender_static_mesh_indexed* new_mesh_ptr = NULL;
 		//-- 
 		class Vertex
 		{
 		public:
 			Vertex(const vector3& Pos, const vector3& Norm, const vector2& Tex)
 				: Position(Pos), Normal(Norm), Texture(Tex)
-			{}
+			{
+				Tangent = vec_normalize(vec_cross( vector3(0,1,0),Normal));
+			}
 
 			Vertex()
 			{}
 
 			vector3 Position;
 			vector3 Normal;
+			vector3 Tangent;
 			vector2 Texture;
 		};
 
@@ -428,9 +436,9 @@ namespace nexus
 		vector3 vPoint;
 		
 		//Generate space for the required triangles and vertices.
-		unsigned short       wNumTriangles = (wNumRings + 1) * wNumSections * 2;
+		unsigned short       wNumTriangles = wNumRings * wNumSections * 2;
 		unsigned int      dwNumIndices   = wNumTriangles*3;
-		unsigned int      dwNumVertices  = (wNumRings + 1) * wNumSections + 2;
+		unsigned int      dwNumVertices  = (wNumRings+1) * (wNumSections+1);
 
 		Vertex* pvVertices     = nNew Vertex[dwNumVertices];
 		unsigned short*      pwIndices      = nNew unsigned short[3*wNumTriangles];
@@ -439,24 +447,23 @@ namespace nexus
 		vector3 vTopPoint  = vCenter + vector3( 0.0f, +sy*fRadius, 0.0f);
 		vector3 vBotPoint  = vCenter + vector3( 0.0f, -sy*fRadius, 0.0f);
 		vector3 vNormal = vector3( 0.0f, 1.0f, 0.0f );
-
-		pvVertices[0]               = Vertex( vector3(vTopPoint.x, vTopPoint.y, vTopPoint.z),  vector3(vNormal.x, vNormal.y, vNormal.z), vector2(0.0f, 0.0f) );
-		pvVertices[dwNumVertices-1] = Vertex( vector3(vBotPoint.x, vTopPoint.y, vTopPoint.z), vector3(-vNormal.x, -vNormal.y, -vNormal.z), vector2(0.0f, 0.0f) );
-
+		
+		
+		
 		// Generate vertex points for rings
-		float dtheta = (float)(PI / (wNumRings + 2));     //Angle between each ring
-		float dphi   = (float)(2*PI / wNumSections); //Angle between each section
-		float theta  = dtheta;
-		n = 1; //vertex being generated, begins at 1 to skip top point
+		float dtheta =nPI /  (float)wNumRings;     //Angle between each ring
+		float dphi   = 2*nPI / (float)wNumSections; //Angle between each section
+		float theta  = 0;
+		n = 0; //vertex being generated, begins at 1 to skip top point
 
-		for( i = 0; i < (wNumRings+1); i++ )
+		for(int i = 0; i < wNumRings + 1; i++ )
 		{
 			y = fRadius * (float)cos(theta); // y is the same for each ring
 			v = theta / PI;     // v is the same for each ring
 			rsintheta = fRadius * (float)sin(theta);
 			float phi = 0.0f;
 
-			for( j = 0; j < wNumSections; j++ )
+			for( j = 0; j < wNumSections+1; j++ )
 			{
 				x = rsintheta * (float)sin(phi);
 				z = rsintheta * (float)cos(phi);
@@ -475,53 +482,47 @@ namespace nexus
 			theta += dtheta;
 		}
 
-		// Generate triangles for top and bottom caps.
-		for( i = 0; i < wNumSections; i++ )
+		for( j = 0; j < wNumSections+1; j++ )
 		{
-			pwIndices[3*i+0] = 0;
-			pwIndices[3*i+1] = i + 1;
-			pwIndices[3*i+2] = 1 + ((i + 1) % wNumSections);
-
-			pwIndices[3*(wNumTriangles - wNumSections + i)+0] = (unsigned short)( dwNumVertices - 1 );
-			pwIndices[3*(wNumTriangles - wNumSections + i)+1] = (unsigned short)( dwNumVertices - 2 - i );
-			pwIndices[3*(wNumTriangles - wNumSections + i)+2] = (unsigned short)( dwNumVertices - 2 - 
-				((1 + i) % wNumSections) );
+			pvVertices[j].Tangent = pvVertices[j+wNumSections+1].Tangent ;
+			pvVertices[dwNumVertices - 1 - j].Tangent = pvVertices[dwNumVertices - j - wNumSections - 2 ].Tangent ;
 		}
 
 		// Generate triangles for the rings
-		m = 1;            // first vertex in current ring,begins at 1 to skip top point
-		n = wNumSections; // triangle being generated, skip the top cap 
+		m = 0;            // first vertex in current ring,begins at 1 to skip top point
+		n = 0; // triangle being generated, skip the top cap 
 
 		for( i = 0; i < wNumRings; i++ )
 		{
 			for( j = 0; j < wNumSections; j++ )
 			{
 				pwIndices[3*n+0] = m + j;
-				pwIndices[3*n+1] = m + wNumSections + j;
-				pwIndices[3*n+2] = m + wNumSections + ((j + 1) % wNumSections);
+				pwIndices[3*n+1] = m + wNumSections + 1+ j;
+				pwIndices[3*n+2] = m + wNumSections + 1+(j + 1);
 
 				pwIndices[3*(n+1)+0] = pwIndices[3*n+0];
 				pwIndices[3*(n+1)+1] = pwIndices[3*n+2];
-				pwIndices[3*(n+1)+2] = m + ((j + 1) % wNumSections);
+				pwIndices[3*(n+1)+2] = m + j + 1;
 
 				n += 2;
 			}
-			m += wNumSections;
+			m += wNumSections+1;
 		}
-
+		
 		//------------------------------------------------------------------------------------------------
 		nmesh_vertex_data_common vert_data;
-		vert_data.init(dwNumVertices, 1, 1);
+		vert_data.init(dwNumVertices, 2, 1);
 		vertex_stream* pos_stream = vert_data.get_stream(0);
 		vertex_stream* second_stream = vert_data.get_stream(1);
 		
-		for(unsigned int i=0; i<dwNumVertices; i++)
+		for(i=0; i<dwNumVertices; i++)
 		{
 			Vertex& vt = pvVertices[i];
 
 			pos_stream->set_element(i, 0, vt.Position);
-			second_stream->set_element(i, 0, vt.Normal);			
-			second_stream->set_element(i, 1, vt.Texture);
+			second_stream->set_element(i, 0, vt.Normal);	
+			second_stream->set_element(i,1,vt.Tangent);
+			second_stream->set_element(i, 2, vt.Texture);
 		}
 
 		index_buffer16 index_data;
@@ -535,7 +536,7 @@ namespace nexus
 		//-- create render mesh
 		nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
 
-		render_res_ptr<nrender_static_mesh_indexed> new_mesh_ptr( rres_mgr->alloc_static_mesh_indexed() );
+		new_mesh_ptr = ( rres_mgr->alloc_static_mesh_indexed() );
 
 		if( !new_mesh_ptr )
 			nthrow(_T("component: create render static mesh object failed."));
@@ -543,6 +544,6 @@ namespace nexus
 		// TODO: material id
 		new_mesh_ptr->create(EDraw_TriangleList, &vert_data, &index_data, 0);		
 
-		return new_mesh_ptr.release();
+		return new_mesh_ptr;
 	}
 }//namespace nexus

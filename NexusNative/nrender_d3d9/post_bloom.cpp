@@ -78,7 +78,7 @@ namespace nexus
 
 		//-- create effect
 		std::string effect_code;
-		load_shder_source(_T("shader_d3d9/post_process/bloom.fx"), effect_code);
+		load_shader_source(_T("shader_d3d9/post_process/bloom.fx"), effect_code);
 
 		ID3DXEffect* d3d_eft = NULL;
 		hr = D3DXCreateEffect(device,
@@ -95,7 +95,7 @@ namespace nexus
 
 	}
 
-	void post_bloom::draw_process(const rt_item& source_rt)
+	void post_bloom::draw_process(const rt_item& source_rt) const
 	{
 		float                       g_BrightThreshold           = 0.8f;             // A configurable parameter into the pixel shader
 		float                       g_GaussMultiplier           = 0.4f;             // Default multiplier

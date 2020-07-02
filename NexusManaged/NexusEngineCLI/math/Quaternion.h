@@ -6,6 +6,8 @@ using System::Runtime::InteropServices::OutAttribute;
 
 namespace NexusEngine
 {
+	using namespace NexusEngineExtension;
+
 	value class Matrix;
 	value class Vector3;
 	
@@ -16,6 +18,7 @@ namespace NexusEngine
 	[System::Serializable]
 	[System::Runtime::InteropServices::StructLayout( System::Runtime::InteropServices::LayoutKind::Sequential )]
 	[System::ComponentModel::TypeConverter( NexusEngine::Design::QuaternionConverter::typeid )]
+	[XmlClassSerializable("Quaternion",false)]
 	public value class Quaternion : System::IEquatable<Quaternion>
 	{
 	public:
@@ -23,24 +26,28 @@ namespace NexusEngine
 		/// Gets or sets the X component of the quaternion.
 		/// </summary>
 		/// <value>The X component of the quaternion.</value>
+		[XmlFieldSerializable("x")]
 		float x;
 
 		/// <summary>
 		/// Gets or sets the Y component of the quaternion.
 		/// </summary>
 		/// <value>The Y component of the quaternion.</value>
+		[XmlFieldSerializable("y")]
 		float y;
 
 		/// <summary>
 		/// Gets or sets the Z component of the quaternion.
 		/// </summary>
 		/// <value>The Z component of the quaternion.</value>
+		[XmlFieldSerializable("z")]
 		float z;
 
 		/// <summary>
 		/// Gets or sets the W component of the quaternion.
 		/// </summary>
 		/// <value>The W component of the quaternion.</value>
+		[XmlFieldSerializable("w")]
 		float w;
 
 		/// <summary>
@@ -548,5 +555,16 @@ namespace NexusEngine
 		/// <returns><c>true</c> if <paramref name="value1"/> is the same instance as <paramref name="value2"/> or 
 		/// if both are <c>null</c> references or if <c>value1.Equals(value2)</c> returns <c>true</c>; otherwise, <c>false</c>.</returns>
 		static bool Equals( Quaternion% value1, Quaternion% value2 );
+	
+		//--
+		static Quaternion FromNative(const nexus::quat& q)
+		{
+			return Quaternion(q.x, q.y, q.z, q.w);
+		}
+
+		nexus::quat ToNative()
+		{
+			return nexus::quat(x,y,z,w);
+		}
 	};
 }

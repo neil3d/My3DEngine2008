@@ -12,29 +12,33 @@ namespace NexusEditor.EditorMain
     /// <summary>
     /// 将引擎的Log信息显示到一个窗口中
     /// </summary>
-    public partial class EditorLogForm : Form, NexusEngine.NEditorLog
+    public partial class EditorLogForm : Form
     {
         public EditorLogForm()
         {
             InitializeComponent();
         }
 
-        public void WriteString(string txt)
+        public void WriteString(NexusEngine.LogType t, string txt)
         {
-            this.textBoxLog.AppendText(txt);            
-        }
+            try
+            {
+                string log = string.Format("{0} : {1}{2}", t.ToString(), txt, Environment.NewLine);
+                this.textBoxLog.AppendText(log);
+            }
+            finally
+            {
 
-        public void WriteString(NexusEngine.ELogType t, string txt)
-        {
-            string log = string.Format("{0} : {1}",
-                t.ToString(), txt);
-            this.textBoxLog.AppendText(log);
+            }
         }
 
         private void EditorLogForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            e.Cancel = true;
-            this.Hide();
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                this.Hide();
+            }
         }
     }
 }

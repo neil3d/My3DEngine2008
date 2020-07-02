@@ -5,6 +5,7 @@
 #include "memory/nmemory.h"
 #include "base_depend.h"
 #include "base_define.h"
+#include "ntype_def.h"
 
 //-- object model
 #include "object/nexception.h"
@@ -24,9 +25,9 @@
 #include "math/ncamera.h"
 #include "math/geom_def.h"
 #include "math/nfrustum.h"
-#include "math/math_serialize.h"
 #include "math/rect.h"
 #include "math/object_space.h"
+#include "math/math_serialize.h"
 
 //-- platform
 #include "platform/nshared_lib.h"
@@ -38,6 +39,12 @@
 #include "nlog.h"
 #include "util/string_util.h"
 
+// event_delegate
+#include "event_delegate/event_arg.h"
+#include "event_delegate/delegates.h"
+
 nCoreAPI void nexus_init_core();
+
+
 
 #endif //_NCORE_H_

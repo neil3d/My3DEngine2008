@@ -23,8 +23,8 @@ namespace nexus
 
 		static nstring get_name(void)	{	return nstring(_T("point_light"));}
 		static void modify_drawing_policy_type(light_drawing_policy_type* dp_type);
-
-		virtual void set_effect_parameter(d3d9_shading_effect* effect_ptr, const nrender_light_proxy* lgt);
+		static EDrawingPolicy  get_policy_type() { return EDP_Point_Light; }
+		//virtual void set_effect_parameter(d3d9_shading_effect* effect_ptr, const nrender_light_proxy* lgt);
 	};
 }//namespace nexus
 

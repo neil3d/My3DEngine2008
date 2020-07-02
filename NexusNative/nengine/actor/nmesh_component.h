@@ -8,10 +8,12 @@
 #ifndef _NMESH_COMPONENT_H
 #define _NMESH_COMPONENT_H
 #include "nprimitive_component.h"
-#include "../material/nmaterial.h"
+#include "../renderer/nrender_mesh.h"
+#include "../material/nmtl_base.h"
 
 namespace nexus
 {
+	struct mesh_element;
 	/**
 	 * mesh组件
 	*/
@@ -19,50 +21,78 @@ namespace nexus
 		public nprimitive_component
 	{
 	public:
+		typedef shared_ptr<nmesh_component> ptr;
+
 		nmesh_component(const nstring& name_str);
 		virtual ~nmesh_component(void);
 
 		virtual void _destroy();
-		virtual void render(const nviewport& view);
-
-		virtual nmaterial_base* get_material(int lod, int mtl_id);
-		virtual transparent_flag get_transparent_flag() const;
-
+		virtual void render(class render_package_base* rpb);
+	
+		virtual nmtl_base* get_material(int lod, int mtl_id);		
 		/**
 		 *	可以指定另外的material，来替代mesh resource自带的材质
 		*/
-		void replace_material(int lod, int mtl_id, nmaterial_base::ptr mtl_ptr);
+		void replace_material(int lod, int mtl_id, nmtl_base::ptr mtl_ptr);
 
 		virtual int get_render_lod() const							{	return 0;}
-		virtual nrender_mesh* get_render_mesh(int lod)  = 0;		
-
+		virtual const vector<mesh_element>& get_mesh_element(int lod)  { return m_mesh_elements; }
+		virtual void set_enable_instance(bool is_enable ) { m_enable_instance = is_enable; }
+		virtual bool enable_instance() const { return false; }
 		virtual void serialize(narchive& ar);
 
-		virtual const nrender_proxy* get_render_proxy() const
-		{ return &m_render_proxy;	}
-	private:
-		typedef std::map<std::pair<int, int>, nmaterial_base::ptr> material_map;
+	protected:
+		virtual void on_resource_ready() {};
+
+		typedef std::map<std::pair<int, int>, nmtl_base::ptr> material_map;
+		bool						m_enable_instance;
+		vector<mesh_element> m_mesh_elements;
+
+	private:		
 		material_map		m_replace_mtl;
-		transparent_flag	m_trans_flag;
-
-		// a bridge, 避免使用多继承
-		struct mesh_proxy : public primitive_proxy
-		{
-			nmesh_component* get_owner() const
-			{
-				return (nmesh_component*)m_comp;
-			}
-
-			virtual int get_render_lod() const					{	return get_owner()->get_render_lod(); }			
-			virtual nrender_mesh* get_render_mesh(int lod) const		{	return get_owner()->get_render_mesh(lod);}
-			virtual nmaterial_base* get_material(int lod, int mtl_id) const	{	return get_owner()->get_material(lod, mtl_id);}
-			virtual transparent_flag get_transparent_flag() const		{	return get_owner()->get_transparent_flag();}
-			
-		};
-
-		mesh_proxy		m_render_proxy;
-
+		
 		nDECLARE_VIRTUAL_CLASS(nmesh_component)
+	};
+
+	struct  mesh_element
+	{
+		nrender_mesh*	mesh;
+		matrix44		matrix;
+		nrender_mesh_section* sec;
+		nmtl_base* mtl;
+		nprimitive_component* comp;
+		bool instance;
+
+		mesh_element(
+			nprimitive_component* in_comp,
+			nrender_mesh*	in_mesh,
+			nrender_mesh_section* in_mesh_section,
+			nmtl_base* in_mtl,
+			bool binstance = false
+			):
+		comp(in_comp),
+			matrix(matrix44::identity),
+			mesh(in_mesh),
+			sec(in_mesh_section),
+			mtl(in_mtl),
+			instance(binstance)
+		{};
+
+		//static mesh deco object 专用构造函数
+		mesh_element(
+			const matrix44& _matrix,
+			nrender_mesh*	in_mesh,
+			nrender_mesh_section* in_mesh_section,
+			nmtl_base* in_mtl,
+			bool binstance = false
+			):
+		comp(NULL),
+			matrix(_matrix),
+			mesh(in_mesh),
+			sec(in_mesh_section),
+			mtl(in_mtl),
+			instance(binstance)
+		{};
 	};
 }//namespace nexus
 #endif //_NMESH_COMPONENT_H

@@ -9,11 +9,11 @@
 #define _NEXUS_VERTEX_FACTORY_TYPE_H_
 #include "ncore.h"
 #include "d3d_ptr.h"
-#include "d3d_view_info.h"
 
 namespace nexus
 {
 	class d3d9_shading_effect;
+	class nview_info;
 
 	/**
 	 *	一个vertex factory type
@@ -41,14 +41,24 @@ namespace nexus
 		const nstring& get_name()	{	return m_mesh_vertex_data_name;}
 
 		const shader_macro_array& get_shader_macro_array() const	{	return m_shader_macro_array;}
+		void add_macro(const shader_define& macro )	
+		{
+			m_shader_macro_array.push_back(macro);
+		};
+
 		void load_shader_file();
+
+		const vector<D3DVERTEXELEMENT9>& get_element_array()
+		{
+			return m_element_array;
+		}
 	
-	protected:
 		void create_shared(const nmesh_vertex_data* vb, vector<D3DVERTEXELEMENT9>& d3d_element_array);
 	protected:
 		nstring	m_mesh_vertex_data_name;
 		nstring m_vertex_factory_name;
 		std::string								m_shader_code;
+		vector<D3DVERTEXELEMENT9> m_element_array;
 		shader_macro_array						m_shader_macro_array;	// 冗余数据？在nmesh_vertex_data中已经有一份了
 		d3d_ptr<IDirect3DVertexDeclaration9>	m_vert_decl;
 	};
@@ -71,12 +81,16 @@ namespace nexus
 
 		void conditional_create_for_static(const nmesh_vertex_data* vb);
 		void conditional_create_for_morph(const nmesh_vertex_data* vb);
+		void conditional_create_for_instance(const nmesh_vertex_data* vb);
 
-		vertex_factory_type* get_type(nstring type_name);		
+		vertex_factory_type* get_type(const nstring& type_name);		
+		vertex_factory_type* get_instance_type(const nstring& type_name);		
 
 		void destroy()	
 		{
 			m_type_map.clear();
+			m_vert_decl_static_pos_only.reset();
+			m_vert_decl_morph_pos_only.reset();
 		}
 
 		void draw_set_vert_decl_static_pos_only();

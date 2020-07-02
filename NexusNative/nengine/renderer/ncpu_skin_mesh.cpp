@@ -30,6 +30,9 @@ namespace nexus
 
 	void nrender_cpu_skin_mesh::update_skin(const matrix_palette& mat_pal)
 	{
+		if(mat_pal.empty())
+			return;
+
 		//-- update local skin vertex data
 		size_t num_vert = m_skined_vert_data->get_num_vert();
 
@@ -61,6 +64,7 @@ namespace nexus
 		for(size_t i=0; i<num_vert; i++)
 		{
 			dst_pos_vert[i] = vector3(0, 0, 0);
+			//dst_sk_vert[i].uv = src_sk_vert[i].uv;
 			for(int b=0; b<4; b++)
 			{
 				if( src_sk_vert[i].bone_index[b] == 255)

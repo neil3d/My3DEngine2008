@@ -23,20 +23,19 @@ namespace nexus
 
 		virtual void load_from_file(const resource_location& loc);
 		virtual void save_to_file(const resource_location& loc);
-		virtual bool ready() const	{	return true;/*todo*/ }
-
+		
 		void advance_speed_wind(float fTime);
 
 		const box_sphere_bounds& get_bounds() const		{	return m_bounding_box; }
 
 		nrender_static_mesh_indexed* get_branches_mesh() const	{	return m_branches_mesh.get();}
-		const nmaterial_base* get_branches_material() const	{	return &m_branches_mtl;}
+		const nmtl_base* get_branches_material() const	{	return &m_branches_mtl;}
 
 		nrender_static_mesh_indexed* get_frond_mesh() const	{	return m_frond_mesh.get();}
-		const nmaterial_base* get_frond_material() const	{	return &m_frond_mtl;}
+		const nmtl_base* get_frond_material() const	{	return &m_frond_mtl;}
 
 		const vector2& get_leafcard_angle_scalars() const {	return m_leafcard_angle_scalars;}
-		nrender_static_mesh* get_leafcard_lod_mesh(size_t lod) const
+		nrender_static_mesh_indexed* get_leafcard_lod_mesh(size_t lod) const
 		{
 			if( lod < m_leafcard_lods.size() )
 				return m_leafcard_lods[lod];
@@ -45,10 +44,18 @@ namespace nexus
 		}
 		nrender_static_mesh_indexed* get_leafmesh() const	{	return m_leafmesh.get();}
 
-		const nmaterial_base* get_leaf_material() const	{	return &m_leaf_mtl; }
+		const nmtl_base* get_leaf_material() const	{	return &m_leaf_mtl; }
 
 		const matrix44* get_wind_matrix() const	{	return &m_wnd_mat[0];}
-		const float* get_leaf_angle_table() const	{	return &m_vLeafAngleUploadTable[0];}
+		const float* get_leaf_angle_table() const	
+		{	
+			if (m_vLeafAngleUploadTable.empty())
+			{
+				return NULL;
+			}
+			else
+				return &m_vLeafAngleUploadTable[0];
+		}
 
 		bool has_branch() const {	return m_has_branch;}
 		bool has_frond() const	{	return m_has_frond;}
@@ -56,6 +63,10 @@ namespace nexus
 		bool has_leafmesh() const {	return m_has_leafmesh;}
 
 		boost::shared_ptr<CSpeedTreeRT>	get_speed_tree()	{	return m_spt;}
+
+		virtual void _on_device_lost(int param);
+		virtual bool _on_device_reset(int param);
+
 	private:
 		void compute_bounds(boost::shared_ptr<CSpeedTreeRT> spt);
 		void create_branches(boost::shared_ptr<CSpeedTreeRT> spt);
@@ -74,7 +85,7 @@ namespace nexus
 		nspt_frond_material	m_frond_mtl;
 
 		bool	m_has_leafcard, m_has_leafmesh;
-		render_res_array<nrender_static_mesh>		m_leafcard_lods;
+		render_res_array<nrender_static_mesh_indexed>		m_leafcard_lods;
 		render_res_ptr<nrender_static_mesh_indexed>	m_leafmesh;		
 		nspt_leaf_material	m_leaf_mtl;
 
@@ -92,6 +103,8 @@ namespace nexus
 		vector2			m_leafcard_angle_scalars;
 
 		matrix44	m_wnd_mat[c_nNumWindMatricesPerSource];
+
+		nDECLARE_NAMED_CLASS(nspeed_base_tree)
 	};
 }//namespace nexus
 #endif //_NEXUS_SPEED_BASE_TREE_H_

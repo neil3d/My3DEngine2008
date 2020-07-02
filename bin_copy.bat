@@ -1,12 +1,19 @@
-md \nexus_bin
-xcopy debug\*.exe \nexus_bin\debug /I
-xcopy debug\*.nex \nexus_bin\debug /I
-xcopy debug\*.dll \nexus_bin\debug /I
+md \NexusBin
+xcopy debug\*.exe \NexusBin\01_NexusEd\debug /I
+xcopy debug\*.nex \NexusBin\01_NexusEd\debug /I
+xcopy debug\*.dll \NexusBin\01_NexusEd\debug /I
+xcopy debug\*.config \NexusBin\01_NexusEd\debug /I
 
-xcopy release\*.exe \nexus_bin\release /I
-xcopy release\*.nex \nexus_bin\release /I
-xcopy release\*.dll \nexus_bin\release /I
+xcopy release\*.exe \NexusBin\01_NexusEd\release /I
+xcopy release\*.nex \NexusBin\01_NexusEd\release /I
+xcopy release\*.dll \NexusBin\01_NexusEd\release /I
+xcopy release\*.config \NexusBin\01_NexusEd\release /I
 
-xcopy engine_data\*.* \nexus_bin\engine_data /s /I
-xcopy game_data\*.* \nexus_bin\game_data /s /I
+xcopy debug\zh-CHT\*.dll \NexusBin\01_NexusEd\debug\zh-CHT /I
+xcopy debug\en-US\*.dll \NexusBin\01_NexusEd\debug\en-US /I
+xcopy release\zh-CHT\*.dll \NexusBin\01_NexusEd\release\zh-CHT /I
+xcopy release\en-US\*.dll \NexusBin\01_NexusEd\release\en-US /I
+
+::xcopy nexus_game\*.* \NexusBin\01_NexusEd\nexus_game /s /I
+
 

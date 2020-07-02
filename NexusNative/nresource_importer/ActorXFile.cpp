@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "ActorXFile.h"
 
 bool PSKFile::load_from_file(const nstring& file_name)

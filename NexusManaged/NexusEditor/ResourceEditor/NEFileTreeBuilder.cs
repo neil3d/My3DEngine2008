@@ -119,6 +119,11 @@ namespace NexusEditor.ResourceEditor
                 pkgNode.ImageIndex = 3;
                 pkgNode.SelectedImageIndex = 3;
 
+				NEFileTag tag;
+				tag.pkgName = pkgName;
+				tag.path = "";
+				pkgNode.Tag = tag;
+
                 NEPkgTreeWalker fq = new NEPkgTreeWalker(pkgNode, pkgName);
                 fileSys.QueryPackage(pkgName, "/", fq);
 

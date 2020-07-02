@@ -29,7 +29,7 @@ namespace Design
 
 	bool BoundingSphereConverter::CanConvertTo(ITypeDescriptorContext^ context, Type^ destinationType)
 	{
-		if( destinationType == String::typeid || destinationType == InstanceDescriptor::typeid )
+		if( destinationType == String::typeid )
 			return true;
 		else
 			return ExpandableObjectConverter::CanConvertTo(context, destinationType);

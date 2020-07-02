@@ -105,6 +105,24 @@ namespace NexusEditor.ResourceEditor
                 case "spt":
                     ret = "Speed Tree";
                     break;
+                case "skm":
+                    ret = "Skeletal Mesh";
+                    break;
+                case "animset":
+                    ret = "Skeletal Anim Set";
+                    break;
+                case "txa":
+                    ret = "Texture Atlas";
+                    break;
+                case "nui":
+                    ret = "GUI File";
+                    break;
+                case "mtl":
+                    ret = "Material";
+                    break;
+                case "att":
+                    ret = "Game Object Attribute";
+                    break;
                 case "dds":
                 case "tga":
                 case "jpg":

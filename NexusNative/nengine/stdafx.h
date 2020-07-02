@@ -3,6 +3,7 @@
 
 #pragma warning(disable: 4251)	// class  needs to have dll-interface to
 #pragma warning(disable: 4819)	// The file contains a character that cannot be represented in the current code page (936).
+#pragma warning(disable: 4127)
 
 #pragma warning(push)
 #pragma warning(disable:4512)

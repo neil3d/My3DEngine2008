@@ -23,36 +23,22 @@ namespace nexus
 	};
 
 	/**
-	 *	材质模版中的材质参数信息
-	 *	@see class nmaterial_template
+	 *	材质中的材质参数＋值/资源对象数据
+	 *	@see class nmaterial
 	*/
 	struct material_parameter
 	{
 		std::string			name;
 		EMaterialParameter	type;
+		std::string			macro;	// 对应的shader宏
 
-		material_parameter():type(EMPT_None)
-		{}
-	};
-
-	/**
-	 *	材质中的材质参数＋值/资源对象数据
-	 *	@see class nmaterial
-	*/
-	struct material_parameter_value : public material_parameter
-	{
 		int						int_value;
 		vector4					vec_value;
 		nresource_texture::ptr	tex_value;
+		int						texture_type;	//0-普通2D贴图；1-CubeMap
 
-		material_parameter_value():int_value(0)
+		material_parameter():type(EMPT_None),int_value(0),texture_type(0)
 		{}
-		material_parameter_value(const material_parameter* param)
-			:int_value(0),vec_value(0,0,0,0),tex_value(NULL)
-		{
-			name = param->name;
-			type = param->type;
-		}
 
 		void set_value(const vector4& val)
 		{
@@ -60,9 +46,10 @@ namespace nexus
 			tex_value = NULL;
 		}
 
-		void set_value(nresource_texture::ptr val)
+		void set_value(nresource_texture::ptr val, char tex_type)
 		{
 			tex_value = val;
+			texture_type = tex_type;
 		}
 
 		void set_value(int val)

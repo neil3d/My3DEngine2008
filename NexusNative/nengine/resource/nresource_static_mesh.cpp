@@ -13,6 +13,7 @@ namespace nexus
 	nDEFINE_NAMED_CLASS(nresource_static_mesh, nresource)
 
 		nresource_static_mesh::nresource_static_mesh(const nstring& name_str):nresource(name_str)
+			,m_pretriangle_collision(true)
 	{
 	}
 
@@ -23,11 +24,12 @@ namespace nexus
 			nstatic_mesh_lod::ptr lod = m_lod_array[i];
 			for(size_t j=0; j<lod->m_mtl_array.size(); j++)
 			{
-				nmaterial_base::ptr mtl = lod->m_mtl_array[j];
+				nmtl_base::ptr mtl = lod->m_mtl_array[j];
 				if(mtl)
 					mtl->_destroy();
 			}
-		}
+		}// end of for()
+		m_lod_array.clear();
 	}
 
 	nrender_mesh* nresource_static_mesh::get_render_mesh(int lod) const
@@ -46,9 +48,6 @@ namespace nexus
 			resource_importer_manager::instance()->import_static_mesh(full_path);
 		if(new_lod_mesh)
 		{
-			//-- make NULL material
-			new_lod_mesh->m_mtl_array.resize(new_lod_mesh->m_secton_array.size());			
-
 			//-- create render mesh
 			nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
 
@@ -59,7 +58,7 @@ namespace nexus
 
 			//-- add to array
 			if( lod==-1
-				|| lod >= m_lod_array.size() )
+				|| lod >= (int)m_lod_array.size() )
 			{
 				m_lod_array.push_back(new_lod_mesh);
 				m_render_mesh_array.push_back(new_render_mesh.release());
@@ -76,62 +75,93 @@ namespace nexus
 		}
 	}
 
-	nmaterial_base::ptr nresource_static_mesh::get_material(int lod, int mtl_id) const
+	nmtl_base::ptr nresource_static_mesh::get_material(int lod, int mtl_id) const
 	{
 		nASSERT(lod < (int)m_lod_array.size());
 		nstatic_mesh_lod::ptr mesh_lod  = m_lod_array[lod];
 
-		nmaterial_base::ptr mtl_ret;
-		if( mtl_id < (int)mesh_lod->m_mtl_array.size() )
+		nmtl_base::ptr mtl_ret;
+		if( mtl_id>=0 && mtl_id < (int)mesh_lod->m_mtl_array.size() )
 			mtl_ret = mesh_lod->m_mtl_array[mtl_id];
 		return mtl_ret;
 	}
 
-	void nresource_static_mesh::import_set_material(int lod, int mtl_id, nmaterial_base::ptr mtl_ptr)
+
+	void nresource_static_mesh::import_set_material(int lod, int sec, nmtl_base::ptr mtl_ptr)
 	{
-		nASSERT(lod < (int)m_lod_array.size());
-		nstatic_mesh_lod::ptr mesh_lod  = m_lod_array[lod];
-
-		nASSERT(mtl_id < (int)mesh_lod->m_mtl_array.size());
-		mesh_lod->m_mtl_array[mtl_id] = mtl_ptr;
-
-		//-- transparent flag
-		m_trans_flag.clear();		
-
-		for(size_t i=0; i<m_lod_array.size(); i++)
+		if((size_t)lod >= m_lod_array.size())
 		{
-			nstatic_mesh_lod::ptr mesh_lod  = m_lod_array[i];	
-
-			for(size_t j=0; j<mesh_lod->m_mtl_array.size(); j++)
-			{
-				nmaterial_base::ptr mtl_ptr = mesh_lod->m_mtl_array[j];
-
-				if( mtl_ptr)
-					m_trans_flag.set(mtl_ptr->get_trans_type());										
-				else				
-					m_trans_flag.set(ETrans_Opaque);										
-			}
+			nLog_Error(_T("bad lod in [nresource_anim_mesh::import_set_material()]"));
+			return;
 		}
+
+		nstatic_mesh_lod::ptr lod_mesh  = m_lod_array[lod];
+		if((size_t)sec >= lod_mesh->m_secton_array.size())
+		{
+			nLog_Error(_T("bad section in [nresource_anim_mesh::import_set_material()]"));
+			return;
+		}
+		nmesh_section::ptr mesh_sec = lod_mesh->m_secton_array[sec];
+
+		//-- 找到对应的mtl id
+		vector<nmtl_base::ptr>& mtl_array = lod_mesh->m_mtl_array;
+		if(sec < (int)mtl_array.size())
+		{
+			mtl_array[sec] = mtl_ptr;
+		}
+		else
+		{
+			mtl_array.resize(sec+1);
+			mtl_array[sec] = mtl_ptr;
+		}
+		mesh_sec->m_material_id = sec;
+		m_render_mesh_array[lod]->get_section(sec)->set_material_id(sec);
+
+		// delete by zewu: 下面的代码会导致m_mtl_array不断在增大
+		//-- 找到对应的mtl id
+		//int mtl_id = -1;
+		//vector<nmtl_base::ptr>& mtl_array = lod_mesh->m_mtl_array;
+		//for (int i=0; i<(int)mtl_array.size(); i++)
+		//{
+		//	if(mtl_array[i] == mtl_ptr)
+		//	{
+		//		mtl_id = i;
+		//		break;
+		//	}
+		//}
+		//if(mtl_id == -1)
+		//{
+		//	mtl_id = mtl_array.size();
+		//	mtl_array.push_back(mtl_ptr);
+		//}
+
+		////-- 设置相应的section
+		//mesh_sec->m_material_id = mtl_id;
+		//m_render_mesh_array[lod]->get_section(sec)->set_material_id(mtl_id);
 	}
 
 	void nresource_static_mesh::serialize(narchive& ar)
 	{
 		nresource::serialize(ar);
 
-		nSERIALIZE(ar, m_bounding_box);
-		nSERIALIZE(ar, m_trans_flag);
+		nSERIALIZE(ar, m_bounding_box);		
 		nSERIALIZE(ar, m_lod_array);
 
 		if( ar.is_loading() )
 		{
-			//-- create render resouce
+			//-- create render resource
 			nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
 			for(size_t i=0; i<m_lod_array.size(); i++)
 			{
 				nstatic_mesh_lod::ptr mesh_lod = m_lod_array[i];
 				render_res_ptr<nrender_static_mesh_indexed> new_render_mesh(
 					rres_mgr->alloc_static_mesh_indexed() );
-
+				vertex_stream* vs = mesh_lod->m_vert_data->get_stream(1);
+				if(vs->get_elemets_define()[2].usage == 4)
+				{
+					nLog_Debug(_T("Error Resource(%s)\r\n"), get_name_str().c_str());
+				}
+				
 				new_render_mesh->create(mesh_lod.get());
 
 				//-- add to array			
@@ -286,5 +316,65 @@ namespace nexus
 			num_sec = lod->m_secton_array.size();
 			num_tri = lod->get_face_count();
 		}
+	}
+
+	void nresource_static_mesh::_on_device_lost(int param)
+	{
+		boost::mutex::scoped_lock lock(m_mutex);
+
+		m_render_mesh_array.clear();
+		m_render_simple_mesh.reset();
+	}
+
+	bool nresource_static_mesh::_on_device_reset(int param)
+	{
+		boost::mutex::scoped_lock lock(m_mutex);
+
+		nrender_resource_manager* rres_mgr = nengine::instance()->get_render_res_mgr();
+
+		if( m_simple_mesh )
+		{
+			m_render_simple_mesh.reset( rres_mgr->alloc_simple_mesh() );
+			m_render_simple_mesh->create( m_simple_mesh.get() );		
+		}
+
+		//-- create render resource		
+		for(size_t i=0; i<m_lod_array.size(); i++)
+		{
+			nstatic_mesh_lod::ptr mesh_lod = m_lod_array[i];
+			render_res_ptr<nrender_static_mesh_indexed> new_render_mesh(
+				rres_mgr->alloc_static_mesh_indexed() );
+
+			new_render_mesh->create(mesh_lod.get());
+
+			//-- add to array			
+			m_render_mesh_array.push_back(new_render_mesh.release());
+		}
+
+		return true;
+	}
+
+	bool nresource_static_mesh::ready() const
+	{
+		if( !nresource::ready() )
+			return false;
+
+		boost::mutex::scoped_lock lock(m_mutex);
+
+		for(size_t i=0; i<m_lod_array.size(); i++)
+		{
+			nstatic_mesh_lod::ptr mesh_lod = m_lod_array[i];
+
+			for (size_t j=0; j<mesh_lod->m_mtl_array.size(); j++)
+			{
+				nmtl_base::ptr mtl = mesh_lod->m_mtl_array[j];
+				if( !mtl )
+					continue; // 在资源编辑导入的时候，运行材质为空
+				if( !mtl->resource_ready() )
+					return false;
+			}
+		}
+
+		return true;
 	}
 }//namespace nexus

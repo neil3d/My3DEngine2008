@@ -15,7 +15,6 @@
 #include "memory/nmemory.h"
 
 #include <tchar.h>
-#include <assert.h>
 #include <math.h>
 
 //-- STL
@@ -26,6 +25,8 @@
 #include <string>
 #include <algorithm>
 #include <memory>
+#include <deque>
+#include <limits>
 
 typedef std::wstring	nstring;
 
@@ -37,8 +38,7 @@ typedef std::wstring	nstring;
 #include <boost/weak_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
-
-#define BOOST_THREAD_DYN_DLL
+#define BOOST_THREAD_DYN_DLL 
 #include <boost/thread/once.hpp>
 #include <boost/thread.hpp>
 #pragma warning(pop)
@@ -47,6 +47,22 @@ using namespace std;
 using namespace boost;
 
 //--
-#define nASSERT assert
+#if defined( _DEBUG )
+#	if defined( _MSC_VER ) && !defined( _WIN64 )
+#		define nASSERT( x )		if ( !(x)) { _asm { int 3 } }
+#	else
+#		include <assert.h>
+#		define nASSERT assert
+#	endif
+#else
+#	define nASSERT( x ) {}
+#endif
+
+#ifdef _DEBUG
+	#ifndef DEBUG
+		#define DEBUG
+	#endif
+#endif
+
 
 #endif //_BASE_DEPEND_H_

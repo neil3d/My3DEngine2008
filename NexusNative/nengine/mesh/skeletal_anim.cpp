@@ -3,6 +3,8 @@
 
 namespace nexus
 {
+	nDEFINE_CLASS(nskeletal_anim_sequence, nobject)
+
 	void nskeleton_define::init_ref_base()
 	{
 		m_ref_base.resize(m_bones.size());
@@ -28,4 +30,25 @@ namespace nexus
 		}
 	}
 
+	template<>
+	inline narchive& nserialize(narchive& ar, bone_track& bt, const TCHAR* obj_name)
+	{
+		nstring class_name(_T("bone_track"));
+		ar.object_begin(obj_name, class_name);
+		nserialize(ar, bt.pos_keys, _T("pos_keys"));
+		nserialize(ar, bt.rot_keys, _T("rot_keys"));
+		nserialize(ar, bt.key_times, _T("key_times"));
+		ar.object_end();
+
+		return ar;
+	}
+
+
+	void nskeletal_anim_sequence::serialize(narchive& ar)
+	{
+		nSERIALIZE(ar, m_name);
+		nSERIALIZE(ar, m_length);
+		nSERIALIZE(ar, m_num_frame);
+		nSERIALIZE(ar, m_tracks);
+	}
 }//namespace nexus

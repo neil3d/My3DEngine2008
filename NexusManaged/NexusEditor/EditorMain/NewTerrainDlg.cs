@@ -32,6 +32,17 @@ namespace NexusEditor.EditorMain
         {
             get { return m_prop; }
         }
+
+        private void buttonOk_Click(object sender, EventArgs e)
+        {
+            if (checkBoxCenter.Checked)
+            {
+                float trnW = m_prop.Width * m_prop.Scale.x;
+                float trnH = m_prop.Height * m_prop.Scale.z;
+                Vector3 pos = new Vector3(-trnW * 0.5f, m_prop.Position.y, -trnH * 0.5f);
+                m_prop.Position = pos;
+            }
+        }
     }
 
 }

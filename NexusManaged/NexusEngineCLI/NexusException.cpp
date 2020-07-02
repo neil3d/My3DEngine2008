@@ -3,7 +3,7 @@
 
 namespace NexusEngine
 {
-	NexusException::NexusException(System::String^ info):System::Exception(info)
+	NexusException::NexusException(System::String^ info):System::ApplicationException(info)
 	{
 	}
 }//namespace NexusEngine

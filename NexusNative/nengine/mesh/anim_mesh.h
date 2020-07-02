@@ -10,7 +10,7 @@
 #include "ncore.h"
 #include "mesh_index_data.h"
 #include "mesh_vertex_data_common.h"
-#include "../material/nmaterial.h"
+#include "../material/nmtl_base.h"
 #include "math/geom_def.h"
 #include "mesh_lod.h"
 
@@ -76,13 +76,13 @@ namespace nexus
 				&& m_tracks[0].m_normal_keys.size() >1;
 		}
 
-		bool has_tangent_keys() const
+		bool has_uv_keys() const
 		{
 			return m_tracks.size() > 0
 				&& m_tracks[0].m_uv_keys.size() >1;
 		}
 
-		bool has_uv_keys() const
+		bool has_tangent_keys() const
 		{
 			return m_tracks.size() > 0
 				&& m_tracks[0].m_tangent_keys.size() >1;
@@ -99,6 +99,7 @@ namespace nexus
 		}
 		float get_frame_time(size_t frm) const
 		{
+			nASSERT(frm < m_frame_time.size());
 			return m_frame_time[frm];
 		}
 
@@ -115,7 +116,7 @@ namespace nexus
 		typedef shared_ptr<nanim_mesh> ptr;
 
 		vector<nmesh_section::ptr>	m_secton_array;
-		vector<nmaterial_base::ptr>	m_mtl_array;
+		vector<nmtl_base::ptr>		m_mtl_array;
 		
 		vector<nanim_mesh_sequence::ptr> m_sequence_array;
 

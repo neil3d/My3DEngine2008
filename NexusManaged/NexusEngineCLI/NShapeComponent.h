@@ -9,7 +9,7 @@ namespace NexusEngine
 	public:
 		void CreateBox(float width, float height, float depth);
 		void CreateSphere(float radius, int numRings, int numSections);
-		void SetMaterial(NMaterial^ mtl);
+		void SetMaterial(NMtlBase^ mtl);
 
 		//-- Native Wrapper
 	public:

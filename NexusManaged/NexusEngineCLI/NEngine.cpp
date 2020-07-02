@@ -3,6 +3,7 @@
 #include "NFileSystem.h"
 #include "NRenderElement.h"
 #include "NWrapperException.h"
+#include "NRenderResourceManager.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -17,16 +18,21 @@ namespace NexusEngine
 		cfg.color_bits		= ColorBits;
 		cfg.bWindowed		= !FullScreen;
 		cfg.bEnableHDR		= EnableHDR;
+		cfg.bEnableSSAO = EnableSSAO;
 
 		pin_ptr<const wchar_t> szRenderClass = PtrToStringChars(RenderClass);
 		pin_ptr<const wchar_t> szFileSystemClass = PtrToStringChars(FileSystemClass);
 		pin_ptr<const wchar_t> szFileSystemRoot = PtrToStringChars(FileSystemRoot);
 		pin_ptr<const wchar_t> szEngineDataPkg = PtrToStringChars(EngineDataPkg);
+		pin_ptr<const wchar_t> szResourceCacheClass = PtrToStringChars(ResourceCacheClass);
+		pin_ptr<const wchar_t> szResourceIOClass = PtrToStringChars(ResourceIOClass);
 
 		cfg.renderer_class		= szRenderClass;
 		cfg.file_system_class	= szFileSystemClass;
 		cfg.file_sys_root		= szFileSystemRoot;
 		cfg.engine_data_pkg		= szEngineDataPkg;
+		cfg.resource_cache_class = szResourceCacheClass;
+		cfg.resource_io_class	= szResourceIOClass;
 	}
 
 	NEngine::NEngine(void):NativeObjectOwnedRaw(new nengine)
@@ -71,6 +77,11 @@ namespace NexusEngine
 		NativeObjectBorrowed^ nativeFileSysWrapper 
 			= gcnew NativeObjectBorrowed( NativePtr->get_file_sys() );
 		m_fileSys = gcnew NFileSystem(nativeFileSysWrapper);
+
+		
+		//-- hold render resource manager
+		NativeObjectBorrowed^ nativeRenderResManager = gcnew NativeObjectBorrowed(NativePtr->get_render_res_mgr());
+		m_renderResourceManager = gcnew NRenderResourceManager( nativeRenderResManager );
 		
 		END_NATIVE_GUARD
 	}
@@ -80,6 +91,11 @@ namespace NexusEngine
 		NativePtr->close();
 		delete s_instance;
 		s_instance = nullptr;
+	}
+
+	void NEngine::BeginPlay()
+	{
+		NativePtr->begin_play();
 	}
 
 	NLevel^ NEngine::CreateLevel(System::String^ lvName, System::String^ nativeClassName)
@@ -96,8 +112,11 @@ namespace NexusEngine
 
 	void NEngine::DestroyLevel(NLevel^ lv)
 	{
-		NativePtr->destroy_level( lv->GetNativeSmartPtr() );
-		m_levelDict->Remove( lv->Name );
+		if(lv->NativePtr!=nullptr)
+		{
+			NativePtr->destroy_level( lv->GetNativeSmartPtr() );
+			m_levelDict->Remove( lv->Name );
+		}			
 	}
 
 	void NEngine::DestroyLevel(System::String^ lvName)
@@ -115,8 +134,7 @@ namespace NexusEngine
 		nexus::resource_location nloc;
 		loc->ToNative(nloc);
 
-		nlv = NativePtr->load_level(nloc, NULL);		
-
+		nlv = NativePtr->load_level(nloc, NULL);
 		END_NATIVE_GUARD
 
 		System::String^ className = gcnew System::String(nlv->reflection_get_class()->get_name());
@@ -135,5 +153,14 @@ namespace NexusEngine
 		pin_ptr<const wchar_t> szLvName = PtrToStringChars(lvName);
 		NativePtr->save_level(szLvName,
 			nloc, NULL);
+	}
+
+	void NEngine::ExportLevel( System::String^ lvName, NResourceLoc^ loc )
+	{
+		nexus::resource_location nloc;
+		loc->ToNative(nloc);
+
+		pin_ptr<const wchar_t> szLvName = PtrToStringChars(lvName);
+		NativePtr->export_level(szLvName, nloc);
 	}
 }//namespace NexusEngine

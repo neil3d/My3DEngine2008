@@ -7,7 +7,7 @@
 
 #ifndef _NEXUS_TERRAIN_EDITOR_H_
 #define _NEXUS_TERRAIN_EDITOR_H_
-#include "neditor_cmd_mgr.h"
+#include "neditor_engine.h"
 #include "../terrain/nterrain_actor.h"
 #include "mouse_helper.h"
 
@@ -40,7 +40,9 @@ namespace nexus
 	{
 		EBT_Heightmap = 0,
 		EBT_Alphamap,
-		EBT_Decomap
+		EBT_Decomap,
+		EBT_NavigationMap,
+		EBT_WalkableMap,
 	};
 
 	/** 笔刷操作 */
@@ -80,7 +82,7 @@ namespace nexus
 
 	/**
 	 *	地形编辑器
-	 *	@remarks 提供编辑功能接口；提供方便Python编辑器调用的包装接口
+	 *	@remarks 提供编辑功能接口；提供方便编辑器调用的包装接口
 	*/
 	class nEDAPI nterrain_editor
 	{
@@ -90,6 +92,7 @@ namespace nexus
 
 		void bind_terrain(const nterrain_actor::ptr& trn_ptr);
 		bool empty() const;
+		void show_chunk_edge(bool s)	{	m_show_chunk_edge = s;}
 
 		void close()
 		{
@@ -98,14 +101,8 @@ namespace nexus
 
 		void generate_noise(nrect rc, int numOctaves, float amplitude, float frequency);
 		void import_heightmap(const nstring& img_file_name);
+		nterrain_mtl_setup* get_material();
 		
-		// material
-		void create_material_basic(const resource_location& texture_loc);
-		void create_texture_splatting(size_t alpha_w, size_t alpha_h);
-		void splat_set_layer(size_t layer_index, const resource_location& texture_loc, const vector2& uv_scale, float uv_rotate);
-		void splat_layer_noise(size_t layer_index, nrect rc, int numOctaves, float amplitude, float frequency);
-		void get_layer_param(size_t layer_index, resource_location& out_tex, vector2& out_scale, float& out_rotate);
-
 		void set_brush(const nterrain_brush& brush)		{	m_brush = brush; }
 		void draw_widgets(nrender_primitive_draw_interface* PDI);
 
@@ -133,6 +130,7 @@ namespace nexus
 		mouse_drag	m_right_drag;
 		
 		npoint	m_cursor_pos;
+		bool	m_show_chunk_edge;
 	};
 }//namespace nexus
 

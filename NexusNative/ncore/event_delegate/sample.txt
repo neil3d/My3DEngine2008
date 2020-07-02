@@ -1,0 +1,62 @@
+#include <iostream>
+#include "stdlib.h"
+#include "event_arg.h"
+#include "delegates.h"
+
+class int_evnet_arg : public nevent_arg
+{
+public:
+	int count;
+
+	int_evnet_arg(int _count) : count(_count) {};
+};
+
+
+class test_delegate_class
+{
+public: 
+	void do_somthing(int_evnet_arg* e)
+	{
+		std::cout << "test_delegate_class::do_somthing " << e->count << std::endl;
+	}
+};
+
+class test_derived_class : public test_delegate_class
+{
+public:
+	void do_somthing(int_evnet_arg* e)
+	{
+		std::cout << "test_derived_class::do_somthing " << e->count << std::endl;
+	}
+
+	static void do_another(int_evnet_arg* e)
+	{
+		std::cout << "test_derived_class::do_another " << e->count << std::endl;
+	}
+};
+
+void free_thing(int_evnet_arg* e)               
+{ 
+	std::cout << "free_thing " << e->count << std::endl;
+} 
+
+int main()
+{
+	typedef nevent_handler<void,int_evnet_arg*> my_event;
+	my_event event;
+
+	test_delegate_class test_class;
+	test_derived_class derived_class;
+
+	event += new my_event::T<test_delegate_class>(&test_class,&test_delegate_class::do_somthing);
+	event += new my_event::T<test_derived_class>(&derived_class,&test_derived_class::do_somthing);
+	event += new my_event::S(&test_derived_class::do_another);
+	event += new my_event::S(&free_thing);
+
+	std::cout<< std::endl << "<multi cast event>" << std::endl;
+	int_evnet_arg arg(10);
+	event(&arg);
+	std::cout<< std::endl << "<multi cast event>" << std::endl;
+
+	system("pause");
+}

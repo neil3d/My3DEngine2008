@@ -8,6 +8,7 @@
 #ifndef _NEXUS_RENDER_GROUP_FULL_H_
 #define _NEXUS_RENDER_GROUP_FULL_H_
 #include "render_group.h"
+#include "drawing_atom.h"
 
 namespace nexus
 {
@@ -33,13 +34,10 @@ namespace nexus
 		void draw_opaque(const d3d_view_info* view, drawing_policy* dp, drawing_filter* filter=NULL);
 		// draw unlit transparent objects
 		void draw_unlit_trans(const d3d_view_info* view, drawing_policy* dp, drawing_filter* filter=NULL);
-		// draw lighting transparent objects
-		void draw_mixed_trans(const d3d_view_info* view, drawing_policy* dp, drawing_filter* filter=NULL);
-
 	private:		
-		void draw_proxy_vector(proxy_vector& pv, const d3d_view_info* view, drawing_policy* dp, drawing_filter* filter=NULL);		
+		void draw_atom_array(st_drawing_atom_array& pv, const d3d_view_info* view, drawing_policy* dp, drawing_filter* filter=NULL);		
 
-		proxy_vector	m_proxy_vector[ETrans_Max];
+		st_drawing_atom_array	m_atoms[ETrans_Max];
 	};
 }//namespace nexus
 

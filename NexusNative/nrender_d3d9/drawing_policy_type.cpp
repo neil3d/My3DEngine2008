@@ -6,10 +6,10 @@
 #include "drawing_wireframe.h"
 #include "drawing_unlit.h"
 #include "drawing_base_pass.h"
-#include "drawing_unlit_trans.h"
 #include "drawing_light.h"
 #include "draw_hit_proxy.h"
-#include "shadow_buffer.h"
+#include "drawing_extend.h"
+#include "ambent_light_policy.h"
 
 namespace nexus
 {
@@ -21,7 +21,7 @@ namespace nexus
 			<< dp_name.name_str
 			<< _T(".fx");
 
-		load_shder_source(ss.str(), shader_source);
+		load_shader_source(ss.str(), shader_source);
 	}
 
 	dp_type_list::dp_type_list(void)
@@ -51,13 +51,12 @@ namespace nexus
 		m_dp_type_map.clear();
 	}
 
-	template<typename TLight, typename TShadow>
+	template<typename TLight>
 	void create_light_type(dp_type_list& dl)
 	{
-		drawing_light<TLight, TShadow, true, true>::create_type(dl);
-		drawing_light<TLight, TShadow, true, false>::create_type(dl);
-		drawing_light<TLight, TShadow, false, true>::create_type(dl);
-		drawing_light<TLight, TShadow, false, false>::create_type(dl);
+		drawing_light<TLight, 0>::create_type(dl);
+		drawing_light<TLight, 1>::create_type(dl);
+		drawing_light<TLight, 2>::create_type(dl);
 	}
 
 	void dp_type_list::create_all_type()
@@ -69,13 +68,12 @@ namespace nexus
 		drawing_unlit::create_type(*this);
 		draw_hit_proxy::create_type(*this);
 		
-		drawing_base_pass::create_type(*this);
-		drawing_unlit_trans::create_type(*this);
+		drawing_base_pass<hemisphere_policy>::create_type(*this);
+		
+		create_light_type<point_light_policy>(*this);
+		create_light_type<directional_light_policy>(*this);
+		create_light_type<spot_light_policy>(*this);
 
-		create_light_type<point_light_policy, noshadow>(*this);
-		create_light_type<directional_light_policy, noshadow>(*this);
-
-		create_light_type<point_light_policy, shadow_buffer>(*this);
-		create_light_type<directional_light_policy, shadow_buffer>(*this);
+		drawing_extend::create_type(*this);
 	}
 }//namespace nexus

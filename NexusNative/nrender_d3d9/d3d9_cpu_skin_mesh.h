@@ -29,20 +29,13 @@ namespace nexus
 	private:
 		struct nshader_modifier_cpu_skin : public nshader_modifier
 		{
-			shader_define	m_macro;
-
 			nshader_modifier_cpu_skin(void)
-				:m_macro("CPU_SKIN", "1")
-			{}
-
-			virtual nstring get_name() const	{	return _T("cpu_skin");}
-			virtual size_t get_num_macro() const	{	return 1;}
-			virtual const shader_define& get_macro(size_t i) const
 			{
-				return m_macro;
+				add_macro(shader_define("CPU_SKIN", "1"));
 			}
 		};
-		static nshader_modifier_cpu_skin	s_shader_modifier;
+
+		static nshader_modifier_cpu_skin s_shader_modifier;
 	};
 }//namespace nexus
 

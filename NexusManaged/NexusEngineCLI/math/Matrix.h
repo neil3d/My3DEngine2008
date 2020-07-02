@@ -6,6 +6,8 @@ using System::Runtime::InteropServices::OutAttribute;
 
 namespace NexusEngine
 {
+	using namespace NexusEngineExtension;
+
 	value class Plane;
 	value class Quaternion;
 	value class Vector2;
@@ -19,6 +21,7 @@ namespace NexusEngine
 	[System::Serializable]
 	[System::Runtime::InteropServices::StructLayout( System::Runtime::InteropServices::LayoutKind::Sequential, Pack = 8 )]
 	[System::ComponentModel::TypeConverter( NexusEngine::Design::MatrixConverter::typeid )]
+	[XmlClassSerializable("Matrix",false)]
 	public value class Matrix : System::IEquatable<Matrix>
 	{
 	internal:
@@ -29,81 +32,97 @@ namespace NexusEngine
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the first row and first column. 
 		/// </summary>
+		[XmlFieldSerializable("M11")]
 		float M11;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the first row and second column. 
 		/// </summary>
+		[XmlFieldSerializable("M12")]
 		float M12;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the first row and third column. 
 		/// </summary>
+		[XmlFieldSerializable("M13")]
 		float M13;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the first row and fourth column. 
 		/// </summary>
+		[XmlFieldSerializable("M14")]
 		float M14;
 
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the second row and first column. 
 		/// </summary>
+		[XmlFieldSerializable("M21")]
 		float M21;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the second row and second column. 
 		/// </summary>
+		[XmlFieldSerializable("M22")]
 		float M22;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the second row and third column. 
 		/// </summary>
+		[XmlFieldSerializable("M23")]
 		float M23;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the second row and fourth column. 
 		/// </summary>
+		[XmlFieldSerializable("M24")]
 		float M24;
 
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the third row and first column. 
 		/// </summary>
+		[XmlFieldSerializable("x")]
 		float M31;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the third row and second column. 
 		/// </summary>
+		[XmlFieldSerializable("M32")]
 		float M32;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the third row and third column. 
 		/// </summary>
+		[XmlFieldSerializable("M33")]
 		float M33;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the third row and fourth column. 
 		/// </summary>
+		[XmlFieldSerializable("M34")]
 		float M34;
 
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the fourth row and first column. 
 		/// </summary>
+		[XmlFieldSerializable("M41")]
 		float M41;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the fourth row and second column. 
 		/// </summary>
+		[XmlFieldSerializable("M42")]
 		float M42;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the fourth row and third column. 
 		/// </summary>
+		[XmlFieldSerializable("M43")]
 		float M43;
 		
 		/// <summary>
 		/// Gets or sets the element of the matrix that exists in the fourth row and fourth column. 
 		/// </summary>
+		[XmlFieldSerializable("M44")]
 		float M44;
 		
 		[System::ComponentModel::Browsable(false)]
