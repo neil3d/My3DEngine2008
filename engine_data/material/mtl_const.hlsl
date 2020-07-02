@@ -5,7 +5,7 @@
 #ifndef MTL_HAVE_DIFFUSE
 float4 mtlGetDiffuseColor(mtlParameters mtlParam)
 {
-	return float4(1,0,0,1);
+	return float4(0,0.44f,0.18f,1);
 }
 #endif
 

@@ -1,1 +1,0 @@
-from ResourceMain import NEResourceMgr

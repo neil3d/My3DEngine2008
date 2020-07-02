@@ -1,0 +1,416 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CB27385B-5D9A-432B-A142-A43374506466}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NexusEditor</RootNamespace>
+    <AssemblyName>NexusEditor</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+    <StartupObject>NexusEditor.Program</StartupObject>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ApplicationIcon>NEd.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Design" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EditorMain\ActorListDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\ActorListDlg.Designer.cs">
+      <DependentUpon>ActorListDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\CameraCtrlSettingDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\CameraCtrlSettingDlg.Designer.cs">
+      <DependentUpon>CameraCtrlSettingDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\EditorLogForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\EditorLogForm.Designer.cs">
+      <DependentUpon>EditorLogForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\EditorMainForm.Actor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\EditorMainForm.Command.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\EditorMainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\EditorMainForm.designer.cs">
+      <DependentUpon>EditorMainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Design\PropertyDescriptorEx.cs" />
+    <Compile Include="EditorMain\AboutBoxNexus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\AboutBoxNexus.Designer.cs">
+      <DependentUpon>AboutBoxNexus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\EditorMainForm.Resource.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\EditorMainForm.Terrain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\TerrainBasicMtlDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\TerrainBasicMtlDlg.Designer.cs">
+      <DependentUpon>TerrainBasicMtlDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\TerrainNoiseDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\TerrainNoiseDlg.Designer.cs">
+      <DependentUpon>TerrainNoiseDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\TerrainSplattingLayerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\TerrainSplattingLayerForm.Designer.cs">
+      <DependentUpon>TerrainSplattingLayerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\TerrainSplattingMtlDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\TerrainSplattingMtlDlg.Designer.cs">
+      <DependentUpon>TerrainSplattingMtlDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\TerrainToolsDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\TerrainToolsDlg.Designer.cs">
+      <DependentUpon>TerrainToolsDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NActorEditor.cs" />
+    <Compile Include="EditorMain\NEMainViewport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="EditorMain\NewTerrainDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditorMain\NewTerrainDlg.Designer.cs">
+      <DependentUpon>NewTerrainDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditorMain\TerrainProperties.cs" />
+    <Compile Include="NControl\CollapsibleGroupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NControl\CollapsibleGroupBox.designer.cs">
+      <DependentUpon>CollapsibleGroupBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NControl\NWaitCursor.cs" />
+    <Compile Include="NControl\Spalsh.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NEViewPort.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NEWidgetsRender.cs" />
+    <Compile Include="NLevelEditorEngine.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="EditorMain\ActorListDlg.resx">
+      <DependentUpon>ActorListDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\CameraCtrlSettingDlg.resx">
+      <DependentUpon>CameraCtrlSettingDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\EditorLogForm.resx">
+      <DependentUpon>EditorLogForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\EditorMainForm.resx">
+      <DependentUpon>EditorMainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\AboutBoxNexus.resx">
+      <DependentUpon>AboutBoxNexus.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\NewTerrainDlg.resx">
+      <DependentUpon>NewTerrainDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\TerrainBasicMtlDlg.resx">
+      <DependentUpon>TerrainBasicMtlDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\TerrainNoiseDlg.resx">
+      <DependentUpon>TerrainNoiseDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\TerrainSplattingLayerForm.resx">
+      <DependentUpon>TerrainSplattingLayerForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\TerrainSplattingMtlDlg.resx">
+      <DependentUpon>TerrainSplattingMtlDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditorMain\TerrainToolsDlg.resx">
+      <DependentUpon>TerrainToolsDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NControl\CollapsibleGroupBox.resx">
+      <DependentUpon>CollapsibleGroupBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NEViewPort.resx">
+      <DependentUpon>NEViewPort.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\ImportLODDlg.resx">
+      <DependentUpon>ImportLODDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\ResAnimMeshEditor.resx">
+      <DependentUpon>ResAnimMeshEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\ResourceEditorForm.resx">
+      <DependentUpon>ResourceEditorForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\ResStaticMeshEditor.resx">
+      <DependentUpon>ResStaticMeshEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\SpeedTreeViewer.resx">
+      <DependentUpon>SpeedTreeViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResourceEditor\StaticMeshEdOptionsDlg.resx">
+      <DependentUpon>StaticMeshEdOptionsDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ResourceEditor\AnimSequenceInfo.cs" />
+    <Compile Include="ResourceEditor\ImportLODDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ImportLODDlg.Designer.cs">
+      <DependentUpon>ImportLODDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\MaterialParamEdit.cs" />
+    <Compile Include="ResourceEditor\MaterialProperty.cs" />
+    <Compile Include="ResourceEditor\MeshLODInfo.cs" />
+    <Compile Include="ResourceEditor\NEFileListBuilder.cs" />
+    <Compile Include="ResourceEditor\NEFileTreeBuilder.cs" />
+    <Compile Include="ResourceEditor\ResAnimMeshEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ResAnimMeshEditor.Designer.cs">
+      <DependentUpon>ResAnimMeshEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\ResAnimMeshProperty.cs" />
+    <Compile Include="ResourceEditor\ResourceActorCreator.cs" />
+    <Compile Include="ResourceEditor\ResourceEditorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ResourceEditorForm.Designer.cs">
+      <DependentUpon>ResourceEditorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\ResourceListFilter.cs" />
+    <Compile Include="ResourceEditor\ResourcePreview.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ResProperty.cs" />
+    <Compile Include="ResourceEditor\ResStaticMeshEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\ResStaticMeshEditor.Designer.cs">
+      <DependentUpon>ResStaticMeshEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\ResStaticMeshProperty.cs" />
+    <Compile Include="ResourceEditor\SpeedTreeViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\SpeedTreeViewer.Designer.cs">
+      <DependentUpon>SpeedTreeViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\StaticMeshEdOptionsDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResourceEditor\StaticMeshEdOptionsDlg.Designer.cs">
+      <DependentUpon>StaticMeshEdOptionsDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceEditor\ThumbnailManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NexusEngineCLI\NexusEngineCLI.vcproj">
+      <Project>{1C2F58EF-63FC-4A85-A67F-5B5BC9721BDF}</Project>
+      <Name>NexusEngineCLI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\006.png" />
+    <None Include="Resources\037.png" />
+    <None Include="Resources\028.png" />
+    <None Include="Resources\013.png" />
+    <None Include="Resources\036.png" />
+    <None Include="Resources\016.png" />
+    <None Include="Resources\050.png" />
+    <None Include="Resources\052.png" />
+    <None Include="Resources\2062_p2.bmp" />
+    <None Include="Resources\BigLogo.jpg" />
+    <None Include="Resources\405_19.jpg" />
+    <None Include="Resources\280_23.gif" />
+    <None Include="Resources\280_05.gif" />
+    <None Include="Resources\405_19.png" />
+    <None Include="Resources\405_03.png" />
+    <None Include="Resources\405_01.png" />
+    <None Include="ImageListFiles\Command\280_15.png" />
+    <None Include="ImageListFiles\Command\280_21.png" />
+    <None Include="ImageListFiles\Command\405_11.png" />
+    <None Include="ImageListFiles\Command\405_21.png" />
+    <None Include="ImageListFiles\Command\405_23.png" />
+    <None Include="ImageListFiles\Command\405_24.png" />
+    <None Include="ImageListFiles\Command\405_25.png" />
+    <None Include="ImageListFiles\Command\TerrainMode.bmp" />
+    <None Include="ImageListFiles\gray.png" />
+    <None Include="Resources\102.gif" />
+    <None Include="Resources\103.gif" />
+    <None Include="Resources\104.gif" />
+    <None Include="Resources\101.gif" />
+    <None Include="Resources\405_37.png" />
+    <None Include="Resources\EditorSplash.png" />
+    <None Include="Resources\2063_p2.bmp" />
+    <None Include="Resources\connect.gif" />
+    <None Include="Resources\405_43.png" />
+    <None Include="Resources\405_39.png" />
+    <None Include="Resources\145.gif" />
+    <None Include="Resources\115.gif" />
+    <None Include="Resources\2332_p1.bmp" />
+    <None Include="Resources\282_29.png" />
+    <None Include="Resources\282_31.png" />
+    <None Include="Resources\161_02.png" />
+    <None Include="Resources\280_07.gif" />
+    <None Include="Resources\103_12.png" />
+    <None Include="Resources\103_13.png" />
+    <None Include="Resources\1026_p1.bmp" />
+    <None Include="Resources\273_23.png" />
+    <None Include="Resources\005.png" />
+    <Content Include="Resources\HeightMap.bmp" />
+    <None Include="Resources\nlogo.bmp" />
+    <None Include="Resources\minus.bmp" />
+    <None Include="Resources\lock.png" />
+    <Content Include="Resources\NoTexture.bmp" />
+    <None Include="Resources\unlock.png" />
+    <None Include="Resources\page_white_code.gif" />
+    <None Include="Resources\page_white_picture.gif" />
+    <None Include="Resources\plus.bmp" />
+    <None Include="Resources\zoom.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

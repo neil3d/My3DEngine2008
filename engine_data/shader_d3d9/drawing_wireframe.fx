@@ -2,15 +2,23 @@
 
 
 void vsMain(vfInput vert,	
-			out float4 outPos : POSITION
+			out float4 outPos : POSITION,
+			out float3 outNormal : TEXCOORD0
 			)
 {
 	outPos = vfTransformPos(vert);
+	outNormal = vfGetWorldNormal(vert);
 }
 
-float4 psMain() : COLOR
+float4 psMain(float3 normal : TEXCOORD0) : COLOR
 {
-	return float4(1,1,0.9,1);
+	float3 dummyLight = float3(-1,1,1);
+	dummyLight = normalize(dummyLight);
+	
+	float d = saturate(dot(normal, dummyLight));
+	d = saturate(d+0.8f);
+	
+	return float4(d,d,d,1);
 }
 
 technique techDefault

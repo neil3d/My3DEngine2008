@@ -1,0 +1,214 @@
+<?xml version="1.0" ?>
+<nexus_archive_root>
+    <m_bounding_box class_name="box_sphere_bounds">
+        <origin class_name="vector3">
+            <x>0</x>
+            <y>73.1257019</y>
+            <z>0</z>
+        </origin>
+        <box_extent class_name="vector3">
+            <x>19.1290283</x>
+            <y>73.4407043</y>
+            <z>20.1133118</z>
+        </box_extent>
+        <sphere_radius>78.5111618</sphere_radius>
+    </m_bounding_box>
+    <m_trans_flag>2</m_trans_flag>
+    <m_lod_array array_size="1">
+        <array_item class_name="nstatic_mesh_lod">
+            <m_vert_data class_name="nmesh_vertex_data_common">
+                <m_pos_stream class_name="vertex_stream">
+                    <m_data>AIGQwOMUwEIQ6KBBABpYwEA+n74AYIJBgEd1wUBDoL4AIB++QAiZwUENwEIAAAAAQAiZQfgRwEIg5EZBAG1/QQCin77gMyBBABpYwEA+n74AYIJBAIGQwOMUwEIQ6KBBAAiZQYsIwEJA5EbBAG1/QYDkoL7gLCXBAG1/QQCin77gMyBBQAiZQfgRwEIg5EZBAIGQwKAFwEIQ6KDBABxYwEBIob6A3ITBAG1/QYDkoL7gLCXBAAiZQYsIwEJA5EbBQAiZwUENwEIAAAAAgEd1wUBDoL4AIB++ABxYwEBIob6A3ITBAIGQwKAFwEIQ6KDBAAiZQYsIwEJA5EbBQAiZQfgRwEIg5EZBAIGQwOMUwEIQ6KBBAJy6v0oR00KA4ZfAANRJQAa5BkMAmkW/ACBbvkL+8UIAHyZAABJbwB3bzULAv7lAAHxpwP6130JA9MBAANjjQK4i00IA/3pAAJglP8xaxUIADN4/AJ64QBiLxEKAz1jAAHvMQKJr8ELARIDAAFofQUA330IAfvLAANRJQAa5BkMAmkW/gCAlQZKrzkJACv7AAJglP8xaxUIADN4/AJ64QBiLxEKAz1jAABJbwB3bzULAv7lAgCAlQZKrzkJACv7AAFofQUA330IAfvLAAHxpwP6130JA9MBAAHvMQKJr8ELARIDAACBbvkL+8UIAHyZAAIUYQeYl7kLAUd/AADpMwI4m7kIA1bdAADpMwACREkMA1bdAAIUYQXyOEkPAUd/A</m_data>
+                    <m_data_size>564</m_data_size>
+                    <m_element_array array_size="1">
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>0</stream_index>
+                            <offset>0</offset>
+                            <type>2</type>
+                            <usage>1</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                    </m_element_array>
+                    <m_vert_size>12</m_vert_size>
+                </m_pos_stream>
+                <m_macro_array array_size="2">
+                    <array_item class_name="shader_define">
+                        <name>VERT_NUM_NORMAL</name>
+                        <value>2</value>
+                    </array_item>
+                    <array_item class_name="shader_define">
+                        <name>VERT_NUM_TEXCOORD</name>
+                        <value>1</value>
+                    </array_item>
+                </m_macro_array>
+                <m_num_normal>2</m_num_normal>
+                <m_num_uv>1</m_num_uv>
+                <m_second_stream class_name="vertex_stream">
+                    <m_data>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</m_data>
+                    <m_data_size>1504</m_data_size>
+                    <m_element_array array_size="3">
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>0</offset>
+                            <type>2</type>
+                            <usage>2</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>12</offset>
+                            <type>2</type>
+                            <usage>3</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>24</offset>
+                            <type>1</type>
+                            <usage>4</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                    </m_element_array>
+                    <m_vert_size>32</m_vert_size>
+                </m_second_stream>
+            </m_vert_data>
+            <m_secton_array array_size="2">
+                <array_item class_name="nmesh_section">
+                    <index_buffer>AgABAAAAAAADAAIAEgARABAAEAATABIAEAAWABMAFgAVABMAFQAUABMADgANAAwADAAPAA4ACgAJAAgACAALAAoABgAFAAQABAAHAAYA</index_buffer>
+                    <m_material_id>0</m_material_id>
+                    <m_primitive_type>4</m_primitive_type>
+                    <m_base_vertex_index>0</m_base_vertex_index>
+                </array_item>
+                <array_item class_name="nmesh_section">
+                    <index_buffer>LQAsACsAKwAuAC0AHAAbABoAHAAqABsAIQAqABwAHAAfACEAIAAfABwAHAAiACAAHgAiABwAHAAdAB4AHAAaAB0AGQAYABcAKAAZABcAFwAlACgAFwAjACUAFwAkACMAJgAkABcAJwAmABcAFwApACcAGAApABcA</index_buffer>
+                    <m_material_id>1</m_material_id>
+                    <m_primitive_type>4</m_primitive_type>
+                    <m_base_vertex_index>0</m_base_vertex_index>
+                </array_item>
+            </m_secton_array>
+            <m_mtl_array array_size="2">
+                <array_item class_name="nmaterial">
+                    <m_name>Mtl_L0S0</m_name>
+                    <template_loc class_name="resource_location">
+                        <pkg_name>demo_data</pkg_name>
+                        <file_name>/mtl/MaskDiffNormal.hlsl</file_name>
+                    </template_loc>
+                    <m_parameter_array array_size="3">
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_DiffuseMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/texture/g01-087-a.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_NormalMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/normal/g01-087-a_NRM.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_AlphaMask</name>
+                            <type>6</type>
+                            <int_value>124</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name></pkg_name>
+                                <file_name></file_name>
+                            </tex_loc>
+                        </array_item>
+                    </m_parameter_array>
+                </array_item>
+                <array_item class_name="nmaterial">
+                    <m_name>Mtl_L0S1</m_name>
+                    <template_loc class_name="resource_location">
+                        <pkg_name>demo_data</pkg_name>
+                        <file_name>/mtl/MaskDiffNormal.hlsl</file_name>
+                    </template_loc>
+                    <m_parameter_array array_size="3">
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_DiffuseMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/texture/g01-087-b.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_NormalMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/normal/g01-087-b_NRM.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_AlphaMask</name>
+                            <type>6</type>
+                            <int_value>28</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name></pkg_name>
+                                <file_name></file_name>
+                            </tex_loc>
+                        </array_item>
+                    </m_parameter_array>
+                </array_item>
+            </m_mtl_array>
+            <m_bounding_box class_name="box_sphere_bounds">
+                <origin class_name="vector3">
+                    <x>0</x>
+                    <y>73.1257019</y>
+                    <z>0</z>
+                </origin>
+                <box_extent class_name="vector3">
+                    <x>19.1290283</x>
+                    <y>73.4407043</y>
+                    <z>20.1133118</z>
+                </box_extent>
+                <sphere_radius>78.5111618</sphere_radius>
+            </m_bounding_box>
+        </array_item>
+    </m_lod_array>
+</nexus_archive_root>

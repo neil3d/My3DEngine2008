@@ -46,11 +46,24 @@ float4 psMain_Blue(float2 uv : TEXCOORD0): COLOR
 	return tex2D(texSampler, uv).bbba;
 }
 
+
+//With INTZ format, the lookups will return 32 bit depth value, 
+//but RAWZ value is compressed. In order to decompress it, you must do the following in the pixel shader:
+float4 psMain_RAWZ(float2 uv : TEXCOORD0): COLOR
+{
+	float3 m=float3(0.996093809371817670572857294849, 0.0038909914428586627756752238080039, 1.5199185323666651467481343000015e-5);
+	float z = dot(tex2D(texSampler, uv).arg, m);
+	return float4(z,z,z,1);
+}
+
 technique techDefault
 {
 	pass p0
 	{
 		CullMode = None;
+		ZEnable = false;
+		ZWriteEnable = False;
+		
 		VertexShader = compile vs_1_1 vsMain();
 		PixelShader = compile ps_2_0 psMain();
 	}
@@ -83,6 +96,16 @@ technique techBlue
 		CullMode = None;
 		VertexShader = compile vs_1_1 vsMain();
 		PixelShader = compile ps_2_0 psMain_Blue();
+	}
+}
+
+technique techRAWZ
+{
+	pass p0
+	{
+		CullMode = None;
+		VertexShader = compile vs_1_1 vsMain();
+		PixelShader = compile ps_2_0 psMain_RAWZ();
 	}
 }
 

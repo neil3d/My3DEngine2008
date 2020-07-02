@@ -1,0 +1,4 @@
+.Material保存一个Render State Block,用来控制depth test等渲染状态;
+.Level load做到异常安全;
+.shader cache:所有使用过的shader编译好之后存盘，每次先从cache中查找;
+.Level分不同的Layer, 每个Layer可以单独选择是否显示等;每个Layer存盘为一个单独的文件,这样方便多人协同编辑一个关卡.

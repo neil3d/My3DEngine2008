@@ -153,7 +153,8 @@ float4 psTest(float2 uv : TEXCOORD0): COLOR
 	return tex2D(luminance, uv).xxxw;
 	//return float4(1,0,0,1);
 }
-
+
+
 
 technique techDefault
 {

@@ -4,6 +4,7 @@
 
 #define MTL_NEED_VERT_NORMAL
 #define TRN_TEX_SPLATTING
+#define VERTEX_LIGHTING
 
 texture texAlpha:MTL_LayerAlpha;
 

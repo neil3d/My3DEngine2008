@@ -1,0 +1,214 @@
+<?xml version="1.0" ?>
+<nexus_archive_root>
+    <m_bounding_box class_name="box_sphere_bounds">
+        <origin class_name="vector3">
+            <x>0.000144958496</x>
+            <y>197.33725</y>
+            <z>3.81469727e-006</z>
+        </origin>
+        <box_extent class_name="vector3">
+            <x>147.712128</x>
+            <y>197.300354</y>
+            <z>103.651031</z>
+        </box_extent>
+        <sphere_radius>267.375854</sphere_radius>
+    </m_bounding_box>
+    <m_trans_flag>2</m_trans_flag>
+    <m_lod_array array_size="1">
+        <array_item class_name="nstatic_mesh_lod">
+            <m_vert_data class_name="nmesh_vertex_data_common">
+                <m_pos_stream class_name="vertex_stream">
+                    <m_data>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</m_data>
+                    <m_data_size>1836</m_data_size>
+                    <m_element_array array_size="1">
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>0</stream_index>
+                            <offset>0</offset>
+                            <type>2</type>
+                            <usage>1</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                    </m_element_array>
+                    <m_vert_size>12</m_vert_size>
+                </m_pos_stream>
+                <m_macro_array array_size="2">
+                    <array_item class_name="shader_define">
+                        <name>VERT_NUM_NORMAL</name>
+                        <value>2</value>
+                    </array_item>
+                    <array_item class_name="shader_define">
+                        <name>VERT_NUM_TEXCOORD</name>
+                        <value>1</value>
+                    </array_item>
+                </m_macro_array>
+                <m_num_normal>2</m_num_normal>
+                <m_num_uv>1</m_num_uv>
+                <m_second_stream class_name="vertex_stream">
+                    <m_data>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</m_data>
+                    <m_data_size>4896</m_data_size>
+                    <m_element_array array_size="3">
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>0</offset>
+                            <type>2</type>
+                            <usage>2</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>12</offset>
+                            <type>2</type>
+                            <usage>3</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>24</offset>
+                            <type>1</type>
+                            <usage>4</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                    </m_element_array>
+                    <m_vert_size>32</m_vert_size>
+                </m_second_stream>
+            </m_vert_data>
+            <m_secton_array array_size="2">
+                <array_item class_name="nmesh_section">
+                    <index_buffer>AgABAAAAAAADAAIA</index_buffer>
+                    <m_material_id>0</m_material_id>
+                    <m_primitive_type>4</m_primitive_type>
+                    <m_base_vertex_index>0</m_base_vertex_index>
+                </array_item>
+                <array_item class_name="nmesh_section">
+                    <index_buffer>CQAMAAsACwAKAAkAawBqAGQAZgBlAGQAaABmAGQAagBoAGQAagBpAGgAaABnAGYAWQBYAFIAVABTAFIAWABUAFIAWABWAFQAWABXAFYAVgBVAFQAYwBiAFsAWwBcAGMAXABbAFoAWgBdAFwAXQBaAF4AXgBfAF0AXwBeAGAAYABhAF8ASwBRAFAAUABKAEsASABLAEoASgBJAEgATABIAEkASQBNAEwATgBMAE0ATQBPAE4APAA/AD4APgA9ADwARAA8AD0APQBFAEQARgBEAEUARQBHAEYAMQA0ADMAMwAyADEAQQAxADIAMgBAAEEAQgBBAEAAQABDAEIADwAOAA0ADQAQAA8AEwASABEAEQAUABMAFwAWABUAFQAYABcAGwAaABkAGQAcABsAHwAeAB0AHQAgAB8AIwAiACEAIQAkACMAJwAmACUAJQAoACcAKwAqACkAKQAsACsALwAuAC0ALQAwAC8ANwA2ADUAOAA3ADUAOQA4ADUAOgA5ADUAOwA6ADUAfgB9AHwAfAB/AH4AggCBAIAAgwCCAIAAhACDAIAAhwCGAIUAhQCIAIcAiwCKAIkAiQCMAIsAjwCOAI0AjQCQAI8AkwCSAJEAkQCUAJMAlwCWAJUAlQCYAJcABgAFAAQABwAGAAQACAAHAAQAbgBtAGwAbABvAG4AcgBxAHAAcABzAHIAdgB1AHQAdAB3AHYAegB5AHgAeAB7AHoA</index_buffer>
+                    <m_material_id>1</m_material_id>
+                    <m_primitive_type>4</m_primitive_type>
+                    <m_base_vertex_index>0</m_base_vertex_index>
+                </array_item>
+            </m_secton_array>
+            <m_mtl_array array_size="2">
+                <array_item class_name="nmaterial">
+                    <m_name>Mtl_L0S0</m_name>
+                    <template_loc class_name="resource_location">
+                        <pkg_name>demo_data</pkg_name>
+                        <file_name>/mtl/MaskDiffNormal.hlsl</file_name>
+                    </template_loc>
+                    <m_parameter_array array_size="3">
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_DiffuseMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/texture/g01-080-f.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_NormalMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/normal/g01-080-f_NRM.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_AlphaMask</name>
+                            <type>6</type>
+                            <int_value>28</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name></pkg_name>
+                                <file_name></file_name>
+                            </tex_loc>
+                        </array_item>
+                    </m_parameter_array>
+                </array_item>
+                <array_item class_name="nmaterial">
+                    <m_name>Mtl_L0S1</m_name>
+                    <template_loc class_name="resource_location">
+                        <pkg_name>demo_data</pkg_name>
+                        <file_name>/mtl/MaskDiffNormal.hlsl</file_name>
+                    </template_loc>
+                    <m_parameter_array array_size="3">
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_DiffuseMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/texture/g01-081-c.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_NormalMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/normal/g01-081-c_NRM.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_AlphaMask</name>
+                            <type>6</type>
+                            <int_value>28</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name></pkg_name>
+                                <file_name></file_name>
+                            </tex_loc>
+                        </array_item>
+                    </m_parameter_array>
+                </array_item>
+            </m_mtl_array>
+            <m_bounding_box class_name="box_sphere_bounds">
+                <origin class_name="vector3">
+                    <x>0.000144958496</x>
+                    <y>197.33725</y>
+                    <z>3.81469727e-006</z>
+                </origin>
+                <box_extent class_name="vector3">
+                    <x>147.712128</x>
+                    <y>197.300354</y>
+                    <z>103.651031</z>
+                </box_extent>
+                <sphere_radius>267.375854</sphere_radius>
+            </m_bounding_box>
+        </array_item>
+    </m_lod_array>
+</nexus_archive_root>

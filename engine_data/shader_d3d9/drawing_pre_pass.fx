@@ -4,33 +4,40 @@
 
 void vsMain_Mtl(vfInput vert,
 			out vfInterpolants inter,
-			out float4 outPos : POSITION
+			out float4 outPos : POSITION,
+			out float4 outDepth: COLOR0
 			)
 {
 	vfMakeInterpolants(vert, inter);
 	
 	outPos = vfTransformPos(vert);
+	outDepth = outPos;
 }
 
-float4 psMain_Mtl(vfInterpolants inter) : COLOR
+float4 psMain_Mtl(vfInterpolants inter,float4 outDepth: COLOR0) : COLOR
 {
 	mtlParameters mtlParam;
 	vfMakeMaterialParameters(inter, mtlParam);
 	
 	float4 ret = 0;
 	ret.a = mtlGetOpacity(mtlParam);	
+	ret.r = outDepth.z/outDepth.w;
 	return ret;
 }
 
 void vsMain(vfInput vert,
-			out float4 outPos : POSITION)
+			out float4 outPos : POSITION,
+			out float4 outDepth: COLOR0)
 {
 	outPos = vfTransformPos(vert);
+	outDepth = outPos;
 }
 
-float4 psMain() : COLOR
+float4 psMain(float4 outDepth: COLOR0) : COLOR
 {
-	return float4(1,0,0,1);
+	float4 ret = 0;
+	ret.r = outDepth.z/outDepth.w;
+	return ret;
 }
 
 
@@ -42,8 +49,7 @@ technique techDefault
 		ZWriteEnable = True;
 		ZFunc = Less;
 		
-		FillMode = Solid;
-		ColorWriteEnable = 0;
+		FillMode = Solid;		
 		
 		#ifdef MTL_USE_ALPHA_MASK
 			AlphaTestEnable = True;
@@ -73,8 +79,7 @@ technique techMixedTrans
 		ZWriteEnable = True;
 		ZFunc = Less;
 		
-		FillMode = Solid;
-		ColorWriteEnable = 0;
+		FillMode = Solid;		
 		
 		AlphaTestEnable = True;
 		AlphaRef = 220;

@@ -1,0 +1,7 @@
+
+IDV SpeedTreeRT整合笔记
+
+.使用Base Tree--Instance概念，以减少内存/显存占用：多个tree instance只占用一份；
+.对于资源管理来说，由于使用spt instance机制，不必整合到引擎现有的resource机制，但是IO部分可以重用,cache部分不适用；
+.为了实现SPT SDK文档（Optimized Forest Rendering）中所说的尽量减少状态切换，需要在渲染层对Base tree--Instance概念进行处理，所以特殊增加一个渲染器管理；
+.因为要与现有引擎中的光影计算等基础功能整合，所以必须符合现有的mesh-material管理方式，而不能直接使用SDK例子中的代码；

@@ -1,6 +1,7 @@
 #include "material.hlsl"
 #include "vertex_factory.hlsl"
 #include "lighting.hlsl"
+#include "shadow.hlsl"
 
 void vsMain(vfInput vert,
 			out vfInterpolants inter
@@ -10,16 +11,16 @@ void vsMain(vfInput vert,
 #else
 			,out lgtTangentInfo lgt
 #endif
+			,out float4 shadowUV : TEXCOORD7
 			,out float4 outPos : POSITION
 			)
 {
 	vfMakeInterpolants(vert, inter);
 
+	float3 worldPos = vfGetWorldPos(vert);
+	float3 worldNormal = vfGetWorldNormal(vert);
 #if MTL_LIGHT 
 	#ifdef VERTEX_LIGHTING
-		float3 worldPos = vfGetWorldPos(vert);
-		float3 worldNormal = vfGetWorldNormal(vert);
-		
 		lgtCalulate_WorldSpace(worldPos, worldNormal, mtlGetSpecularPower_Vert(),
 								outLgtDiffuse, outLgtSpecular);
 		#ifdef MTL_TWO_SIDED
@@ -32,10 +33,11 @@ void vsMain(vfInput vert,
 			outLgtSpecular += lgtSpecular2;
 		#endif
 	#else
-		lgtMakeTangentInfo(vfGetWorldPos(vert), vfGetTangentBasis(vert), lgt);
+		lgtMakeTangentInfo(worldPos, vfGetTangentBasis(vert), lgt);
 	#endif
 #endif
 	
+	shadowUV = shadowVS(worldPos);
 	outPos = vfTransformPos(vert);
 }
 
@@ -46,6 +48,7 @@ float4 psMain(vfInterpolants inter
 #else
 			,lgtTangentInfo lgt
 #endif
+			,float4 shadowUV : TEXCOORD7
 			) : COLOR
 {
 	mtlParameters mtlParam;
@@ -56,10 +59,12 @@ float4 psMain(vfInterpolants inter
 	float4 diffuseColor = mtlGetDiffuseColor(mtlParam);
 	float4 specularColor = mtlGetSpecularColor(mtlParam);
 	
+	float4 shadow = shadowPS(shadowUV);
+	
 #if MTL_LIGHT 
 	#ifdef VERTEX_LIGHTING
-		result = diffuseColor * lgtDiffuse;
-		result += specularColor * lgtSpecular;
+		result = diffuseColor * (lgtDiffuse*shadow+lgtAmbientColor);
+		result += specularColor * lgtSpecular*shadow;
 	#else
 		float3 pixelNormal = mtlGetNormal(mtlParam);
 		float  specPower = mtlGetSpecularPower(mtlParam);
@@ -69,8 +74,8 @@ float4 psMain(vfInterpolants inter
 		lgtCalculate_TangentSpace(pixelNormal, specPower, lgt, 
 				lgtDiffuse, lgtSpecular);
 				
-		result = diffuseColor * lgtDiffuse;
-		result += specularColor * lgtSpecular;
+		result = diffuseColor * (lgtDiffuse*shadow+lgtAmbientColor);
+		result += specularColor * lgtSpecular*shadow;
 				
 		#ifdef MTL_TWO_SIDED			
 			float4 lgtDiffuse2;
@@ -79,8 +84,8 @@ float4 psMain(vfInterpolants inter
 			lgtCalculate_TangentSpace(-pixelNormal, specPower, lgt, 
 				lgtDiffuse2, lgtSpecular2);
 				
-			result += diffuseColor * lgtDiffuse2;
-			result += specularColor * lgtSpecular2;
+			result += diffuseColor * (lgtDiffuse2*shadow+lgtAmbientColor);
+			result += specularColor * lgtSpecular2*shadow;
 		#endif
 		
 	#endif

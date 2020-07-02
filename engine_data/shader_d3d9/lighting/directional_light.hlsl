@@ -23,7 +23,7 @@ void lgtCalulate_WorldSpace(float3 vertPos, float3 vertNormal, float mtlSpecPowe
     float4 lighting = lit(diffuse, spec, mtlSpecPower); // produces float3(amb=1, diff, spec, 1)
     
 	// return
-	lightDiffuse = lgtAmbientColor + lgtDiffuseColor*lighting.y;
+	lightDiffuse = lgtDiffuseColor*lighting.y;
 	lightSpecular = lgtDiffuseColor*lighting.z;
 }
 
@@ -60,6 +60,6 @@ void lgtCalculate_TangentSpace(float3 pixelNormal, float mtlSpecPower,
 	float4 lighting = lit(diffuse, spec, mtlSpecPower);
 	
 	// return
-	lightDiffuse = lgtAmbientColor + lgtDiffuseColor*lighting.y;
+	lightDiffuse = lgtDiffuseColor*lighting.y;
 	lightSpecular = lgtDiffuseColor*lighting.z;
 }

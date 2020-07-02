@@ -1,0 +1,184 @@
+<?xml version="1.0" ?>
+<nexus_archive_root>
+    <m_bounding_box class_name="box_sphere_bounds">
+        <origin class_name="vector3">
+            <x>0.185836792</x>
+            <y>85.0755539</y>
+            <z>8.8556118</z>
+        </origin>
+        <box_extent class_name="vector3">
+            <x>65.1025925</x>
+            <y>96.1036758</y>
+            <z>45.7136917</z>
+        </box_extent>
+        <sphere_radius>124.755783</sphere_radius>
+    </m_bounding_box>
+    <m_trans_flag>1</m_trans_flag>
+    <m_lod_array array_size="1">
+        <array_item class_name="nstatic_mesh_lod">
+            <m_vert_data class_name="nmesh_vertex_data_common">
+                <m_pos_stream class_name="vertex_stream">
+                    <m_data>DRlpQSY27EEcOq21DBnpQCY27EFg3klBeCMPQa6NMUNU7HdBeCOPQa2NMUM2jOO2DxnpwCY27EFe3klBeSMPwa6NMUNT7HdBDxnpwCY27EFe3klBDRlpwSY27EHVFSy2eSOPwaqNMUNIBAy3eSMPwa6NMUNT7HdBChnpwCY27EFk3knBdiMPwaqNMUNi7HfBChnpwCY27EFk3knBERnpQCY27EFi3knBfCMPQaqNMUNg7HfBdiMPwaqNMUNi7HfBDRlpQSY27EEcOq21eCOPQa2NMUM2jOO2eCOPQa2NMUM2jOO2eCMPQa6NMUNU7HdBw+7ZP+ItNUMI3x2/eSMPwa6NMUNT7HdBeSOPwaqNMUNIBAy3diMPwaqNMUNi7HfBfCMPQaqNMUNg7HfBaDL5vlrGl0H4RlpCoVH4vhKDUkIQFjdC1ixwQCgYT0LjKitC3qlPQOdUikGLrFFCQoqHwDNzikHuv1FCDcOXwNwfT0LBRStCoVH4vhKDUkIQFjdCaDL5vlrGl0H4RlpCYI00wBCLaUFP4ENClLZIwP2cSUJyDRhCDcOXwNwfT0LBRStCQoqHwDNzikHuv1FC3qlPQOdUikGLrFFC1ixwQCgYT0LjKitCqE8HQDqYSULa/BdCu6fmP5xlaUFT1ENCQoqHwDNzikHuv1FCaDL5vlrGl0H4RlpC3qlPQOdUikGLrFFCu6fmP5xlaUFT1ENCYI00wBCLaUFP4ENCUtS3QCm2lMAeWALCsWI5QGKj48Afg+LB9EU2QCjSNUL4bAFA9EW2QM6vP0IE/A/ANykzwGKj48Ahg+LB9EU2wCjSNUL4bAFANykzwGKj48Ahg+LBk7e0wCq2lMAeWALC8kW2wM2vP0IO/A/A9EU2wCjSNUL4bAFAMykzwOSRC8CtbhPC8EU2wHSNSUJ8stDAMykzwOSRC8CtbhPCtGI5QOSRC8CtbhPC9kU2QHSNSUJ6stDA8EU2wHSNSUJ8stDAUtS3QCm2lMAeWALC9EW2QM6vP0IE/A/Aa55pwsWyIsH44xlC/5Zjwrwb+MDkny1CWkmgwD4UA0L2DARByoTQwAbW8kEkdVRAdZltwlgQO8BKYDRCAl3wwLBmFkKNDh9BdZltwlgQO8BKYDRCVKN9wiDzAb/EZCdCE1Y4wegPIEL7QNZAAl3wwLBmFkKNDh9BYdWBwlgQO8DZqBNCxXNQwa5mFkJ4huE/YdWBwlgQO8DZqBNCTah5wsQb+MBz6AxC8GkowTwUA0IAm5c9xXNQwa5mFkJ4huE/a55pwsWyIsH44xlCyoTQwAbW8kEkdVRAtGZ/Qmi1yr8BxypCDBZvQkR3fMDJkjdCQAzKQCIHGEKc8RtBzUgmQeh4IUIFhdFACYZkQhOsCsHocjBCSBhrQJEjBUIv5P5ACYZkQhOsCsHocjBCrEZqQi9zMME9hxxCapGjQI5j90HoDT9ASBhrQJEjBUIv5P5AWJd6QhOsCsF3uw9CWgsTQY8jBUJA6Vq+WJd6QhOsCsF3uw9CrZOCQkR3fMBY2xZCZEs9QR8HGEL4nsg/WgsTQY8jBUJA6Vq+tGZ/Qmi1yr8BxypCzUgmQeh4IUIFhdFACHf4vsICWUJn1DxCz3f3vhy8XEL0BfdAQIKKQAmoTkL0BfdALhpwQFuETUI3eUFCXr6XwEGeTUK/bkFCpimqwMXHTkL0BfdAz3f3vhy8XEL0BfdACHf4vsICWUJn1DxChrJIwFYVO0LS60hC0JZfwN0TOELoBfdApimqwMXHTkL0BfdAXr6XwEGeTUK/bkFCLhpwQFuETUI3eUFCQIKKQAmoTkL0BfdAJPMdQEQAOEL0BfdAaEIHQFMFO0JK8khCXr6XwEGeTUK/bkFCCHf4vsICWUJn1DxCLhpwQFuETUI3eUFCaEIHQFMFO0JK8khChrJIwFYVO0LS60hC/NEMP2VS30IoXUpCRh0OP1Pd4UIMWdHBecKYQFsf3EIOWdHBdqdRQDNY20JKfUpCbg8MwCph20IAfUpCsrlrwEws3EIMWdHBRh0OP1Pd4UIMWdHB/NEMP2VS30IoXUpCvdyTvzn31ELSsEpC/WAFwNfp0kIOWdHBsrlrwEws3EIMWdHBbg8MwCph20IAfUpCdqdRQDNY20JKfUpCecKYQFsf3EIOWdHB9CBJQNnh0kIMWdHBSjQOQK/x1EL/sEpCbg8MwCph20IAfUpC/NEMP2VS30IoXUpCdqdRQDNY20JKfUpCSjQOQK/x1EL/sEpCvdyTvzn31ELSsEpCQhx4wdISFENCQy9CKMJcQUhYFUNJC4LBZLaMQUx5EkPKf2bB9hxRwbgVEkM8JTRChtiPwTQaEkMckCpC3s4fQcV/EkNn6JDBKMJcQUhYFUNJC4LBQhx4wdISFENCQy9CFJSIwTzlDkOCiixCIs42QYreDUO1TIvB3s4fQcV/EkNn6JDBhtiPwTQaEkMckCpC9hxRwbgVEkM8JTRCZLaMQUx5EkPKf2bB+PuAQYzaDUOK8HHBuJdgwXbiDkOcdjJChtiPwTQaEkMckCpCQhx4wdISFENCQy9C9hxRwbgVEkM8JTRCuJdgwXbiDkOcdjJCFJSIwTzlDkOCiixCEMyKQSiIC0MevTBCT0wdwZ7NDEOLA4fBnEW/wKLuCUOhvZTBtM+eQQ6LCUOsaCxCPMBtQYqPCUNKTDVCrz9bwRv1CUMKcnLBT0wdwZ7NDEOLA4fBEMyKQSiIC0MevTBCqCd9QZJaBkM0yTNCz99DweBTBUM+2nzBrz9bwRv1CUMKcnLBPMBtQYqPCUNKTDVCtM+eQQ6LCUOsaCxCnEW/wKLuCUOhvZTBXPTuwOJPBUPtbo/BWUKXQcxXBkPKSi5CPMBtQYqPCUNKTDVCEMyKQSiIC0MevTBCtM+eQQ6LCUOsaCxCWUKXQcxXBkPKSi5CqCd9QZJaBkM0yTNCu6fmP5xlaUFT1ENCqE8HQDqYSULa/BdClLZIwP2cSUJyDRhCYI00wBCLaUFP4ENCsrlrwEws3EIMWdHB/WAFwNfp0kIOWdHB9CBJQNnh0kIMWdHBecKYQFsf3EIOWdHBRh0OP1Pd4UIMWdHB3s4fQcV/EkNn6JDBIs42QYreDUO1TIvB+PuAQYzaDUOK8HHBZLaMQUx5EkPKf2bBKMJcQUhYFUNJC4LBrz9bwRv1CUMKcnLBz99DweBTBUM+2nzBXPTuwOJPBUPtbo/BnEW/wKLuCUOhvZTBT0wdwZ7NDEOLA4fB</m_data>
+                    <m_data_size>2436</m_data_size>
+                    <m_element_array array_size="1">
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>0</stream_index>
+                            <offset>0</offset>
+                            <type>2</type>
+                            <usage>1</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                    </m_element_array>
+                    <m_vert_size>12</m_vert_size>
+                </m_pos_stream>
+                <m_macro_array array_size="2">
+                    <array_item class_name="shader_define">
+                        <name>VERT_NUM_NORMAL</name>
+                        <value>2</value>
+                    </array_item>
+                    <array_item class_name="shader_define">
+                        <name>VERT_NUM_TEXCOORD</name>
+                        <value>1</value>
+                    </array_item>
+                </m_macro_array>
+                <m_num_normal>2</m_num_normal>
+                <m_num_uv>1</m_num_uv>
+                <m_second_stream class_name="vertex_stream">
+                    <m_data>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</m_data>
+                    <m_data_size>6496</m_data_size>
+                    <m_element_array array_size="3">
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>0</offset>
+                            <type>2</type>
+                            <usage>2</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>12</offset>
+                            <type>2</type>
+                            <usage>3</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>24</offset>
+                            <type>1</type>
+                            <usage>4</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                    </m_element_array>
+                    <m_vert_size>32</m_vert_size>
+                </m_second_stream>
+            </m_vert_data>
+            <m_secton_array array_size="2">
+                <array_item class_name="nmesh_section">
+                    <index_buffer>CwAKAAcABwAIAAsACAAHAAYABgAJAAgAYwBiAF8AXwBgAGMAYABfAF4AXgBhAGAAXQBcAFkAWQBaAF0AWgBZAFgAWABbAFoAVwBWAFMAUwBUAFcAVABTAFIAUgBVAFQAUQBQAE0ATQBOAFEATgBNAEwATABPAE4ASwBKAEcARwBIAEsASABHAEYARgBJAEgARQBEAEEAQQBCAEUAQgBBAEAAQABDAEIAPwA+ADsAOwA8AD8APAA7ADoAOgA9ADwAOQA4ADUANQA2ADkANgA1ADQANAA3ADYAMwAyAC8ALwAwADMAMAAvAC4ALgAxADAAEQAQAA0ADQAOABEADgANAAwADAAPAA4AAAADAAIAAgABAAAAAQACAAUABQAEAAEA</index_buffer>
+                    <m_material_id>0</m_material_id>
+                    <m_primitive_type>4</m_primitive_type>
+                    <m_base_vertex_index>0</m_base_vertex_index>
+                </array_item>
+                <array_item class_name="nmesh_section">
+                    <index_buffer>GwAaABkAGQAcABsAwwDCAMEAxADDAMEAxQDEAMEAvgC9ALwAvwC+ALwAwAC/ALwAugC5ALgAuAC7ALoAsQCwAK8ArwCyALEArQCsAKsAqwCuAK0AqQCoAKcApwCqAKkApQCkAKMAowCmAKUAoACfAJ4AoQCgAJ4AogChAJ4AnACbAJoAmgCdAJwAmACXAJYAlgCZAJgAlACTAJIAkgCVAJQAkACPAI4AjgCRAJAAiwCKAIkAjACLAIkAjQCMAIkAhwCGAIUAhQCIAIcAgwCCAIEAgQCEAIMAfwB+AH0AfQCAAH8AewB6AHkAeQB8AHsAdgB1AHQAdwB2AHQAeAB3AHQAcgBxAHAAcABzAHIAbgBtAGwAbABvAG4AagBpAGgAaABrAGoAZgBlAGQAZABnAGYAJwAmACUAJQAoACcAIwAiACEAIQAkACMAHwAeAB0AHQAgAB8AyADHAMYAyQDIAMYAygDJAMYAGAAXABQAEgAYABQAFAATABIAFAAVABMAFAAWABUAFAAXABYAKwAqACkALAArACkALQAsACkAtQC0ALMAtgC1ALMAtwC2ALMA</index_buffer>
+                    <m_material_id>1</m_material_id>
+                    <m_primitive_type>4</m_primitive_type>
+                    <m_base_vertex_index>0</m_base_vertex_index>
+                </array_item>
+            </m_secton_array>
+            <m_mtl_array array_size="2">
+                <array_item class_name="nmaterial">
+                    <m_name>Mtl_L0S0</m_name>
+                    <template_loc class_name="resource_location">
+                        <pkg_name>demo_data</pkg_name>
+                        <file_name>/mtl/DiffNormal.hlsl</file_name>
+                    </template_loc>
+                    <m_parameter_array array_size="2">
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_DiffuseMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/texture/g01-088-b.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_NormalMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/normal/g01-088-b_NRM.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                    </m_parameter_array>
+                </array_item>
+                <array_item class_name="nmaterial">
+                    <m_name>Mtl_L0S1</m_name>
+                    <template_loc class_name="resource_location">
+                        <pkg_name>demo_data</pkg_name>
+                        <file_name>/mtl/DiffNormal.hlsl</file_name>
+                    </template_loc>
+                    <m_parameter_array array_size="2">
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_DiffuseMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/texture/g01-088-a.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_NormalMap</name>
+                            <type>5</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name>demo_data</pkg_name>
+                                <file_name>/mesh/normal/g01-088-a_NRM.dds</file_name>
+                            </tex_loc>
+                        </array_item>
+                    </m_parameter_array>
+                </array_item>
+            </m_mtl_array>
+            <m_bounding_box class_name="box_sphere_bounds">
+                <origin class_name="vector3">
+                    <x>0.185836792</x>
+                    <y>85.0755539</y>
+                    <z>8.8556118</z>
+                </origin>
+                <box_extent class_name="vector3">
+                    <x>65.1025925</x>
+                    <y>96.1036758</y>
+                    <z>45.7136917</z>
+                </box_extent>
+                <sphere_radius>124.755783</sphere_radius>
+            </m_bounding_box>
+        </array_item>
+    </m_lod_array>
+</nexus_archive_root>

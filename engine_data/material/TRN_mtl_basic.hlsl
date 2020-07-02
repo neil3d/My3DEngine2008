@@ -1,8 +1,10 @@
 #define NEXUS_MATERIAL
+#define MTL_TWO_SIDED
 #define MTL_LIGHT 1
 #define MTL_NUM_TEXCOORD 1
 
 #define MTL_NEED_VERT_NORMAL
+#define VERTEX_LIGHTING
 
 texture g_texDiffuse:MTL_DiffuseMap;
 

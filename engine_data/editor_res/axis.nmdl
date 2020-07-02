@@ -1,0 +1,154 @@
+<?xml version="1.0" ?>
+<nexus_archive_root>
+    <m_bounding_box class_name="box_sphere_bounds">
+        <origin class_name="vector3">
+            <x>0</x>
+            <y>0</y>
+            <z>60</z>
+        </origin>
+        <box_extent class_name="vector3">
+            <x>3</x>
+            <y>3</y>
+            <z>60</z>
+        </box_extent>
+        <sphere_radius>60.1498146</sphere_radius>
+    </m_bounding_box>
+    <m_trans_flag>1</m_trans_flag>
+    <m_lod_array array_size="1">
+        <array_item class_name="nstatic_mesh_lod">
+            <m_vert_data class_name="nmesh_vertex_data_common">
+                <m_pos_stream class_name="vertex_stream">
+                    <m_data>AAAAAAAAAAAAAAAACp0fPyQmSD8AAAAAAACAPwAAAAAAAAAAjNxjvuKUeT8AAAAACp0fPyQmSD8AAAAA6KVmvwsm3j4AAAAA6KVmvwsm3r4AAAAAjNxjvuKUeb8AAAAACp0fPyQmSL8AAAAACp0fPyQmSD8AAMhCAACAPwAAAAAAAMhCCp0fPyQmSD8AAAAAjNxjvuKUeT8AAMhCCp0fPyQmSD8AAMhCCp0fPyQmSD8AAAAA6KVmvwsm3j4AAMhC6KVmvwsm3r4AAMhCjNxjvuKUeb8AAMhCCp0fPyQmSL8AAMhCAAAAAAAAAAAAAMhCCp0fPyQmSD8AAMhCAAAAAAAAAAAAAMhCtcMHQLXDB0AAAMhCAABAQAAAAAAAAMhCAAAAgAAAQEAAAMhCtcMHQLXDB0AAAMhCtcMHwLXDB0AAAMhCAABAwAAAAIAAAMhCtcMHwLnDB8AAAMhCAAAAAAAAQMAAAMhCtcMHQLnDB8AAAMhCIjnZPyI52T8AANBCmpkZQAAAAAAAANBCtcMHQLXDB0AAAMhCAAAAgJqZGUAAANBCIjnZPyI52T8AANBCtcMHQLXDB0AAAMhCIjnZvyI52T8AANBCmpkZwAAAAIAAANBCIjnZvyo52b8AANBCAAAAAJqZGcAAANBCIjnZPyo52b8AANBC2eqiP9nqoj8AANhCZmbmPwAAAAAAANhCIjnZPyI52T8AANBCAAAAgGZm5j8AANhC2eqiP9nqoj8AANhCIjnZPyI52T8AANBC2eqiv9nqoj8AANhCZmbmvwAAAIAAANhC2eqiv9nqor8AANhCAAAAAGZm5r8AANhC2eqiP9nqor8AANhCIjlZPyI5WT8AAOBCmpmZPwAAAAAAAOBC2eqiP9nqoj8AANhCAAAAgJqZmT8AAOBCIjlZPyI5WT8AAOBC2eqiP9nqoj8AANhCIjlZvyI5WT8AAOBCmpmZvwAAAIAAAOBCIjlZvyI5Wb8AAOBCAAAAAJqZmb8AAOBCIjlZPyI5Wb8AAOBCIjnZPiI52T4AAOhCmpkZPwAAAAAAAOhCIjlZPyI5WT8AAOBCAAAAgJqZGT8AAOhCIjnZPiI52T4AAOhCIjlZPyI5WT8AAOBCIjnZviI52T4AAOhCmpkZvwAAAIAAAOhCIjnZviI52b4AAOhCAAAAAJqZGb8AAOhCIjnZPiI52b4AAOhCAAAAAAAAAAAAAPBCAAAAAAAAAAAAAPBCAAAAAAAAAAAAAPBCIjnZPiI52T4AAOhCAAAAAAAAAAAAAPBCAAAAAAAAAAAAAPBCAAAAAAAAAAAAAPBCAAAAAAAAAAAAAPBCAAAAAAAAAAAAAPBCAAAAAAAAAAAAAPBC</m_data>
+                    <m_data_size>1020</m_data_size>
+                    <m_element_array array_size="1">
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>0</stream_index>
+                            <offset>0</offset>
+                            <type>2</type>
+                            <usage>1</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                    </m_element_array>
+                    <m_vert_size>12</m_vert_size>
+                </m_pos_stream>
+                <m_macro_array array_size="2">
+                    <array_item class_name="shader_define">
+                        <name>VERT_NUM_NORMAL</name>
+                        <value>2</value>
+                    </array_item>
+                    <array_item class_name="shader_define">
+                        <name>VERT_NUM_TEXCOORD</name>
+                        <value>1</value>
+                    </array_item>
+                </m_macro_array>
+                <m_num_normal>2</m_num_normal>
+                <m_num_uv>1</m_num_uv>
+                <m_second_stream class_name="vertex_stream">
+                    <m_data>AAAAAAAAAAAAAIC/AADA/wAAwP8AAMD/AAAAPwAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAAABHkmQ/AACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAAAAQD8AAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAA2EgSPQAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAAADKbdu9AACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAFHbNj4AAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAWJKkPgAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAAADltu0+AACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAALltGz8AAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAR5JkPwAAAAAAAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAEA/AAAAAAAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAMpt270AAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAA2EgSPQAAAAAAAAAAAACAPwAAAAAAAIA/AAAAAAAAAADKbdu9AAAAAAAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAMpt270AAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAUds2PgAAAAAAAAAAAACAPwAAAAAAAIA/AAAAAAAAAABYkqQ+AAAAAAAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAOW27T4AAAAAAAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAuW0bPwAAAAAAAAAAAAAAAAAAgD8AAMD/AADA/wAAwP8AAAA/AAAAAAAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAMpt270AAAAAAAAAAAAAAAAAAIC/AADA/wAAwP8AAMD/AAAAPwAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAGA/AACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAAAAQD8AAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAAC+AACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAAAAAD4AAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAAACAPgAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAMA+AACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAAAAAD8AAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAAAAgPwAAgD9HBDM/RwQzP3HmFz5vpjS/b1s1P0dRVbwAAGA/zcxMP+kqfT8AAACAceYXPlKsKrpg/38/AjmOOwAAQD/NzEw/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAAAAAvgAAgD8AAACA6Sp9P3HmFz5S+n+/ef3/OkxRVbwAAAAAzcxMP0cEMz9HBDM/ceYXPm+mNL9vWzU/R1FVvAAAAL7NzEw/AAAAAAAAgD8AAAAAAACAPwAAAAAAAAAAAAAAvgAAgD9HBDO/RwQzP3HmFz5vWzW/b6Y0v0dRVbwAAAA+zcxMP+kqfb8AAACAceYXPnv9/7pS+n+/SlFVvAAAgD7NzEw/RwQzv0cEM79x5hc+cKY0P3BbNb9QUVW8AADAPs3MTD8AAAAA6Sp9v3HmFz5S+n8/OP3/ujJRVbwAAAA/zcxMP0cEMz9HBDO/ceYXPnBbNT9wpjQ/XlFVvAAAID/NzEw/RwQzP0cEMz9x5hc+cJs0v4tkNT+2A228AABgP5qZGT/pKn0/AAAAgHHmFz6VkOO5uP9/P5OhPTsAAEA/mpkZP0cEMz9HBDM/ceYXPm+mNL9vWzU/R1FVvAAAAL7NzEw/AAAAgOkqfT9x5hc+/fh/v8U2DjvEA228AAAAAJqZGT9HBDM/RwQzP3HmFz5wmzS/i2Q1P7YDbbwAAAC+mpkZP0cEMz9HBDM/ceYXPm+mNL9vWzU/R1FVvAAAAL7NzEw/RwQzv0cEMz9x5hc+i2Q1v3CbNL+2A228AAAAPpqZGT/pKn2/AAAAgHHmFz7FNg67/fh/v8QDbbwAAIA+mpkZP0cEM79HBDO/ceYXPnGbND+LZDW/zwNtvAAAwD6amRk/AAAAgOkqfb9x5hc+/fh/P6U2DruzA228AAAAP5qZGT9HBDM/RwQzv3HmFz6KZDU/cZs0P8YDbbwAACA/mpkZP0cEMz9HBDM/ceYXPieFNL94djU/uDOOvAAAYD/MzMw+6Sp9PwAAAIBx5hc+AAAAAAAAgD8AAAAAAABAP8zMzD5HBDM/RwQzP3HmFz5wmzS/i2Q1P7YDbbwAAAC+mpkZPwAAAIDpKn0/ceYXPuj1f7/zpSo7vjOOvAAAAADMzMw+RwQzP0cEMz9x5hc+J4U0v3h2NT+4M468AAAAvszMzD5HBDM/RwQzP3HmFz5wmzS/i2Q1P7YDbbwAAAC+mpkZP0cEM79HBDM/ceYXPnh2Nb8nhTS/uDOOvAAAAD7MzMw+6Sp9vwAAAIBx5hc+86Uqu+j1f7++M468AACAPszMzD5HBDO/RwQzv3HmFz4nhTQ/eHY1v7gzjrwAAMA+zMzMPgAAAADpKn2/ceYXPuj1fz/zpSq7vjOOvAAAAD/MzMw+RwQzP0cEM79x5hc+eHY1PyeFND+4M468AAAgP8zMzD4aM0E/VaMjP65kFz7ANyW/mYlDP6POArwAAGA/zMxMPoNSfD+wOae9rmQXPpCDqz2uF38/3s4CvAAAQD/MzEw+RwQzP0cEMz9x5hc+J4U0v3h2NT+4M468AAAAvszMzD6wOac9g1J8P65kFz6uF3+/kIOrPd7OArwAAAAAzMxMPhozQT9VoyM/rmQXPsA3Jb+ZiUM/o84CvAAAAL7MzEw+RwQzP0cEMz9x5hc+J4U0v3h2NT+4M468AAAAvszMzD5VoyO/GjNBP65kFz6ZiUO/wDclv6POArwAAAA+zMxMPoNSfL+wOac9rmQXPpCDq72uF3+/3s4CvAAAgD7MzEw+GjNBv2ajI7+uZBc+yzclP5CJQ78pzwK8AADAPszMTD6wOae9g1J8v65kFz6uF38/kIOrvd7OArwAAAA/zMxMPlWjIz8aM0G/rmQXPpmJQz/ANyU/o84CvAAAID/MzEw+OUZqP0kUwj6CkAw+AADA/wAAwP8AAMD/AAAAPwAAAAA5Rmo/SRTCvoKQDD4AAMD/AADA/wAAwP8AAAA/AAAAAEkUwj45Rmo/gpAMPncpV71B3AG+p5N9PwAAAD8AAAAAGjNBP1WjIz+uZBc+wDclv5mJQz+jzgK8AAAAvszMTD5JFMK+OUZqP4KQDD6vfGi/nvHKvrfwCT4AAAA/AAAAADlGar9JFMI+gpAMPhjvw75eg2y/gpAMsgAAAD8AAAAAOUZqv0kUwr6CkAw+kki5PgclbL+/8Am+AAAAPwAAAABJFMK+OUZqv4KQDD53KVe9QdwBvqeTfb8AAAA/AAAAAEkUwj45Rmq/gpAMPq98aL+e8cq+t/AJvgAAAD8AAAAAAACAPwAAAAAAAAAAAADA/wAAwP8AAMD/AAAAPwAAAAA=</m_data>
+                    <m_data_size>2720</m_data_size>
+                    <m_element_array array_size="3">
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>0</offset>
+                            <type>2</type>
+                            <usage>2</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>12</offset>
+                            <type>2</type>
+                            <usage>3</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                        <array_item class_name="vertex_element_define">
+                            <stream_index>1</stream_index>
+                            <offset>24</offset>
+                            <type>1</type>
+                            <usage>4</usage>
+                            <usage_index>0</usage_index>
+                        </array_item>
+                    </m_element_array>
+                    <m_vert_size>32</m_vert_size>
+                </m_second_stream>
+            </m_vert_data>
+            <m_secton_array array_size="2">
+                <array_item class_name="nmesh_section">
+                    <index_buffer>AAABAAIAAAADAAQAAAAFAAMAAAAGAAUAAAAHAAYAAAAIAAcAAAACAAgAAgAJAAoAAgABAAkACwAMAA0ADgADAAwAAwAPAAwAAwAFAA8ABQAQAA8ABQAGABAABgARABAABgAHABEABwASABEABwAIABIACAAKABIACAACAAoAEwAKAAkAEwAUAAwAEwAMAA8AEwAPABAAEwAQABEAEwARABIAEwASAAoA</index_buffer>
+                    <m_material_id>0</m_material_id>
+                    <m_primitive_type>4</m_primitive_type>
+                    <m_base_vertex_index>0</m_base_vertex_index>
+                </array_item>
+                <array_item class_name="nmesh_section">
+                    <index_buffer>FQAWABcAFQAYABkAFQAaABgAFQAbABoAFQAcABsAFQAdABwAFQAeAB0AFQAXAB4AFwAfACAAFwAWAB8AIQAiACMAJAAYACIAGAAlACIAGAAaACUAGgAmACUAGgAbACYAGwAnACYAGwAcACcAHAAoACcAHAAdACgAHQApACgAHQAeACkAHgAgACkAHgAXACAAIAAqACsAIAAfACoALAAtAC4ALwAiAC0AIgAwAC0AIgAlADAAJQAxADAAJQAmADEAJgAyADEAJgAnADIAJwAzADIAJwAoADMAKAA0ADMAKAApADQAKQArADQAKQAgACsAKwA1ADYAKwAqADUANwA4ADkAOgAtADgALQA7ADgALQAwADsAMAA8ADsAMAAxADwAMQA9ADwAMQAyAD0AMgA+AD0AMgAzAD4AMwA/AD4AMwA0AD8ANAA2AD8ANAArADYANgBAAEEANgA1AEAAQgBDAEQARQA4AEMAOABGAEMAOAA7AEYAOwBHAEYAOwA8AEcAPABIAEcAPAA9AEgAPQBJAEgAPQA+AEkAPgBKAEkAPgA/AEoAPwBBAEoAPwA2AEEAQQBLAEwAQQBAAEsAQABNAEsATgBDAE0AQwBPAE0AQwBGAE8ARgBQAE8ARgBHAFAARwBRAFAARwBIAFEASABSAFEASABJAFIASQBTAFIASQBKAFMASgBMAFMASgBBAEwAVABMAEsAVABLAE0AVABNAE8AVABPAFAAVABQAFEAVABRAFIAVABSAFMAVABTAEwA</index_buffer>
+                    <m_material_id>1</m_material_id>
+                    <m_primitive_type>4</m_primitive_type>
+                    <m_base_vertex_index>0</m_base_vertex_index>
+                </array_item>
+            </m_secton_array>
+            <m_mtl_array array_size="2">
+                <array_item class_name="nmaterial">
+                    <m_name>Mtl_L0S0</m_name>
+                    <template_loc class_name="resource_location">
+                        <pkg_name>engine_data</pkg_name>
+                        <file_name>/material/ENG_ConstColor.hlsl</file_name>
+                    </template_loc>
+                    <m_parameter_array array_size="1">
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_DiffuseColor</name>
+                            <type>4</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>1</x>
+                                <y>1</y>
+                                <z>1</z>
+                                <w>1</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name></pkg_name>
+                                <file_name></file_name>
+                            </tex_loc>
+                        </array_item>
+                    </m_parameter_array>
+                </array_item>
+                <array_item class_name="nmaterial">
+                    <m_name>Mtl_L0S1</m_name>
+                    <template_loc class_name="resource_location">
+                        <pkg_name>engine_data</pkg_name>
+                        <file_name>/material/ENG_ConstColor.hlsl</file_name>
+                    </template_loc>
+                    <m_parameter_array array_size="1">
+                        <array_item class_name="material_parameter_value">
+                            <name>MTL_DiffuseColor</name>
+                            <type>4</type>
+                            <int_value>0</int_value>
+                            <vec_value class_name="vector4">
+                                <x>0</x>
+                                <y>0</y>
+                                <z>0</z>
+                                <w>0</w>
+                            </vec_value>
+                            <tex_loc class_name="resource_location">
+                                <pkg_name></pkg_name>
+                                <file_name></file_name>
+                            </tex_loc>
+                        </array_item>
+                    </m_parameter_array>
+                </array_item>
+            </m_mtl_array>
+            <m_bounding_box class_name="box_sphere_bounds">
+                <origin class_name="vector3">
+                    <x>0</x>
+                    <y>0</y>
+                    <z>60</z>
+                </origin>
+                <box_extent class_name="vector3">
+                    <x>3</x>
+                    <y>3</y>
+                    <z>60</z>
+                </box_extent>
+                <sphere_radius>60.1498146</sphere_radius>
+            </m_bounding_box>
+        </array_item>
+    </m_lod_array>
+</nexus_archive_root>
