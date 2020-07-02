@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<nexus_archive_root>
+    <a>99</a>
+    <vec_a array_size="2">
+        <array_item>123</array_item>
+        <array_item>345</array_item>
+    </vec_a>
+    <obj class_name="nobject">
+        <m_d>123.455</m_d>
+    </obj>
+    <f>99.9000015</f>
+    <v2 class_name="vector2">
+        <x>88</x>
+        <y>99</y>
+    </v2>
+    <vv array_size="2">
+        <array_item class_name="vector2">
+            <x>1</x>
+            <y>2</y>
+        </array_item>
+        <array_item class_name="vector2">
+            <x>3</x>
+            <y>4</y>
+        </array_item>
+    </vv>
+    <m class_name="matrix44">
+        <_11>11</_11>
+        <_12>0</_12>
+        <_13>13</_13>
+        <_14>0</_14>
+        <_21>0</_21>
+        <_22>0</_22>
+        <_23>0</_23>
+        <_24>0</_24>
+        <_31>0</_31>
+        <_32>0</_32>
+        <_33>0</_33>
+        <_34>0</_34>
+        <_41>0</_41>
+        <_42>0</_42>
+        <_43>0</_43>
+        <_44>0</_44>
+    </m>
+</nexus_archive_root>

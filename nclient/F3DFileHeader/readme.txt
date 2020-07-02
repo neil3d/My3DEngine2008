@@ -1,0 +1,2 @@
+F3D所使用的static mesh，顶点关键帧动画mesh，骨骼动画及mesh，这些的文件格式；
+为max插件好nresource_importer所共用；

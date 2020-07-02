@@ -1,0 +1,20 @@
+del *.exp /s
+del *.ilk /s
+del *.lib /s
+del *.pdb /s
+del *.pyd /s
+del buildlog.htm /s
+del *.obj /s
+del *.pch /s
+del *.idb /s
+del *.ncb /s
+del *.manifest.res /s
+del *.manifest /s
+del *.dep /s
+del *.exe /s
+del *.dll /s
+del *.nex /s
+del *.bak /s
+del *.log /s
+del *.user /s
+

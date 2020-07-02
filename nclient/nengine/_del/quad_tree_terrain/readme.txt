@@ -1,0 +1,1 @@
+使用标准的quad tree实现的连续LOD的地形系统，算法十分优雅，LOD效果也很理想--但是每帧都需要update triangluation，速度很慢。
